@@ -1,0 +1,6 @@
+@FloristAIBot_HostAddress = http://localhost:5091
+
+GET {{FloristAIBot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
