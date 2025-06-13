@@ -5,6 +5,7 @@ namespace FloristAI.Core.Entities.Items
     /// <summary>
     /// Модель корзинки
     /// </summary>
+    /// 
     public class Basket
     {
         /// <summary>
