@@ -30,7 +30,7 @@ namespace FloristAI.Core.Entities.Items
         /// <summary>
         /// Размер цветка (например, в сантиметрах).
         /// </summary>
-        public int Size { get; set; } = 0;
+        public int? Size { get; set; } 
 
         /// <summary>
         /// Порядковый номер цветка для отображения.
