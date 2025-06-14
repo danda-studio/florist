@@ -16,12 +16,12 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Список ролей, назначенных пользователю.
         /// </summary>
-        public List<UserRole> Role { get; set; } = new List<UserRole>();
+        public List<UserRole> Roles { get; set; } = new List<UserRole>();
 
         /// <summary>
         /// Информация о пользователе, связанная с Telegram.
         /// </summary>
-        public UserTgData TgInfo { get; set; }
+        public UserTgData TgData { get; set; }
 
         /// <summary>
         /// Информация о партнёре, если пользователь является партнёром.

@@ -15,7 +15,7 @@ namespace FloristAI.Core.Entities.Referrals
         /// <summary>
         /// Идентификатор пользователя, приглашённого партнёром.
         /// </summary>
-        public int UserId { get; set; }
+        public int ReferalId { get; set; }
 
         /// <summary>
         /// Реферальная запись, связанная с данной связью партнёр–пользователь.

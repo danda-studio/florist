@@ -16,13 +16,16 @@ namespace FloristAI.Core.Entities.Referrals
         /// <summary>
         /// Идентификатор пользователя, связанного с рефералом.
         /// </summary>
-        public int UserId { get; set; }
+        public int ReferalId { get; set; }
 
         /// <summary>
         /// Cвязь между партнёром и пользователем в рамках реферальной программы
         /// </summary>
         public PartnerReferal PartnerReferal { get; set; } = new PartnerReferal();
 
+        /// <summary>
+        /// Пользователь, которому принадлежит статус реферала.
+        /// </summary>
         public User User { get; set; }
     }
 }
