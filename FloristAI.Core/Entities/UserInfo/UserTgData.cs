@@ -25,6 +25,12 @@
         /// </summary>
         public string Phone { get; set; } = string.Empty;
 
+
+        /// <summary>
+        /// Язык интерфейса пользователя, связанный с Telegram-аккаунтом.
+        /// </summary>
+        public string LanguageCode { get; set; } = "ru";
+
         /// <summary>
         /// Пользователь, к которому относятся данные Telegram.
         /// </summary>
