@@ -1,25 +1,25 @@
-var builder = WebApplication.CreateBuilder(args);
+using Adapter;
+using FloristAI.Application;
+using FloristAI.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
 
-// Add services to the container.
+var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<PostgresDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("FloristAI.Infrastructure")));
 
-var app = builder.Build();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+builder.Services.AddSingleton<ITelegramBotClient>(provider =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var token = builder.Configuration["Telegram:Token"];
+    return new TelegramBotClient(token);
+});
 
-app.UseHttpsRedirection();
+builder.Services.AddScoped<IMessageAdapter, LangTelegramAdapter>();
 
-app.UseAuthorization();
+//builder.Services.AddHostedService<BotWorker>();
 
-app.MapControllers();
-
-app.Run();
+await builder.Build().RunAsync();
