@@ -10,8 +10,16 @@ var builder = Host.CreateApplicationBuilder(args);
 /// <summary>
 /// Регистрирует контекст базы данных PostgreSQL с миграциями в сборке FloristAI.Infrastructure.
 /// </summary>
+var host = Environment.GetEnvironmentVariable("Host");
+var port = Environment.GetEnvironmentVariable("Port");
+var database = Environment.GetEnvironmentVariable("Database");
+var username = Environment.GetEnvironmentVariable("Username");
+var password = Environment.GetEnvironmentVariable("Password");
+
+var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
 builder.Services.AddDbContext<PostgresDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
+    options.UseNpgsql(connectionString,
         b => b.MigrationsAssembly("FloristAI.Infrastructure")));
 
 /// <summary>
@@ -31,7 +39,7 @@ builder.Services.AddScoped<AdapterRouter>();
 /// </summary>
 builder.Services.AddSingleton<ITelegramBotClient>(provider =>
 {
-    var token = builder.Configuration["Telegram:Token"];
+    var token = Environment.GetEnvironmentVariable("Bot_token");
     return new TelegramBotClient(token);
 });
 
