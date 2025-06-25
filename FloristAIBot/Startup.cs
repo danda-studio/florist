@@ -1,5 +1,5 @@
-﻿using Adapter;
-using FloristAI.Application;
+﻿using FloristAI.Adapter.Adapter;
+using FloristAI.Application.Language;
 using FloristAI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Router;
@@ -35,6 +35,7 @@ namespace FloristAIBot
             services.AddHostedService<BotWorker>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IMessageAdapter, LangTelegramAdapter>();
+            services.AddScoped<IMessageAdapter, RoleTelegramAdapter>();
             services.AddScoped<AdapterRouter>();
 
             var token = Environment.GetEnvironmentVariable("Bot_token");

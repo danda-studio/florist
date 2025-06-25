@@ -21,6 +21,6 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Пользователь, связанный с данной ролью.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }

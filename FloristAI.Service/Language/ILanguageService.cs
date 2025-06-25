@@ -1,11 +1,11 @@
-﻿using FloristAI.Application.Models.Response;
+﻿using FloristAI.Application.Language.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Application
+namespace FloristAI.Application.Language
 {
     /// <summary>
     /// Интерфейс сервиса языков
@@ -16,6 +16,6 @@ namespace FloristAI.Application
         /// Метод для получения списка языков
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Language>> GetLanguageList();
+        public Task<IEnumerable<LanguageModel>> GetLanguageList();
     }
 }

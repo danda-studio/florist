@@ -20,12 +20,12 @@ namespace FloristAI.Core.Entities.Items
         /// <summary>
         /// Название цветка.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; } 
 
         /// <summary>
         /// Цвет цветка.
         /// </summary>
-        public string Color { get; set; }
+        public string? Color { get; set; } 
 
         /// <summary>
         /// Размер цветка (например, в сантиметрах).

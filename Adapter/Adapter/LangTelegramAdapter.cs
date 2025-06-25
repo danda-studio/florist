@@ -1,13 +1,13 @@
-﻿using Adapter.Models;
-using FloristAI.Application;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FloristAI.Adapter.Adapter.Models;
+using FloristAI.Application.Language;
 
-namespace Adapter
+namespace FloristAI.Adapter.Adapter
 {
     /// <summary>
     /// Адаптер обработки команды выбора языка интерфейса Telegram-бота.
