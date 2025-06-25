@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Application.Models.Response
+namespace FloristAI.Application.Language.Models
 {
     /// <summary>
     /// Модель язык интерфейса
     /// </summary>
-    public class Language
+    public class LanguageModel
     {
         /// <summary>
         /// Идентификатор

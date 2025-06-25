@@ -1,33 +1,40 @@
-﻿using FloristAI.Application.Models.Response;
+﻿using FloristAI.Application.Language.Models;
 using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Application
+namespace FloristAI.Application.Language
 {
     /// <summary>
     /// Сервис язык интерфейса
     /// </summary>
     public class LanguageService : ILanguageService
     {
+        private readonly IUserRepository _userRepository;
+        public LanguageService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
+
         /// <summary>
         /// Метод для получения языков
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Language>> GetLanguageList ()
+        public async Task<IEnumerable<LanguageModel>> GetLanguageList ()
         {
             var languages = Enum.GetValues(typeof(LanguageType))
                 .Cast<LanguageType>()
-                .Select(lang => new Language
+                .Select(lang => new LanguageModel
                 {
                     Id = (int)lang,
                     Name = GetLanguageName(lang),
                     Code = GetLanguageCode(lang)
                 });
-            return Task.FromResult(languages);
+            return await Task.FromResult(languages);
         }
 
         /// <summary>

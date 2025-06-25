@@ -1,5 +1,5 @@
-﻿using Adapter;
-using Adapter.Models;
+﻿using FloristAI.Adapter.Adapter;
+using FloristAI.Adapter.Adapter.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,37 +24,46 @@ namespace Router
         /// <param name="adapters">Коллекция доступных адаптеров, реализующих интерфейс <see cref="IMessageAdapter"/>.</param>
         public AdapterRouter(IEnumerable<IMessageAdapter> adapters)
         {
-            _adapters = adapters.ToDictionary(a => a.RouteKey); // "start" => StartAdapter
+            _adapters = adapters.ToDictionary(a => a.RouteKey); 
         }
 
-        /// <summary>
-        /// Обрабатывает входящее сообщение и перенаправляет его соответствующему адаптеру.
-        /// </summary>
-        /// <param name="message">Входящее сообщение от пользователя.</param>
-        /// <param name="chatId">Идентификатор чата Telegram.</param>
-        /// <returns>Результат обработки сообщения в виде объекта <see cref="MessageResult"/>.</returns>
         public async Task<MessageResult> RouteAsync(string message, long chatId)
         {
-            string command = ExtractCommand(message); // "/start" -> "start"
+            if (string.IsNullOrWhiteSpace(message))
+                return new MessageResult { Text = "Неизвестная команда" };
 
+            if (message.Contains(":"))
+                return await RouteCallbackAsync(message, chatId);
+            else
+                return await RouteCommandAsync(message, chatId);
+        }
+
+        private async Task<MessageResult> RouteCommandAsync(string message, long chatId)
+        {
+            var command = ExtractCommand(message); // уберёт "/" 
             if (_adapters.TryGetValue(command, out var adapter))
-            {
                 return await adapter.ProcessMessage(message, chatId);
-            }
 
             return new MessageResult { Text = "Неизвестная команда" };
         }
 
-        /// <summary>
-        /// Извлекает команду из текстового сообщения.
-        /// </summary>
-        /// <param name="message">Исходное сообщение, содержащее команду.</param>
-        /// <returns>Имя команды без префикса '/'. Если сообщение пустое — возвращает пустую строку.</returns>
+        private async Task<MessageResult> RouteCallbackAsync(string callbackData, long chatId)
+        {
+            var parts = callbackData.Split(':', 2);
+            var route = parts[0];
+            var parameter = parts.Length > 1 ? parts[1] : "";
+
+            if (_adapters.TryGetValue(route, out var adapter))
+                return await adapter.ProcessMessage(parameter, chatId);
+
+            return new MessageResult { Text = "Неизвестный callback" };
+        }
+
         private static string ExtractCommand(string message)
         {
-            if (string.IsNullOrWhiteSpace(message)) return "";
-
-            return message.Split(' ')[0].TrimStart('/').ToLower();
+            return message.Split(' ')[0]
+                          .TrimStart('/')
+                          .ToLowerInvariant();
         }
     }
 }
