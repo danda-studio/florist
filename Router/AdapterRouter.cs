@@ -24,8 +24,10 @@ namespace Router
         /// <param name="adapters">Коллекция доступных адаптеров, реализующих интерфейс <see cref="IMessageAdapter"/>.</param>
         public AdapterRouter(IEnumerable<IMessageAdapter> adapters)
         {
-            _adapters = adapters.ToDictionary(a => a.RouteKey); 
+            _adapters = adapters.ToDictionary(a => a.RouteKey);
+            Console.WriteLine($"Зарегистрированные ключи: {string.Join(", ", _adapters.Keys)}"); 
         }
+
 
         public async Task<MessageResult> RouteAsync(string message, long chatId)
         {
@@ -49,6 +51,7 @@ namespace Router
 
         private async Task<MessageResult> RouteCallbackAsync(string callbackData, long chatId)
         {
+            Console.WriteLine($"Пришел callback: {callbackData}");
             var parts = callbackData.Split(':', 2);
             var route = parts[0];
             var parameter = parts.Length > 1 ? parts[1] : "";
