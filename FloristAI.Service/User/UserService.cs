@@ -32,21 +32,22 @@ namespace FloristAI.Application.User
 
         public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId)
         {
-            // 1. Получаем пользователя за один запрос
-            var user = await _userRepository.GetUserWithRolesByChatId(chatId)
-                       ?? await _userRepository.CreateUserWithChatData(chatId);
+            var userId = GetOrCreateUser(chatId);
+            var roles = await _userRepository.GetRoles(userId.Id);
 
-            // 2. Преобразуем роли
-            var roles = user.Roles.Select(r => new UserRole
-            {
-                RoleType = r.RoleType
-            }).ToList();
+            var response = roles
+                .Select(r => new UserRole
+                { 
+                    RoleType = r.Role
+                })
+                .ToList();
 
             return new GetRolesResponse
             {
-                UserId = user.Id,
-                Roles = roles
+                UserId = userId.Id,
+                Roles = response
             };
+
         }
     }
 }
