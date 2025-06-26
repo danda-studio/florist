@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter.Adapter;
 using FloristAI.Application.Language;
+using FloristAI.Application.User;
 using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
@@ -49,6 +50,7 @@ namespace FloristAIBot
             services.AddHostedService<BotWorker>();
             services.AddScoped<AdapterRouter>();
             services.AddScoped<ILanguageService, LanguageService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMessageAdapter, LangTelegramAdapter>();
             services.AddScoped<IMessageAdapter, RoleTelegramAdapter>();
             services.AddScoped<IUserRepository, UserRepository>();
