@@ -1,5 +1,4 @@
-﻿using Adapter;
-using Adapter.Models;
+﻿
 using Microsoft.Extensions.Hosting;
 using Router;
 using System;

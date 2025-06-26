@@ -1,4 +1,5 @@
-﻿using FloristAI.Core.Entities.UserInfo;
+﻿using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,9 +26,31 @@ namespace FloristAI.Infrastructure.Persistence
                            .ToListAsync();
         }
 
-        public async Task<User> AddUser ()
+        public async Task<User?> GetUserByChatId(long chatId)
         {
+            return await _dbContext.Users
+                .Include(u => u.TgData)
+                .FirstOrDefaultAsync(u => u.TgData != null && u.TgData.TelegramId == chatId);
 
         }
+
+
+        public async Task<User> CreateUserWithChatData(long chatId)
+        {
+            var user = new User
+            {
+                LanguageCode = "ru", 
+                TgData = new UserTgData
+                {
+                    TelegramId = chatId
+                }
+            };
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
+            return user;
+        }
+
+
+
     }
 }

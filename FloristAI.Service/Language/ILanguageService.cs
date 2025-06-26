@@ -16,6 +16,6 @@ namespace FloristAI.Application.Language
         /// Метод для получения списка языков
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<LanguageModel>> GetLanguageList();
+        public Task<IEnumerable<LanguageModel>> GetLanguageList(long chatId);
     }
 }

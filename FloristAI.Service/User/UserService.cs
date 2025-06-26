@@ -1,4 +1,5 @@
 ﻿using FloristAI.Application.User.Models;
+using FloristAI.Application.User.Models.Response;
 using FloristAI.Core.Store;
 using System;
 using System.Collections.Generic;
@@ -17,23 +18,35 @@ namespace FloristAI.Application.User
         }
 
 
-        public async Task<GetRolesResponse> GetRoles(int Id)
+        public async Task<GetOrCreateUserResponse> GetOrCreateUser(long chatId)
         {
-            var roles = await _userRepository.GetRoles(Id);
+            var user = await _userRepository.GetUserByChatId(chatId);
+            var entity = user ?? await _userRepository.CreateUserWithChatData(chatId);
 
-            var response = roles
-                .Select(r => new UserRole
-                { 
-                    RoleType = r.Role
-                })
-                .ToList();
+            return new GetOrCreateUserResponse
+            {
+                Id = entity.Id,
+                LanguageCode = entity.LanguageCode
+            };
+        }
+
+        public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId)
+        {
+            // 1. Получаем пользователя за один запрос
+            var user = await _userRepository.GetUserWithRolesByChatId(chatId)
+                       ?? await _userRepository.CreateUserWithChatData(chatId);
+
+            // 2. Преобразуем роли
+            var roles = user.Roles.Select(r => new UserRole
+            {
+                RoleType = r.RoleType
+            }).ToList();
 
             return new GetRolesResponse
             {
-                UserId = Id,
-                Roles = response
+                UserId = user.Id,
+                Roles = roles
             };
-
         }
     }
 }

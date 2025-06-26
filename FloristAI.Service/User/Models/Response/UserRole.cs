@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Application.User.Models
+namespace FloristAI.Application.User.Models.Response
 {
     public class UserRole
     {
