@@ -44,7 +44,8 @@ namespace FloristAIBot
             }
 
             services.AddDbContext<PostgresDbContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString,
+                    b => b.MigrationsAssembly("FloristAI.Migrations")));
 
             // Telegram-бот и бизнес-логика
             services.AddHostedService<BotWorker>();
