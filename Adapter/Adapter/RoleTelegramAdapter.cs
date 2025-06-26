@@ -22,7 +22,8 @@ namespace FloristAI.Adapter.Adapter
 
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
-            var role = await _userService.GetRoles(chatId);
+
+            var role = await _userService.GetRolesByTelegramId(chatId);
             // parameter = "ru" или "ro"
             // например, сохраняем в DB выбранный язык
             return new MessageResult

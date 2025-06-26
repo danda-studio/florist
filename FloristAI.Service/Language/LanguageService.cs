@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace FloristAI.Application.Language
 {
@@ -24,8 +25,9 @@ namespace FloristAI.Application.Language
         /// Метод для получения языков
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<LanguageModel>> GetLanguageList ()
+        public async Task<IEnumerable<LanguageModel>> GetLanguageList(long chatId)
         {
+
             var languages = Enum.GetValues(typeof(LanguageType))
                 .Cast<LanguageType>()
                 .Select(lang => new LanguageModel

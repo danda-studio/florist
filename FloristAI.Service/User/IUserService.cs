@@ -1,4 +1,4 @@
-﻿using FloristAI.Application.User.Models;
+﻿using FloristAI.Application.User.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,8 @@ namespace FloristAI.Application.User
 {
     public interface IUserService
     {
-        public Task<GetRolesResponse> GetRoles(int Id);
+        public Task<GetRolesResponse> GetRolesByTelegramId(long chatId);
+
+        public Task<GetOrCreateUserResponse> GetOrCreateUser(long chatId);
     }
 }

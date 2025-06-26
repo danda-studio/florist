@@ -43,7 +43,8 @@ namespace FloristAI.Adapter.Adapter
         /// </returns>
         public async Task<MessageResult> ProcessMessage(string message, long chatId)
         {
-            var language = await _languageService.GetLanguageList();
+
+            var language = await _languageService.GetLanguageList(chatId);
 
             var keyboard = new InlineKeyboardMarkup(
                 language.Select(lang =>
