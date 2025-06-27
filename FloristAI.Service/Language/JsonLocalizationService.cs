@@ -1,39 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace FloristAI.Application.Language
 {
     public class JsonLocalizationService : ILocalizationService
     {
         private readonly Dictionary<string, Dictionary<string, string>> _locales;
+        private readonly string _localizationFolder;
 
-        public JsonLocalizationService()
+        public JsonLocalizationService(IHostEnvironment env, ILogger<JsonLocalizationService> logger)
         {
+            _localizationFolder = Path.Combine(env.ContentRootPath, "..", "FloristAI.Infrastructure", "Localization");
             _locales = new Dictionary<string, Dictionary<string, string>>();
-            LoadLocale("ru");
-            LoadLocale("ro");
+
+            // Загружаем языки с обработкой ошибок
+            TryLoadLocale(logger, "ru");
+            TryLoadLocale(logger, "ro");
+            TryLoadLocale(logger, "en"); // Английский как fallback
         }
 
-        private void LoadLocale(string lang)
+        private bool TryLoadLocale(ILogger logger, string lang)
         {
-            var json = File.ReadAllText($"{lang}.json"); // путь к файлам с локализацией
-            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            _locales[lang] = dict ?? new Dictionary<string, string>();
+            try
+            {
+                var filePath = Path.Combine(_localizationFolder, $"{lang}.json");
+
+                if (!File.Exists(filePath))
+                {
+                    logger.LogWarning("Файл локализации не найден: {FilePath}", filePath);
+                    return false;
+                }
+
+                var json = File.ReadAllText(filePath);
+                _locales[lang] = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                                  ?? new Dictionary<string, string>();
+
+                logger.LogInformation("Успешно загружена локализация для языка {Language}", lang);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Ошибка при загрузке локализации для языка {Language}", lang);
+                return false;
+            }
         }
 
         public string GetString(string key, string languageCode)
         {
-            if (_locales.TryGetValue(languageCode, out var dict))
-            {
-                if (dict.TryGetValue(key, out var value))
-                    return value;
-            }
-            return key; 
+            // Сначала пробуем запрошенный язык
+            if (_locales.TryGetValue(languageCode, out var dict) && dict.TryGetValue(key, out var value))
+                return value;
+
+
+            // В крайнем случае возвращаем ключ
+            return key;
         }
     }
-
 }
