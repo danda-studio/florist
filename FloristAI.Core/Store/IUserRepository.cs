@@ -10,7 +10,7 @@ namespace FloristAI.Core.Store
     public interface IUserRepository
     {
         public Task<List<UserRole>> GetRoles(int Id);
-        public Task<User> CreateUserWithChatData(long chatId);
+        public Task<User> CreateUserWithChatData(long chatId, string languageCode);
         public Task<User?> GetUserByChatId(long chatId);
 
 

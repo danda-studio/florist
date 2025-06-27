@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FloristAI.Adapter.Adapter.Models;
 using FloristAI.Application.Language;
+using FloristAI.Adapter.Models;
 
-namespace FloristAI.Adapter.Adapter
+namespace FloristAI.Adapter
 {
     /// <summary>
     /// Адаптер обработки команды выбора языка интерфейса Telegram-бота.

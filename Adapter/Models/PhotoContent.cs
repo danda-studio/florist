@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Adapter.Adapter.Models
+namespace FloristAI.Adapter.Models
 {
     /// <summary>
     /// Модель фото

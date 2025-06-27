@@ -9,8 +9,8 @@ namespace FloristAI.Application.User
 {
     public interface IUserService
     {
-        public Task<GetRolesResponse> GetRolesByTelegramId(long chatId);
+        public Task<GetRolesResponse> GetRolesByTelegramId(long chatId, string languageCode);
 
-        public Task<GetOrCreateUserResponse> GetOrCreateUser(long chatId);
+        public Task<GetOrCreateUserResponse> GetOrCreateUser(long chatId, string languageCode);
     }
 }
