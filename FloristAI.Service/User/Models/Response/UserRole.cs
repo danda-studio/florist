@@ -10,5 +10,6 @@ namespace FloristAI.Application.User.Models.Response
     public class UserRole
     {
         public RoleType RoleType { get; set; } = RoleType.Client;
+        public string RoleName { get; set; } = "";
     }
 }

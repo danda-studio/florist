@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 
-namespace FloristAI.Adapter.Adapter.Models
+namespace FloristAI.Adapter.Models
 {
     /// <summary>
     /// Модель сообщения

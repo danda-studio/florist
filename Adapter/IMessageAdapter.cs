@@ -1,11 +1,11 @@
-﻿using FloristAI.Adapter.Adapter.Models;
+﻿using FloristAI.Adapter.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FloristAI.Adapter.Adapter
+namespace FloristAI.Adapter
 {
     /// <summary>
     /// Интерфейс адаптера для обработки сообщений в зависимости от команды.

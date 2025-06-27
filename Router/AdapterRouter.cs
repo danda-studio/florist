@@ -1,5 +1,5 @@
-﻿using FloristAI.Adapter.Adapter;
-using FloristAI.Adapter.Adapter.Models;
+﻿using FloristAI.Adapter;
+using FloristAI.Adapter.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

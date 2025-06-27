@@ -35,15 +35,16 @@ namespace FloristAI.Infrastructure.Persistence
         }
 
 
-        public async Task<User> CreateUserWithChatData(long chatId)
+        public async Task<User> CreateUserWithChatData(long chatId, string languageCode)
         {
             var user = new User
             {
-                LanguageCode = "ru", 
+                LanguageCode = languageCode, 
                 TgData = new UserTgData
                 {
                     TelegramId = chatId
                 }
+                
             };
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();

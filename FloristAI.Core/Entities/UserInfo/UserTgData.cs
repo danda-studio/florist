@@ -26,11 +26,6 @@
         public string? Phone { get; set; }
 
         /// <summary>
-        /// Язык интерфейса пользователя, связанный с Telegram-аккаунтом.
-        /// </summary>
-        public string? LanguageCode { get; set; } 
-
-        /// <summary>
         /// Пользователь, к которому относятся данные Telegram.
         /// </summary>
         public User? User { get; set; }
