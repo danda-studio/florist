@@ -48,11 +48,8 @@ namespace FloristAIBot
                 options.UseNpgsql(connectionString));
 
             // Telegram-бот и бизнес-логика
-            services.AddHostedService<BotWorker>(provider =>
-                 new BotWorker(
-                     provider.GetRequiredService<ITelegramBotClient>(),
-                     provider.GetRequiredService<AdapterRouter>()));
-
+            services.AddHostedService<BotWorker>();
+            services.AddScoped<AdapterRouter>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
