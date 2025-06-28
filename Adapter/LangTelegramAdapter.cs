@@ -58,7 +58,7 @@ namespace FloristAI.Adapter
 
             return new MessageResult
             {
-                Text = "Выберите язык / Selectați o limbă",
+                Text = "🌐 Выберите язык / Selectați o limbă",
                 ReplyMarkup = keyboard
             };
         }
