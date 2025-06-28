@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace FloristAI.Infrastructure
@@ -52,6 +53,9 @@ namespace FloristAI.Infrastructure
                             var message = update.Message;
                             var result = await _router.RouteAsync(message.Text, message.Chat.Id);
 
+                            // Удаляем входящее сообщение
+                            await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
+
                             await _botClient.SendMessage(
                                 chatId: message.Chat.Id,
                                 text: result.Text,
@@ -63,10 +67,16 @@ namespace FloristAI.Infrastructure
                         {
                             var callback = update.CallbackQuery;
                             var chatId = callback.Message?.Chat.Id ?? callback.From.Id;
+                            var messageId = callback.Message?.MessageId ?? 0;
 
                             string command = callback.Data ?? "";
 
                             var result = await _router.RouteAsync(command, chatId);
+
+                            if(messageId != 0)
+                            {
+                                await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                            }
 
                             await _botClient.SendMessage(
                                 chatId: chatId,
