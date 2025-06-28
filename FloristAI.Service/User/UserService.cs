@@ -35,8 +35,8 @@ namespace FloristAI.Application.User
 
         public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId, string languageCode)
         {
-            var userId = await GetOrCreateUser(chatId,languageCode);
-            var roles = await _userRepository.GetRoles(userId.Id);
+            var user = await GetOrCreateUser(chatId,languageCode);
+            var roles = await _userRepository.GetRoles(user.Id);
 
             var response = roles
                 .Select(r => new UserRole
@@ -48,9 +48,16 @@ namespace FloristAI.Application.User
 
             return new GetRolesResponse
             {
-                UserId = userId.Id,
+                UserId = user.Id,
                 Roles = response
             };
+
+        }
+
+        public async Task<bool> EditLanguageInterfaceUser (long chatId, string languageCode)
+        {
+            var user = await GetOrCreateUser(chatId, languageCode);
+            return await _userRepository.EditLanguageCode(user.Id, languageCode);
 
         }
     }

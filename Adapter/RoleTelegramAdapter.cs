@@ -23,7 +23,7 @@ namespace FloristAI.Adapter
 
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
-
+            var langCode = await _userService.EditLanguageInterfaceUser(chatId, parameter);
             var role = await _userService.GetRolesByTelegramId(chatId, parameter);
             var buttons = role.Roles.Select(r => new [] 
             {

@@ -51,6 +51,19 @@ namespace FloristAI.Infrastructure.Persistence
             return user;
         }
 
+        public async Task<bool> EditLanguageCode (int Id, string languageCode)
+        {
+            var user = await _dbContext.Users.FindAsync(Id);
+
+            if (user == null) return false;
+
+            user.LanguageCode = languageCode;
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+
+        }
+
 
 
     }

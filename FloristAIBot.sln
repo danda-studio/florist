@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloristAI.Adapter", "Adapte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloristAI.Router", "Router\FloristAI.Router.csproj", "{0AEE6F3E-B99D-4352-96CB-DE56353122B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloristAI.Tests", "FloristAI.Tests\FloristAI.Tests.csproj", "{3C34C27B-95CE-426F-B9E4-6F4B252AC220}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{0AEE6F3E-B99D-4352-96CB-DE56353122B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AEE6F3E-B99D-4352-96CB-DE56353122B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AEE6F3E-B99D-4352-96CB-DE56353122B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C34C27B-95CE-426F-B9E4-6F4B252AC220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C34C27B-95CE-426F-B9E4-6F4B252AC220}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C34C27B-95CE-426F-B9E4-6F4B252AC220}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C34C27B-95CE-426F-B9E4-6F4B252AC220}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
