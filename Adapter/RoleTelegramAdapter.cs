@@ -33,12 +33,23 @@ namespace FloristAI.Adapter
                 )
             }).ToArray();
 
+            var languageButton = new[]
+            {
+
+                InlineKeyboardButton.WithCallbackData(
+                    text: parameter == "ru" ? "🌐 Изменить язык" : "🌐 Schimbați limba",
+                    callbackData:"start"
+                )
+            };
+
+            var finalButtons = buttons.Append(languageButton).ToArray();
+
             return new MessageResult
             {
                 Text = role.Roles.Count > 1
                     ? (parameter == "ru" ? "Вам доступно несколько ролей:" : "Aveți acces la mai multe roluri:")
                     : (parameter == "ru" ? "Ваша роль:" : "Rolul dvs.:"),
-                ReplyMarkup = new InlineKeyboardMarkup(buttons)
+                ReplyMarkup = new InlineKeyboardMarkup(finalButtons)
             };
         }
 
