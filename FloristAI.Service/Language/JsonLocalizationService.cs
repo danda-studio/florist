@@ -16,6 +16,7 @@ namespace FloristAI.Application.Language
         {
             _localizationFolder = Path.Combine(AppContext.BaseDirectory, "Localization");
             Console.WriteLine($"[i18n] Папка локализации: {_localizationFolder}");
+
             _locales = new Dictionary<string, Dictionary<string, string>>();
 
             // Загружаем языки с обработкой ошибок
@@ -29,6 +30,7 @@ namespace FloristAI.Application.Language
             {
                 var filePath = Path.Combine(_localizationFolder, $"{lang}.json");
 
+                Console.WriteLine($"[i18n] Пробуем загрузить файл: {filePath} | Exists: {File.Exists(filePath)}");
                 if (!File.Exists(filePath))
                 {
                     logger.LogWarning("Файл локализации не найден: {FilePath}", filePath);
