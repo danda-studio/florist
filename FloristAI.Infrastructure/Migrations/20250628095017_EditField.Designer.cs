@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FloristAI.Infrastructure.Persistence.Migrations
+namespace FloristAI.Infrastructure.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20250627222843_InitSchema")]
-    partial class InitSchema
+    [Migration("20250628095017_EditField")]
+    partial class EditField
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

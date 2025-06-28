@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FloristAI.Infrastructure.Persistence.Migrations
+namespace FloristAI.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitSchema : Migration
+    public partial class EditField : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
