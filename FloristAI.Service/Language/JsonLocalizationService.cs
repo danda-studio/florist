@@ -14,13 +14,13 @@ namespace FloristAI.Application.Language
 
         public JsonLocalizationService(IHostEnvironment env, ILogger<JsonLocalizationService> logger)
         {
-            _localizationFolder = Path.Combine(env.ContentRootPath, "..", "FloristAI.Infrastructure", "Localization");
+            _localizationFolder = Path.Combine(AppContext.BaseDirectory, "Localization");
+            Console.WriteLine($"[i18n] Папка локализации: {_localizationFolder}");
             _locales = new Dictionary<string, Dictionary<string, string>>();
 
             // Загружаем языки с обработкой ошибок
             TryLoadLocale(logger, "ru");
             TryLoadLocale(logger, "ro");
-            TryLoadLocale(logger, "en"); // Английский как fallback
         }
 
         private bool TryLoadLocale(ILogger logger, string lang)
@@ -51,13 +51,26 @@ namespace FloristAI.Application.Language
 
         public string GetString(string key, string languageCode)
         {
-            // Сначала пробуем запрошенный язык
-            if (_locales.TryGetValue(languageCode, out var dict) && dict.TryGetValue(key, out var value))
-                return value;
 
+            if (_locales.TryGetValue(languageCode, out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                {
+                    Console.WriteLine($"[i18n] Нашли: [{languageCode}] {key} => {value}");
+                    return value;
+                }
+                else
+                {
+                    Console.WriteLine($"[i18n] Ключ не найден: {key} в языке {languageCode}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[i18n] Язык не найден: {languageCode}");
+            }
 
-            // В крайнем случае возвращаем ключ
             return key;
         }
+
     }
 }

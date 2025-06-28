@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Localization\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
@@ -33,6 +29,15 @@
     <ProjectReference Include="..\Adapter\FloristAI.Adapter.csproj" />
     <ProjectReference Include="..\FloristAI.Core\FloristAI.Core.csproj" />
     <ProjectReference Include="..\Router\FloristAI.Router.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Localization\ro.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Localization\ru.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
