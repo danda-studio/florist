@@ -7,11 +7,19 @@ using Microsoft.Extensions.Logging;
 
 namespace FloristAI.Application.Language
 {
+    /// <summary>
+    /// Сервис локализации
+    /// </summary>
     public class JsonLocalizationService : ILocalizationService
     {
         private readonly Dictionary<string, Dictionary<string, string>> _locales;
         private readonly string _localizationFolder;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="JsonLocalizationService"/>.
+        /// </summary>
+        /// <param name="env">Среда размещения приложения, используется для определения пути.</param>
+        /// <param name="logger">Логгер для вывода сообщений о загрузке локализации.</param>
         public JsonLocalizationService(IHostEnvironment env, ILogger<JsonLocalizationService> logger)
         {
             _localizationFolder = Path.Combine(AppContext.BaseDirectory, "Localization");
@@ -19,18 +27,23 @@ namespace FloristAI.Application.Language
 
             _locales = new Dictionary<string, Dictionary<string, string>>();
 
-            // Загружаем языки с обработкой ошибок
+            // Загружаем доступные языки
             TryLoadLocale(logger, "ru");
             TryLoadLocale(logger, "ro");
         }
 
+        /// <summary>
+        /// Пытается загрузить локализационный файл для указанного языка.
+        /// </summary>
+        /// <param name="logger">Логгер для записи информации и ошибок.</param>
+        /// <param name="lang">Код языка (например, "ru").</param>
+        /// <returns>True, если файл успешно загружен, иначе false.</returns>
         private bool TryLoadLocale(ILogger logger, string lang)
         {
             try
             {
                 var filePath = Path.Combine(_localizationFolder, $"{lang}.json");
 
-                Console.WriteLine($"[i18n] Пробуем загрузить файл: {filePath} | Exists: {File.Exists(filePath)}");
                 if (!File.Exists(filePath))
                 {
                     logger.LogWarning("Файл локализации не найден: {FilePath}", filePath);
@@ -41,7 +54,6 @@ namespace FloristAI.Application.Language
                 _locales[lang] = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
                                   ?? new Dictionary<string, string>();
 
-                logger.LogInformation("Успешно загружена локализация для языка {Language}", lang);
                 return true;
             }
             catch (Exception ex)
@@ -51,14 +63,18 @@ namespace FloristAI.Application.Language
             }
         }
 
+        /// <summary>
+        /// Получает локализованную строку по ключу и коду языка.
+        /// </summary>
+        /// <param name="key">Ключ строки (например, "Menu_Title").</param>
+        /// <param name="languageCode">Код языка (например, "ru").</param>
+        /// <returns>Локализованная строка, если найдена, иначе возвращается сам ключ.</returns>
         public string GetString(string key, string languageCode)
         {
-
             if (_locales.TryGetValue(languageCode, out var dict))
             {
                 if (dict.TryGetValue(key, out var value))
                 {
-                    Console.WriteLine($"[i18n] Нашли: [{languageCode}] {key} => {value}");
                     return value;
                 }
                 else
@@ -73,6 +89,5 @@ namespace FloristAI.Application.Language
 
             return key;
         }
-
     }
 }
