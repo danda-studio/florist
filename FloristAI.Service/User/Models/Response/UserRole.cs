@@ -1,15 +1,21 @@
 ﻿using FloristAI.Core.Entities.Enums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FloristAI.Application.User.Models.Response
 {
+    /// <summary>
+    /// Модель, представляющая роль пользователя.
+    /// </summary>
     public class UserRole
     {
+        /// <summary>
+        /// Тип роли пользователя.
+        /// </summary>
         public RoleType RoleType { get; set; } = RoleType.Client;
-        public string RoleName { get; set; } = "";
+
+        /// <summary>
+        /// Локализованное название роли пользователя.
+        /// </summary>
+        public string RoleName { get; set; } = string.Empty;
     }
 }

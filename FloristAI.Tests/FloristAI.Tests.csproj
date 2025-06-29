@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Adapter\FloristAI.Adapter.csproj" />
     <ProjectReference Include="..\FloristAI.Service\FloristAI.Application.csproj" />
+    <ProjectReference Include="..\Router\FloristAI.Router.csproj" />
   </ItemGroup>
 
 </Project>

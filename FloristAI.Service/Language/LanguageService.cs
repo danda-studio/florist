@@ -15,7 +15,15 @@ namespace FloristAI.Application.Language
     /// </summary>
     public class LanguageService : ILanguageService
     {
+        /// <summary>
+        /// Репозиторий для работы с данными пользователей.
+        /// </summary>
         private readonly IUserRepository _userRepository;
+
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="LanguageService"/>.
+        /// </summary>
+        /// <param name="userRepository">Репозиторий пользователей.</param>
         public LanguageService(IUserRepository userRepository)
         {
             _userRepository = userRepository;

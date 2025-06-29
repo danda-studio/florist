@@ -12,7 +12,7 @@ namespace FloristAI.Adapter
     /// <summary>
     /// Адаптер обработки команды выбора языка интерфейса Telegram-бота.
     /// </summary>
-    public class LangTelegramAdapter : IMessageAdapter
+    public class SelectLanguageAdapter : IMessageAdapter
     {
         /// <summary>
         /// Сервис для получения списка доступных языков.
@@ -20,15 +20,15 @@ namespace FloristAI.Adapter
         private readonly ILanguageService _languageService;
 
         /// <summary>
-        /// Ключ маршрута, соответствующий команде "/start".
+        /// Ключ маршрута, соответствующий команде.
         /// </summary>
         public string RouteKey => "start";
 
         /// <summary>
-        /// Инициализирует новый экземпляр <see cref="LangTelegramAdapter"/>.
+        /// Инициализирует новый экземпляр <see cref="SelectLanguageAdapter"/>.
         /// </summary>
         /// <param name="languageService">Сервис для получения списка поддерживаемых языков.</param>
-        public LangTelegramAdapter(ILanguageService languageService)
+        public SelectLanguageAdapter(ILanguageService languageService)
         {
             _languageService = languageService;
         }
@@ -51,7 +51,7 @@ namespace FloristAI.Adapter
                     new[] {
                         InlineKeyboardButton.WithCallbackData(
                             text: lang.Name,
-                            callbackData: $"select_language:{lang.Code}" // например, "select_language:ru"
+                            callbackData: $"select_role:{lang.Code}" // например, "select_language:ru"
                         )
                     }).ToArray()
             );

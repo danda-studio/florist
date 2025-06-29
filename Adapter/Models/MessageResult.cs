@@ -27,5 +27,10 @@ namespace FloristAI.Adapter.Models
         /// Кнопки сообщения
         /// </summary>
         public ReplyMarkup? ReplyMarkup { get; set; }
+
+        /// <summary>
+        /// Опциональный ключ маршрута, на который нужно сделать редирект
+        /// </summary>
+        public string? RedirectRouteKey { get; set; }
     }
 }
