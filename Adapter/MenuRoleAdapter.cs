@@ -49,35 +49,36 @@ namespace FloristAI.Adapter
 
             var keyboard = new[]
             {
-                InlineKeyboardButton.WithCallbackData(
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Flower", user.LanguageCode),
-                    callbackData: "get_menu:flower"
-                ),
-                InlineKeyboardButton.WithCallbackData(
+                    callbackData: "get_menu:flower")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Basket", user.LanguageCode),
-                    callbackData: "get_menu:basket"
-                ),
-                InlineKeyboardButton.WithCallbackData(
+                    callbackData: "get_menu:basket")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:bouquet"
-                ),
-                InlineKeyboardButton.WithCallbackData(
+                    callbackData: "get_menu:bouquet")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Create_Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:createBouquet"
-                ),
-                InlineKeyboardButton.WithCallbackData(
+                    callbackData: "get_menu:createBouquet")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("My_Orders", user.LanguageCode),
-                    callbackData: "get_menu:myOrder"
-                ),
-                InlineKeyboardButton.WithCallbackData(
+                    callbackData: "get_menu:myOrder")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Become_Partner", user.LanguageCode),
-                    callbackData: "get_menu:becomePartner"
-                ),
-                InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Become_Partner", user.LanguageCode),
-                    callbackData: "select_role"
-                ),
+                    callbackData: "get_menu:becomePartner")
+                },
+                new[] { InlineKeyboardButton.WithCallbackData(
+                    text: _localizationService.GetString("Select_Room", user.LanguageCode),
+                    callbackData: "select_role")
+                },
             };
+
 
             return new MessageResult
             {
