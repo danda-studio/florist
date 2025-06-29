@@ -69,7 +69,7 @@ namespace FloristAI.Adapter
             {
                 InlineKeyboardButton.WithCallbackData(
                     text: r.RoleName,
-                    callbackData: $"role_select:{r.RoleType}"
+                    callbackData: $"role_menu:{r.RoleType}"
                 )
             }).ToArray();
 
@@ -101,15 +101,15 @@ namespace FloristAI.Adapter
         /// </summary>
         /// <param name="role">Тип роли пользователя.</param>
         /// <returns>Строка callback-команды, соответствующая роли.</returns>
-        private string GetRouteKeyForRole(RoleType role)
+        private static string GetRouteKeyForRole(RoleType role)
         {
             return role switch
             {
-                RoleType.Client => "role_select:client",
-                RoleType.Admin => "role_select:admin",
-                RoleType.Partner => "role_select:partner",
-                RoleType.Florist => "role_select:florist",
-                RoleType.Moderator => "role_select:moderator",
+                RoleType.Client => "role_menu:Сlient",
+                RoleType.Admin => "role_menu:Admin",
+                RoleType.Partner => "role_menu:Partner",
+                RoleType.Florist => "role_menu:Florist",
+                RoleType.Moderator => "role_menu:Moderator",
                 _ => "unknown_role"
             };
         }

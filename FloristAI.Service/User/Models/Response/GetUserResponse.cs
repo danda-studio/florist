@@ -15,6 +15,6 @@ namespace FloristAI.Application.User.Models.Response
         /// <summary>
         /// Код языка интерфейса пользователя. Может быть <c>null</c>, если язык не установлен.
         /// </summary>
-        public string? LanguageCode { get; set; }
+        public string LanguageCode { get; set; }
     }
 }
