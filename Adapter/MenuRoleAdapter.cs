@@ -75,7 +75,7 @@ namespace FloristAI.Adapter
                 },
                 new[] { InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("Select_Room", user.LanguageCode),
-                    callbackData: "select_role")
+                    callbackData: $"select_role:{user.LanguageCode}")
                 },
             };
 
