@@ -14,7 +14,7 @@ namespace FloristAI.Adapter
         /// <summary>
         /// Ключ маршрута, по которому будет вызываться адаптер.
         /// </summary>
-        public string RouteKey => "role_select";
+        public string RouteKey => "role_menu";
 
         /// <summary>
         /// Сервис для получения данных по пользователю.
