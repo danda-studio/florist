@@ -53,6 +53,7 @@ namespace FloristAIBot
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
+            services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             var token = Environment.GetEnvironmentVariable("Bot_token") ?? _configuration["Telegram:Token"];
