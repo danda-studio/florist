@@ -51,6 +51,18 @@ namespace FloristAI.Application.User
             };
         }
 
+
+        private async Task<bool> CheckUserInSystem(long chatId)
+        {
+            var user = await _userRepository.GetUserByChatId(chatId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Получает информацию о пользователе по chatId.
         /// </summary>
@@ -77,9 +89,10 @@ namespace FloristAI.Application.User
         /// <returns>Роли пользователя с локализованными названиями.</returns>
         public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId, string languageCode)
         {
-            var user = await GetUser(chatId);
 
-            if (user == null)
+            GetUserResponse user;
+
+            if (!await CheckUserInSystem(chatId))
             {
                 var createdUser = await AddUser(chatId, languageCode);
                 user = new GetUserResponse
@@ -88,16 +101,22 @@ namespace FloristAI.Application.User
                     LanguageCode = createdUser.LanguageCode
                 };
             }
-
-            var roles = await _userRepository.GetRoles(user.UserId);
-
-            var response = roles
-                .Select(r => new UserRole
+            else
+            {
+                user = await GetUser(chatId);
+                if (user == null)
                 {
-                    RoleType = r.Role,
-                    RoleName = _localizationService.GetString($"Role_{r.Role}", languageCode)
-                })
-                .ToList();
+                    throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
+                }
+            }
+            var roles = await _userRepository.GetRoles(user.UserId);
+            var response = roles
+            .Select(r => new UserRole
+            {
+                RoleType = r.Role,
+                RoleName = _localizationService.GetString($"Role_{r.Role}", languageCode)
+            })
+            .ToList();
 
             return new GetRolesResponse
             {
