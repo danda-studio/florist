@@ -47,8 +47,8 @@ namespace FloristAI.Adapter
         /// <returns>Сообщение с результатом: кнопки выбора ролей или редирект.</returns>
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
-            var langCode = await _userService.EditLanguageInterfaceUser(chatId, parameter);
             var role = await _userService.GetRolesByTelegramId(chatId, parameter);
+            var langCode = await _userService.EditLanguageInterfaceUser(chatId, parameter);
 
             if (role.Roles.Count == 1)
             {
