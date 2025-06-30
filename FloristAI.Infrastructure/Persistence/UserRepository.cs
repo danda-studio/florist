@@ -62,6 +62,13 @@ namespace FloristAI.Infrastructure.Persistence
                 TgData = new UserTgData
                 {
                     TelegramId = chatId
+                },
+                Roles = new List<UserRole>
+                {
+                    new UserRole
+                    {
+                        Role = RoleType.Client
+                    }
                 }
             };
 
