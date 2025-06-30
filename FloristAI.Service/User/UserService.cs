@@ -34,6 +34,23 @@ namespace FloristAI.Application.User
             _localizationService = localizationService;
         }
 
+
+        private async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
+        {
+            if (!await CheckUserInSystem(chatId))
+            {
+                var createdUser = await AddUser(chatId, languageCode);
+                return new GetUserResponse
+                {
+                    UserId = createdUser.Id,
+                    LanguageCode = createdUser.LanguageCode
+                };
+            }
+
+            var user = await GetUser(chatId);
+            return user ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
+        }
+
         /// <summary>
         /// Добавляет пользователя с указанным chatId и языком интерфейса.
         /// </summary>
@@ -51,7 +68,11 @@ namespace FloristAI.Application.User
             };
         }
 
-
+        /// <summary>
+        /// Проверка, есть ли пользователь в системе по chatId.
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
         private async Task<bool> CheckUserInSystem(long chatId)
         {
             var user = await _userRepository.GetUserByChatId(chatId);
@@ -89,34 +110,16 @@ namespace FloristAI.Application.User
         /// <returns>Роли пользователя с локализованными названиями.</returns>
         public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId, string languageCode)
         {
+            var user = await GetOrCreateUser(chatId, languageCode);
 
-            GetUserResponse user;
-
-            if (!await CheckUserInSystem(chatId))
-            {
-                var createdUser = await AddUser(chatId, languageCode);
-                user = new GetUserResponse
-                {
-                    UserId = createdUser.Id,
-                    LanguageCode = createdUser.LanguageCode
-                };
-            }
-            else
-            {
-                user = await GetUser(chatId);
-                if (user == null)
-                {
-                    throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
-                }
-            }
             var roles = await _userRepository.GetRoles(user.UserId);
             var response = roles
-            .Select(r => new UserRole
-            {
-                RoleType = r.Role,
-                RoleName = _localizationService.GetString($"Role_{r.Role}", languageCode)
-            })
-            .ToList();
+                .Select(r => new UserRole
+                {
+                    RoleType = r.Role,
+                    RoleName = _localizationService.GetString($"Role_{r.Role}", languageCode)
+                })
+                .ToList();
 
             return new GetRolesResponse
             {
@@ -124,6 +127,7 @@ namespace FloristAI.Application.User
                 Roles = response
             };
         }
+
 
         /// <summary>
         /// Изменяет язык интерфейса пользователя.
