@@ -74,8 +74,8 @@ namespace FloristAI.Adapter
                     callbackData: "get_menu:becomePartner")
                 },
                 new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Select_Room", user.LanguageCode),
-                    callbackData: $"select_role:{user.LanguageCode}")
+                    text: _localizationService.GetString("LanguageSelection", user.LanguageCode),
+                    callbackData: "start")
                 },
             };
 
