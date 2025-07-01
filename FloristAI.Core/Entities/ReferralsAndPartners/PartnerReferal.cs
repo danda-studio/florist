@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FloristAI.Core.Entities.Referrals
+namespace FloristAI.Core.Entities.ReferralsAndPartners
 {
     /// <summary>
     /// Модель связи между партнёром и пользователем в рамках реферальной программы.

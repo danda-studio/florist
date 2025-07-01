@@ -21,7 +21,7 @@ namespace FloristAI.Core.Entities.Items
         /// <summary>
         /// Ссылка на изображение товара.
         /// </summary>
-        public string Image { get; set; }
+        public string? Image { get; set; } 
 
         /// <summary>
         /// Цена товара.
@@ -31,21 +31,21 @@ namespace FloristAI.Core.Entities.Items
         /// <summary>
         /// Список заказов
         /// </summary>
-        public List<Order> Orders { get; set; }
+        public List<Order>? Orders { get; set; }
 
         /// <summary>
         /// Связанная сущность цветка
         /// </summary>
-        public Flower Flower { get; set; }
+        public Flower? Flower { get; set; }
 
         /// <summary>
         /// Связанная сущность корзины
         /// </summary>
-        public Basket Basket { get; set; }
+        public Basket? Basket { get; set; }
 
         /// <summary>
         /// Связанная сущность букета
         /// </summary>
-        public Bouquet Bouquet { get; set; }
+        public Bouquet? Bouquet { get; set; }
     }
 }

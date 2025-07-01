@@ -18,16 +18,16 @@
         /// <summary>
         /// Имя пользователя в Telegram.
         /// </summary>
-        public string UserName { get; set; } = string.Empty;
+        public string? UserName { get; set; } 
 
         /// <summary>
         /// Телефон пользователя, связанный с Telegram-аккаунтом.
         /// </summary>
-        public string Phone { get; set; } = string.Empty;
+        public string? Phone { get; set; }
 
         /// <summary>
         /// Пользователь, к которому относятся данные Telegram.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }

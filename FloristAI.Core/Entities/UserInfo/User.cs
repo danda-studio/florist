@@ -1,4 +1,4 @@
-﻿using FloristAI.Core.Entities.Referrals;
+﻿using FloristAI.Core.Entities.ReferralsAndPartners;
 using System.Collections.Generic;
 
 namespace FloristAI.Core.Entities.UserInfo
@@ -16,31 +16,36 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Список ролей, назначенных пользователю.
         /// </summary>
-        public List<UserRole> Roles { get; set; } = new List<UserRole>();
+        public List<UserRole> Roles { get; set; } 
 
         /// <summary>
         /// Информация о пользователе, связанная с Telegram.
         /// </summary>
-        public UserTgData TgData { get; set; }
+        public UserTgData? TgData { get; set; }
 
         /// <summary>
         /// Информация о партнёре, если пользователь является партнёром.
         /// </summary>
-        public Partner Partner { get; set; }
+        public Partner? Partner { get; set; }
 
         /// <summary>
         /// Информация о реферале, если пользователь был приглашён.
         /// </summary>
-        public Referal Referal { get; set; }
+        public Referal? Referal { get; set; }
 
         /// <summary>
         /// Список заказов, оформленных пользователем.
         /// </summary>
-        public List<Order> Order { get; set; } = new List<Order>();
+        public List<Order>? Order { get; set; }
 
         /// <summary>
         /// Список транзакций, связанных с пользователем.
         /// </summary>
-        public List<Transaction> Transaction { get; set; } = new List<Transaction>();
+        public List<Transaction>? Transaction { get; set; } = [];
+        
+        /// <summary>
+        /// Код языка интерфейса пользователя
+        /// </summary>
+        public string? LanguageCode { get; set; }
     }
 }
