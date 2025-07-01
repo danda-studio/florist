@@ -16,11 +16,11 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Тип роли, назначенной пользователю (например, Клиент, Админ и т.д.).
         /// </summary>
-        public RoleType Role { get; set; } = RoleType.Client;
+        public RoleType Role { get; set; } 
 
         /// <summary>
         /// Пользователь, связанный с данной ролью.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }

@@ -13,7 +13,7 @@
         /// <summary>
         /// Адрес магазина.
         /// </summary>
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         /// <summary>
         /// Географическая широта магазина.

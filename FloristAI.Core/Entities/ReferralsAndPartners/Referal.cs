@@ -1,7 +1,7 @@
 ﻿using FloristAI.Core.Entities.UserInfo;
 using System;
 
-namespace FloristAI.Core.Entities.Referrals
+namespace FloristAI.Core.Entities.ReferralsAndPartners
 {
     /// <summary>
     /// Модель реферала (пользователь)
