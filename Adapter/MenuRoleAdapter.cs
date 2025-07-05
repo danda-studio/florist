@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.User;
 using System.Threading.Tasks;
@@ -24,17 +25,17 @@ namespace FloristAI.Adapter
         /// <summary>
         /// Сервис для получения перевода сообщения.
         /// </summary>
-        private readonly ILocalizationService _localizationService;
+        private readonly IRoleMenuBuilderProvider _builderProvider;
 
         /// <summary>
         /// Создаёт новый экземпляр <see cref="MenuRoleAdapter"/>.
         /// </summary>
         /// <param name="userService">Сервис для работы с пользователями.</param>
         /// <param name="localizationService">Сервис локализации текста.</param>
-        public MenuRoleAdapter(IUserService userService, ILocalizationService localizationService)
+        public MenuRoleAdapter(IUserService userService, IRoleMenuBuilderProvider builderProvider)
         {
             _userService = userService;
-            _localizationService = localizationService;
+            _builderProvider = builderProvider;
         }
 
         /// <summary>
@@ -46,45 +47,8 @@ namespace FloristAI.Adapter
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
             var user = await _userService.GetUser(chatId);
-
-            var keyboard = new[]
-            {
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Flower", user.LanguageCode),
-                    callbackData: "get_menu:flower")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Basket", user.LanguageCode),
-                    callbackData: "get_menu:basket")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:bouquet")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Create_Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:createBouquet")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("My_Orders", user.LanguageCode),
-                    callbackData: "get_menu:myOrder")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Become_Partner", user.LanguageCode),
-                    callbackData: "get_menu:becomePartner")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("LanguageSelection", user.LanguageCode),
-                    callbackData: "start")
-                },
-            };
-
-
-            return new MessageResult
-            {
-                Text = _localizationService.GetString("Menu_Client", user.LanguageCode),
-                ReplyMarkup = keyboard
-            };
+            var builder = _builderProvider.GetBuilder(parameter);
+            return await builder.BuildMenu(chatId);
         }
     }
 }
