@@ -38,9 +38,9 @@ namespace FloristAI.Adapter.ClientMenuBuilder
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Flower", user.LanguageCode), "step:flower") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Basket", user.LanguageCode), "step:basket") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Bouquet", user.LanguageCode), "step:bouquet") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Create_Bouquet", user.LanguageCode), "step:createBouquet") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("My_Orders", user.LanguageCode), "step:myOrder") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Partner", user.LanguageCode), "step:becomePartner") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Create_Bouquet", user.LanguageCode), "step:create_bouquet") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("My_Orders", user.LanguageCode), "step:my_order") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Partner", user.LanguageCode), "step:become_partner") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("LanguageSelection", user.LanguageCode), "start") },
             };
             return new MessageResult
