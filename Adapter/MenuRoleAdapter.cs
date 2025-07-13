@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.RoleMenuBuilder;
+using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.User;
 using System.Threading.Tasks;
@@ -18,11 +19,6 @@ namespace FloristAI.Adapter
         public string RouteKey => "role_menu";
 
         /// <summary>
-        /// Сервис для получения данных по пользователю.
-        /// </summary>
-        private readonly IUserService _userService;
-
-        /// <summary>
         /// Сервис для получения перевода сообщения.
         /// </summary>
         private readonly IRoleMenuBuilderProvider _builderProvider;
@@ -32,9 +28,8 @@ namespace FloristAI.Adapter
         /// </summary>
         /// <param name="userService">Сервис для работы с пользователями.</param>
         /// <param name="localizationService">Сервис локализации текста.</param>
-        public MenuRoleAdapter(IUserService userService, IRoleMenuBuilderProvider builderProvider)
+        public MenuRoleAdapter(IRoleMenuBuilderProvider builderProvider)
         {
-            _userService = userService;
             _builderProvider = builderProvider;
         }
 
@@ -46,8 +41,15 @@ namespace FloristAI.Adapter
         /// <returns>Объект <see cref="MessageResult"/> с текстом меню и кнопками.</returns>
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
-            var user = await _userService.GetUser(chatId);
+            if(string.IsNullOrWhiteSpace(parameter))
+            {
+                return new MessageResult { Text = "Параметр не может быть пустым." };
+            }
             var builder = _builderProvider.GetBuilder(parameter);
+            if (builder == null)
+            {
+                return new MessageResult { Text = "Неизвестный шаг меню." };
+            }
             return await builder.BuildMenu(chatId);
         }
     }

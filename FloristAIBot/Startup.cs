@@ -1,5 +1,7 @@
 ﻿using FloristAI.Adapter;
+using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
+using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.User;
 using FloristAI.Core.Store;
@@ -55,8 +57,11 @@ namespace FloristAIBot
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
             services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
+            services.AddScoped<IMessageAdapter, StepMenuAdapter>();
             services.AddScoped<IRoleMenuBuilder, ClientMenuBuilder>();
+            services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
             services.AddScoped<IRoleMenuBuilderProvider, RoleMenuBuilderProvider>();
+            services.AddScoped<IStepMenuProvider, StepMenuProvider>();
             services.AddScoped<IUserRepository, UserRepository>();
 
             var token = Environment.GetEnvironmentVariable("Bot_token") ?? _configuration["Telegram:Token"];
