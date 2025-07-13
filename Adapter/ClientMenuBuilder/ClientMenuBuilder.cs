@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.User;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.RoleMenuBuilder
+namespace FloristAI.Adapter.ClientMenuBuilder
 {
     public class ClientMenuBuilder : IRoleMenuBuilder
     {
@@ -34,12 +35,12 @@ namespace FloristAI.Adapter.RoleMenuBuilder
             }
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Flower", user.LanguageCode), "get_menu:flower") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Basket", user.LanguageCode), "get_menu:basket") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Bouquet", user.LanguageCode), "get_menu:bouquet") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Create_Bouquet", user.LanguageCode), "get_menu:createBouquet") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("My_Orders", user.LanguageCode), "get_menu:myOrder") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Partner", user.LanguageCode), "get_menu:becomePartner") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Flower", user.LanguageCode), "step:flower") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Basket", user.LanguageCode), "step:basket") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Bouquet", user.LanguageCode), "step:bouquet") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Create_Bouquet", user.LanguageCode), "step:createBouquet") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("My_Orders", user.LanguageCode), "step:myOrder") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Partner", user.LanguageCode), "step:becomePartner") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("LanguageSelection", user.LanguageCode), "start") },
             };
             return new MessageResult
@@ -47,6 +48,8 @@ namespace FloristAI.Adapter.RoleMenuBuilder
                 Text = _localizationService.GetString("Menu_Client", user.LanguageCode),
                 ReplyMarkup = keyboard
             };
+
+            
         }
 
     }
