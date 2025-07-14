@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FloristAI.Application.User.Models.Response
+namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>
     /// Ответ сервиса, содержащий список ролей пользователя.

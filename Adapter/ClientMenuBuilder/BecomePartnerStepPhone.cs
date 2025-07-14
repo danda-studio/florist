@@ -11,17 +11,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder
 {
-    public class BecomePartnerMenuBuilder: IStepMenuBuilder
+    public class BecomePartnerStepPhone : IStepMenuBuilder
     {
         private readonly IUserService _userService;
+
         private readonly ILocalizationService _localizationService;
-        public BecomePartnerMenuBuilder(IUserService userService, ILocalizationService localizationService)
+        public BecomePartnerStepPhone(IUserService userService, ILocalizationService localizationService)
         {
             _userService = userService;
             _localizationService = localizationService;
         }
-        
-        public string Step => "become_partner";
+
+        public string Step => "become_partner_step_phone";
 
         public async Task<MessageResult> BuildMenu(long chatId)
         {
@@ -36,15 +37,13 @@ namespace FloristAI.Adapter.ClientMenuBuilder
             }
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Fill_Button", user.LanguageCode), "step_message:become_partner_step_firstName") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Client") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step:become_partner_step_lastName") },
             };
             return new MessageResult
             {
-                Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
+                Text = _localizationService.GetString("Become_Input_Phone", user.LanguageCode),
                 ReplyMarkup = keyboard
             };
         }
-
     }
 }

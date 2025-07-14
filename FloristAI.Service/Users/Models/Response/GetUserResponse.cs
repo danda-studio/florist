@@ -1,20 +1,20 @@
 ﻿using System;
 
-namespace FloristAI.Application.User.Models.Response
+namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>
-    /// Ответ сервиса при создании нового пользователя или получении существующего.
+    /// Ответ сервиса с данными пользователя.
     /// </summary>
-    public class AddUserResponse
+    public class GetUserResponse
     {
         /// <summary>
         /// Идентификатор пользователя.
         /// </summary>
-        public int Id { get; set; }
+        public int UserId { get; set; }
 
         /// <summary>
         /// Код языка интерфейса пользователя. Может быть <c>null</c>, если язык не установлен.
         /// </summary>
-        public string? LanguageCode { get; set; }
+        public string LanguageCode { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Application.Language;
-using FloristAI.Application.User;
+using FloristAI.Application.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
