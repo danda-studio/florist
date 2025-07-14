@@ -44,7 +44,7 @@
   "Success_Target_Flowers": "Ассортимент цветов",
   "Success_Target_Bouquets": "Ассортимент букетов",
   "Generator_Url_Title": "Заполните данные партнёра, чтобы сгенерировать его пригласительную ссылку.",
-  "Partner_Input_FirstName": "Введите имя партнёра.",
+  "Partner_Input_FirstName": "Введите вашу фамилию.",
   "Partner_Input_LastName": "Введите фамилию партнёра.",
   "Partner_Input_Phone": "Введите номер партнёра, начиная с кода страны (например, +373).",
   "Partner_Created": "Партнёр создан.\nСсылка для приглашения партнера: {0}",

@@ -3,12 +3,13 @@ using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
-using FloristAI.Application.User;
+using FloristAI.Application.Users;
 using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Router;
+using StackExchange.Redis;
 using Telegram.Bot;
 
 namespace FloristAIBot
@@ -47,6 +48,10 @@ namespace FloristAIBot
             services.AddDbContext<PostgresDbContext>(options =>
                 options.UseNpgsql(connectionString,
                  b => b.MigrationsAssembly("FloristAI.Infrastructure")));
+
+            // Регистрация Redis
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(_configuration.GetConnectionString("RedisConnection") ?? "localhost:8800"));
 
             // Регистрация Telegram-бота и бизнес-логики
             services.AddHostedService<BotWorker>();

@@ -1,6 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Application.Language;
-using FloristAI.Application.User;
+using FloristAI.Application.Users;
 using FloristAI.Core.Entities.Enums;
 using System.Linq;
 using System.Threading.Tasks;
