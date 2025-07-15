@@ -21,7 +21,7 @@ namespace FloristAI.Adapter
         {
             var progress = await _userService.GetStep(chatId);
 
-            var builder = _menuProvider.GetBuilder(progress.Step);
+            var builder = _menuProvider.GetBuilder(progress.Step.ToString());
             return await builder.HandleInput(messageText, chatId);
         }
 
