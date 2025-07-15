@@ -4,6 +4,8 @@ using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Core.Entities.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
@@ -12,8 +14,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-        private readonly IStepMenuProvider _menuProvider;
-        public BecomePartnerMenuBuilder(IUserService userService, ILocalizationService localizationService, IStepMenuProvider menuProvider)
+        private readonly IServiceProvider _menuProvider;
+        public BecomePartnerMenuBuilder(IUserService userService, ILocalizationService localizationService, IServiceProvider menuProvider)
         {
             _userService = userService;
             _localizationService = localizationService;
@@ -54,8 +56,10 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
                 Step = CountStep.Second
             });
 
+            var menuProvider = _menuProvider.GetRequiredService<IStepMenuProvider>();
+
             // Переход к следующему шагу
-            var nextBuilder = _menuProvider.GetBuilder("become_partner_step_firstName");
+            var nextBuilder = menuProvider.GetBuilder("become_partner_step_firstName");
             return await nextBuilder.BuildMenu(chatId);
         }
 
