@@ -14,12 +14,10 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-        private readonly IServiceProvider _menuProvider;
-        public BecomePartnerMenuBuilder(IUserService userService, ILocalizationService localizationService, IServiceProvider menuProvider)
+        public BecomePartnerMenuBuilder(IUserService userService, ILocalizationService localizationService)
         {
             _userService = userService;
             _localizationService = localizationService;
-            _menuProvider = menuProvider;
         }
         
         public string Step => "become_partner";
@@ -49,18 +47,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
 
         public async Task<MessageResult> HandleInput(string input, long chatId)
         {
-            await _userService.SaveStep(new SaveStepRequest
-            {
-                ChatId = chatId,
-                FirstName = input,
-                Step = CountStep.Second
-            });
-
-            var menuProvider = _menuProvider.GetRequiredService<IStepMenuProvider>();
-
-            // Переход к следующему шагу
-            var nextBuilder = menuProvider.GetBuilder("become_partner_step_firstName");
-            return await nextBuilder.BuildMenu(chatId);
+            return await BuildMenu(chatId);
         }
 
     }
