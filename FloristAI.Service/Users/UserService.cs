@@ -2,12 +2,7 @@
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
-using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
 
 namespace FloristAI.Application.Users
 {
@@ -64,7 +59,7 @@ namespace FloristAI.Application.Users
             return new GetStepResponse
             {
                 ChatId = chatId,
-                Step = step?.Step ?? PartnerFormStep.None, 
+                Step = step?.Step ?? CountStep.None, 
                 FirstName = step?.FirstName,
                 LastName = step?.LastName,
                 Phone = step?.Phone

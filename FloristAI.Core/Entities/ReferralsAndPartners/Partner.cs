@@ -1,5 +1,4 @@
 ﻿using FloristAI.Core.Entities.UserInfo;
-using System.Collections.Generic;
 
 namespace FloristAI.Core.Entities.ReferralsAndPartners
 {

@@ -1,5 +1,4 @@
 ﻿using FloristAI.Core.Entities.Enums;
-using System;
 
 namespace FloristAI.Application.Users.Models.Response
 {

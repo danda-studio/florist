@@ -1,6 +1,4 @@
 ﻿using FloristAI.Core.Entities.UserInfo;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace FloristAI.Core.Store
 {

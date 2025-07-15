@@ -2,11 +2,6 @@
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using StackExchange.Redis;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FloristAI.Infrastructure.Persistence
 {

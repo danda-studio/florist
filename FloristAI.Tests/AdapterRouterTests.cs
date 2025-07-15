@@ -1,12 +1,7 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.Models;
+using FloristAI.Router;
 using Moq;
-using Router;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace FloristAI.Tests

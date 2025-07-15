@@ -36,5 +36,6 @@
   "Button_Back": "⬅️ Înapoi",
   "Partner_Input_FirstName": "Introduceți prenumele dvs.",
   "Partner_Input_LastName": "Introduceți numele de familie.",
-  "Become_Input_Phone": "Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373)."
+  "Become_Input_Phone": "Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373).",
+  "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes."
 }
