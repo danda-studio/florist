@@ -1,10 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.RoleMenuBuilder;
-using FloristAI.Adapter.StepMenuBuilder;
-using FloristAI.Application.Language;
-using FloristAI.Application.User;
-using System.Threading.Tasks;
-using Telegram.Bot.Types.ReplyMarkups;
+
 
 namespace FloristAI.Adapter
 {

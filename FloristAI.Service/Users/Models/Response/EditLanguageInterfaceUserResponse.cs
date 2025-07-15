@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>

@@ -1,6 +1,5 @@
-﻿using FloristAI.Application.Users.Models.Response;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using FloristAI.Application.Users.Models.Request;
+using FloristAI.Application.Users.Models.Response;
 
 namespace FloristAI.Application.Users
 {
@@ -41,5 +40,6 @@ namespace FloristAI.Application.Users
         Task<GetUserResponse> GetUser(long chatId);
 
         Task<GetStepResponse> GetStep(long chatId);
+        Task<bool> SaveStep(SaveStepRequest request);
     }
 }

@@ -2,26 +2,24 @@
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
+using FloristAI.Application.Users.Models.Request;
 using FloristAI.Core.Entities.Enums;
-using FloristAI.Core.Entities.UserInfo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder
+namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
 {
     public class BecomePartnerStepLastName : IStepMenuBuilder
     {
         private readonly IUserService _userService;
-        
+
         private readonly ILocalizationService _localizationService;
-        public BecomePartnerStepLastName(IUserService userService, ILocalizationService localizationService)
+
+        private readonly IStepMenuProvider _menuProvider;
+        public BecomePartnerStepLastName(IUserService userService, ILocalizationService localizationService, IStepMenuProvider menuProvider)
         {
             _userService = userService;
             _localizationService = localizationService;
+            _menuProvider = menuProvider;
         }
 
         public string Step => "become_partner_step_lastName";
@@ -46,6 +44,20 @@ namespace FloristAI.Adapter.ClientMenuBuilder
                 Text = _localizationService.GetString("Partner_Input_LastName", user.LanguageCode),
                 ReplyMarkup = keyboard
             };
+        }
+
+        public async Task<MessageResult> HandleInput(string input, long chatId)
+        {
+            await _userService.SaveStep(new SaveStepRequest
+            {
+                ChatId = chatId,
+                FirstName = input,
+                Step = CountStep.Fourth
+            });
+
+            // Переход к следующему шагу
+            var nextBuilder = _menuProvider.GetBuilder("become_partner_step_phone");
+            return await nextBuilder.BuildMenu(chatId);
         }
     }
 }

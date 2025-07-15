@@ -2,8 +2,6 @@
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Core.Entities.Enums;
-using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter

@@ -1,12 +1,8 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Router
+
+namespace FloristAI.Router
 {
     /// <summary>
     /// Роутер команд для Telegram-бота, перенаправляющий команды на соответствующие адаптеры.

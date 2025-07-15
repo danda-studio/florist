@@ -1,11 +1,7 @@
-﻿
+﻿using FloristAI.Router;
 using Microsoft.Extensions.Hosting;
-using Router;
-using System;
-using System.Collections.Generic;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace FloristAI.Infrastructure

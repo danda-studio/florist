@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>
