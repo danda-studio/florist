@@ -51,9 +51,13 @@ namespace FloristAIBot
                 options.UseNpgsql(connectionString,
                  b => b.MigrationsAssembly("FloristAI.Infrastructure")));
 
+
+            var redisConnectionString = Environment.GetEnvironmentVariable("RedisConnection")
+                ?? throw new Exception("RedisConnection переменная окружения не найдена");
+
             // Регистрация Redis
             services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(_configuration.GetConnectionString("RedisConnection") ?? "localhost:8800"));
+                ConnectionMultiplexer.Connect(redisConnectionString));
 
             // Регистрация Telegram-бота и бизнес-логики
             services.AddHostedService<BotWorker>();
