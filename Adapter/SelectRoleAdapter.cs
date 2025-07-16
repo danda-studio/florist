@@ -103,7 +103,7 @@ namespace FloristAI.Adapter
         {
             return role switch
             {
-                RoleType.Client => "role_menu:Сlient",
+                RoleType.Client => "role_menu:Client",
                 RoleType.Admin => "role_menu:Admin",
                 RoleType.Partner => "role_menu:Partner",
                 RoleType.Florist => "role_menu:Florist",
