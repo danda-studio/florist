@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Users;
 
@@ -9,9 +10,9 @@ namespace FloristAI.Adapter
         public string RouteKey => "step_message"; 
 
         private readonly IUserService _userService;
-        private readonly IStepMenuProvider _menuProvider;
+        private readonly IStepFlowProvider _menuProvider;
 
-        public StepMessageAdapter(IUserService userService, IStepMenuProvider menuProvider)
+        public StepMessageAdapter(IUserService userService, IStepFlowProvider menuProvider)
         {
             _userService = userService;
             _menuProvider = menuProvider;

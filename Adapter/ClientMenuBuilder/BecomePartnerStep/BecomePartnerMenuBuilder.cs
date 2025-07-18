@@ -45,10 +45,5 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
             };
         }
 
-        public async Task<MessageResult> HandleInput(string input, long chatId)
-        {
-            return await BuildMenu(chatId);
-        }
-
     }
 }
