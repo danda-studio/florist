@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.Models;
+using Telegram.Bot.Types;
 
 
 namespace FloristAI.Router
@@ -87,6 +88,11 @@ namespace FloristAI.Router
                 }
 
                 return result;
+            }
+
+            if (_adapters.TryGetValue("step_message", out var stepAdapter))
+            {
+                return await stepAdapter.ProcessMessage(parameter, chatId);
             }
 
             return new MessageResult { Text = "Неизвестный callback" };
