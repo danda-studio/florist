@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
@@ -10,7 +11,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
 {
-    public class BecomePartnerMenuBuilder: IStepMenuBuilder
+    public class BecomePartnerMenuBuilder: IStepFlowBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
@@ -43,6 +44,12 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
                 Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
                 ReplyMarkup = keyboard
             };
+        }
+
+        public async Task<MessageResult> HandleInput(string input, long chatId)
+        {
+            // Никакой обработки ввода — просто повторяем финальное сообщение
+            return await BuildMenu(chatId);
         }
 
     }

@@ -72,7 +72,7 @@ namespace FloristAIBot
             services.AddScoped<IMessageAdapter, StepMenuAdapter>();
             services.AddScoped<IMessageAdapter, StepMessageAdapter>();
             services.AddScoped<IRoleMenuBuilder, ClientMenuBuilder>();
-            services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerMenuBuilder>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepFirstName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepLastName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepPhone>();
