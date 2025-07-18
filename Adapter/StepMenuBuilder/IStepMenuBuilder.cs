@@ -8,6 +8,5 @@ namespace FloristAI.Adapter.StepMenuBuilder
 
         Task<MessageResult> BuildMenu(long chatId);
 
-        Task<MessageResult> HandleInput(string input, long chatId);
     }
 }

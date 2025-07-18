@@ -3,6 +3,7 @@ using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartner;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.RoleMenuBuilder;
+using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
@@ -72,12 +73,13 @@ namespace FloristAIBot
             services.AddScoped<IMessageAdapter, StepMessageAdapter>();
             services.AddScoped<IRoleMenuBuilder, ClientMenuBuilder>();
             services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
-            services.AddScoped<IStepMenuBuilder, BecomePartnerStepFirstName>();
-            services.AddScoped<IStepMenuBuilder, BecomePartnerStepLastName>();
-            services.AddScoped<IStepMenuBuilder, BecomePartnerStepPhone>();
-            services.AddScoped<IStepMenuBuilder, BecomePartnerStepFinal>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepFirstName>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepLastName>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepPhone>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepFinal>();
             services.AddScoped<IRoleMenuBuilderProvider, RoleMenuBuilderProvider>();
             services.AddScoped<IStepMenuProvider, StepMenuProvider>();
+            services.AddScoped<IStepFlowProvider, StepFlowProvider>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
 

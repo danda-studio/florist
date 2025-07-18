@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
@@ -6,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 {
-    public class BecomePartnerStepFinal : IStepMenuBuilder
+    public class BecomePartnerStepFinal : IStepFlowBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
