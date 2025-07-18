@@ -7,25 +7,25 @@ namespace FloristAI.Adapter
 {
     public class StepMessageAdapter : IMessageAdapter
     {
-        public string RouteKey => "step_message"; 
+        public string RouteKey => "step_message";
 
-        private readonly IUserService _userService;
+        private readonly IStepInitializer _stepInitializer;
         private readonly IStepFlowProvider _menuProvider;
 
-        public StepMessageAdapter(IUserService userService, IStepFlowProvider menuProvider)
+        public StepMessageAdapter(IStepInitializer stepInitializer, IStepFlowProvider menuProvider)
         {
-            _userService = userService;
+            _stepInitializer = stepInitializer;
             _menuProvider = menuProvider;
         }
 
         public async Task<MessageResult> ProcessMessage(string messageText, long chatId)
         {
-            var progress = await _userService.GetStep(chatId);
+            var progress = await _stepInitializer.EnsureStepInitialized(chatId);
 
             var builder = _menuProvider.GetBuilder(progress.Step);
             return await builder.HandleInput(messageText, chatId);
         }
-
     }
+
 }
 
