@@ -59,7 +59,7 @@ namespace FloristAI.Application.Users
             return new GetStepResponse
             {
                 ChatId = chatId,
-                Step = step?.Step ?? CountStep.First, 
+                Step = step?.Step, 
                 FirstName = step?.FirstName,
                 LastName = step?.LastName,
                 Phone = step?.Phone

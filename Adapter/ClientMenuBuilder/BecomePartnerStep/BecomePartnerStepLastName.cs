@@ -54,7 +54,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 ChatId = chatId,
                 FirstName = input,
-                Step = CountStep.Fourth
+                Step = Step
             });
 
             // Переход к следующему шагу
