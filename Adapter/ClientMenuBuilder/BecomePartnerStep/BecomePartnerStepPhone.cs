@@ -8,7 +8,7 @@ using FloristAI.Core.Entities.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
+namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 {
     public class BecomePartnerStepPhone : IStepFlowBuilder
     {

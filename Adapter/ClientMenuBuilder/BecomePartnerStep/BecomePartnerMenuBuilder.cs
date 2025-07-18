@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
+namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 {
     public class BecomePartnerMenuBuilder: IStepFlowBuilder
     {
