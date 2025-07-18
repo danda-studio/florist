@@ -11,7 +11,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 {
-    public class BecomePartnerMenuBuilder: IStepFlowBuilder
+    public class BecomePartnerMenuBuilder: IStepMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
