@@ -61,11 +61,6 @@ namespace FloristAI.Router
                 return result;
             }
 
-            if (_adapters.TryGetValue("step_message", out var stepAdapter))
-            {
-                return await stepAdapter.ProcessMessage(message, chatId);
-            }
-
             return new MessageResult { Text = "Неизвестная команда" };
         }
 
