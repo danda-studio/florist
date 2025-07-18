@@ -10,6 +10,7 @@ namespace FloristAI.Adapter.StepFlowBuilder
     public interface IStepFlowProvider
     {
         public IStepFlowBuilder GetBuilder(string step);
+        public IStepFlowBuilder GetEntryPointBuilder();
     }
 }
 

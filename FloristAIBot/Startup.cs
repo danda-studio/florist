@@ -79,6 +79,7 @@ namespace FloristAIBot
             services.AddScoped<IRoleMenuBuilderProvider, RoleMenuBuilderProvider>();
             services.AddScoped<IStepMenuProvider, StepMenuProvider>();
             services.AddScoped<IStepFlowProvider, StepFlowProvider>();
+            services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
 
