@@ -20,7 +20,6 @@ namespace FloristAI.Adapter
 
         public async Task<MessageResult> ProcessMessage(string messageText, long chatId)
         {
-            var progress = await _userService.GetStep(chatId);
 
             var builder = _menuProvider.GetBuilder(progress.Step);
             return await builder.HandleInput(messageText, chatId);
