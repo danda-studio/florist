@@ -16,8 +16,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
         
         private readonly ILocalizationService _localizationService;
 
-        private readonly IStepFlowProvider _menuProvider;
-        public BecomePartnerStepFirstName(IUserService userService, ILocalizationService localizationService, IStepFlowProvider menuProvider)
+        private readonly Lazy<IStepFlowProvider> _menuProvider;
+        public BecomePartnerStepFirstName(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
             _localizationService = localizationService;
@@ -58,7 +58,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartner
             });
 
             // Переход к следующему шагу
-            var nextBuilder = _menuProvider.GetBuilder("become_partner_step_lastName");
+            var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_lastName");
             return await nextBuilder.BuildMenu(chatId);
         }
 
