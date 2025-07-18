@@ -1,6 +1,5 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.ClientMenuBuilder;
-using FloristAI.Adapter.ClientMenuBuilder.BecomePartner;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
@@ -82,6 +81,9 @@ namespace FloristAIBot
             services.AddScoped<IStepFlowProvider, StepFlowProvider>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
+
+            services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
+                new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
 
             var token = Environment.GetEnvironmentVariable("Bot_token") ?? _configuration["Telegram:Token"];
             services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
