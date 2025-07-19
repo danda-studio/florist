@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Telegram.Bot.Types;
+﻿using QRCoder;
+using System;
 
 namespace FloristAI.Application.Users.ReferralCode
 {
@@ -19,11 +15,18 @@ namespace FloristAI.Application.Users.ReferralCode
         public string GetReferralLink(int Id)
         {
             string botName = "FLowerKisaBot";
-            // Генерация реферальной ссылки
             return $"https://t.me/{botName}?start={Id}";
-
         }
 
+        public byte[] GetReferralQrCode(int id)
+        {
+            string link = GetReferralLink(id);
 
+            var generator = new QRCodeGenerator();
+            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
+
+            var renderer = new PngByteQRCode(data);
+            return renderer.GetGraphic(20);
+        }
     }
 }

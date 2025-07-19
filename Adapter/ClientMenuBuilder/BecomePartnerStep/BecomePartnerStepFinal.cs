@@ -35,38 +35,44 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 };
             }
 
-           /* var qrImageUrl = GenerateQrImageUrl(user.ReferralLink);*/ // QR-картинка от ссылки
+            // Получаем QR-код в виде byte[]
+            byte[] qrBytes = _referralService.GetReferralQrCode(user.UserId);
+
             var referralText = $"""
-                {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
+            {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
-                {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} $"{_referralService.GetReferralLink(user.UserId)}"
+            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_referralService.GetReferralLink(user.UserId)}
 
-                {_localizationService.GetString("Referral_Description", user.LanguageCode)}
-                """;
+            {_localizationService.GetString("Referral_Description", user.LanguageCode)}
+            """;
 
             var keyboard = new[]
             {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData(
-                    _localizationService.GetString("GoToPartner_Menu", user.LanguageCode),
-                    "role_menu:Partner"
-                )
-            },
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData(
-                    _localizationService.GetString("Button_Menu", user.LanguageCode),
-                    "role_menu:Client"
-                )
-            }
-        };
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(
+                        _localizationService.GetString("GoToPartner_Menu", user.LanguageCode),
+                        "role_menu:Partner"
+                    )
+                },
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData(
+                        _localizationService.GetString("Button_Menu", user.LanguageCode),
+                        "role_menu:Client"
+                    )
+                }
+            };
 
             return new MessageResult
             {
                 Text = referralText,
-                //Photo = qrImageUrl,
-                ReplyMarkup = keyboard
+                Photo = new PhotoContent
+                {
+                    ImageBytes = qrBytes,  // Передаём бинарные данные
+                    Description = referralText
+                },
+                ReplyMarkup = new InlineKeyboardMarkup(keyboard)
             };
         }
 
