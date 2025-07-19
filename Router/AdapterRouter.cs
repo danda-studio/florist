@@ -38,8 +38,19 @@ namespace FloristAI.Router
 
             if (message.Contains(":"))
                 return await RouteCallback(message, chatId);
-            else
+            else if (message.StartsWith("/"))
                 return await RouteCommand(message, chatId);
+
+            return await RouteTextInput(message, chatId);
+        }
+
+        public async Task<MessageResult> RouteTextInput(string message, long chatId)
+        {
+            if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
+            {
+                return await stepInputAdapter.ProcessMessage(message, chatId);
+            }
+            return new MessageResult { Text = "Неизвестный шаг ввода текста" };
         }
 
         /// <summary>
