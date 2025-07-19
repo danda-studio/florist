@@ -39,7 +39,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             }
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step:become_partner_step_lastName") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:become_partner_step_lastName") },
             };
             return new MessageResult
             {
