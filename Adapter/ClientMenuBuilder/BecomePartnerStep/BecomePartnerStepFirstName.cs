@@ -45,7 +45,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             };
             return new MessageResult
             {
-                Text = _localizationService.GetString("Partner_Input_FirstName", user.LanguageCode),
+                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
                 ReplyMarkup = keyboard
             };
         }
