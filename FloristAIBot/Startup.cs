@@ -6,6 +6,7 @@ using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
+using FloristAI.Application.Users.ReferralCode;
 using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
@@ -65,6 +66,7 @@ namespace FloristAIBot
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
+            services.AddScoped<IReferralService, ReferralService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
             services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
