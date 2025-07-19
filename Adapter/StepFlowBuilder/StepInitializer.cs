@@ -20,12 +20,12 @@ namespace FloristAI.Adapter.StepFlowBuilder
             _stepFlowProvider = stepFlowProvider;
         }
 
-        public async Task<PartnerFormProgress> EnsureStepInitialized(long chatId)
+        public async Task<GetStepResponse> EnsureStepInitialized(long chatId)
         {
             var progress = await _userService.GetStep(chatId);
             if (!string.IsNullOrEmpty(progress.Step))
             {
-                return new PartnerFormProgress
+                return new GetStepResponse
                 {
                     ChatId = progress.ChatId,
                     Step = progress.Step,
@@ -46,7 +46,7 @@ namespace FloristAI.Adapter.StepFlowBuilder
 
             await _userService.SaveStep(request);
 
-            return new PartnerFormProgress
+            return new GetStepResponse
             {
                 ChatId = chatId,
                 Step = entry.Step
