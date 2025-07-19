@@ -57,7 +57,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 InlineKeyboardButton.WithCallbackData(
                     _localizationService.GetString("Button_Menu", user.LanguageCode),
-                    "menu"
+                    "role_menu:Client"
                 )
             }
         };
