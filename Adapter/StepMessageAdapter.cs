@@ -9,28 +9,25 @@ namespace FloristAI.Adapter
     {
         public string RouteKey => "step_message";
 
-        private readonly IStepInitializer _stepInitializer;
-        private readonly IUserService _userService;
         private readonly IStepFlowProvider _menuProvider;
 
-        public StepMessageAdapter(IStepInitializer stepInitializer, IStepFlowProvider menuProvider, IUserService userService)
+        public StepMessageAdapter(IStepFlowProvider menuProvider)
         {
-            _stepInitializer = stepInitializer;
             _menuProvider = menuProvider;
-            _userService = userService;
         }
 
-        public async Task<MessageResult> ProcessMessage(string messageText, long chatId)
+        public async Task<MessageResult> ProcessMessage(string stepName, long chatId)
         {
-            var currentStep = await _userService.GetStep(chatId);
-
-            if (string.IsNullOrWhiteSpace(currentStep.Step))
+            var builder = _menuProvider.GetBuilder(stepName);
+            if (builder == null)
             {
-                currentStep = await _stepInitializer.EnsureStepInitialized(chatId);
+                return new MessageResult
+                {
+                    Text = $"Step '{stepName}' not found."
+                };
             }
 
-            var builder = _menuProvider.GetBuilder(currentStep.Step);
-            return await builder.HandleInput(messageText, chatId);
+            return await builder.BuildMenu(chatId);
         }
     }
 
