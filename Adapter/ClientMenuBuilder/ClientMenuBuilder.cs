@@ -36,7 +36,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Create_Bouquet", user.LanguageCode), "step:create_bouquet") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("My_Orders", user.LanguageCode), "step:my_order") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Partner", user.LanguageCode), "step:become_partner") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("LanguageSelection", user.LanguageCode), "start") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("LanguageSelection", user.LanguageCode), "/start") },
             };
             return new MessageResult
             {
