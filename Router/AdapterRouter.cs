@@ -44,7 +44,7 @@ namespace FloristAI.Router
             return await RouteTextInput(message, chatId);
         }
 
-        public async Task<MessageResult> RouteTextInput(string message, long chatId)
+        private async Task<MessageResult> RouteTextInput(string message, long chatId)
         {
             if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
             {

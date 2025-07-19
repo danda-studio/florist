@@ -34,11 +34,11 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
            /* var qrImageUrl = GenerateQrImageUrl(user.ReferralLink);*/ // QR-картинка от ссылки
             var referralText = $"""
-                ✅ {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
+                {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
-                🔗 {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)}: "какой-то урл"
+                {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} "какой-то урл"
 
-                ℹ️ {_localizationService.GetString("Referral_Description", user.LanguageCode)}
+                {_localizationService.GetString("Referral_Description", user.LanguageCode)}
                 """;
 
             var keyboard = new[]
@@ -53,7 +53,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(
-                    _localizationService.GetString("Button_MainMenu", user.LanguageCode),
+                    _localizationService.GetString("Button_Menu", user.LanguageCode),
                     "menu"
                 )
             }
