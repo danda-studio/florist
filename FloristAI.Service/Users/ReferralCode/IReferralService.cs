@@ -9,5 +9,6 @@ namespace FloristAI.Application.Users.ReferralCode
     public interface IReferralService
     {
         string GetReferralLink(int Id);
+        byte[] GetReferralQrCode(int Id);
     }
 }

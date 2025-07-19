@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace FloristAI.Infrastructure
@@ -52,12 +53,27 @@ namespace FloristAI.Infrastructure
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
 
-                            await _botClient.SendMessage(
-                                chatId: message.Chat.Id,
-                                text: result.Text,
-                                replyMarkup: result.ReplyMarkup,
-                                cancellationToken: token
-                            );
+                            // Если есть фото, отправляем его
+                            if (result.Photo?.ImageBytes != null)
+                            {
+                                using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                await _botClient.SendPhoto(
+                                    chatId: message.Chat.Id,
+                                    photo: InputFile.FromStream(stream),
+                                    caption: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
+                            else
+                            {
+                                await _botClient.SendMessage(
+                                    chatId: message.Chat.Id,
+                                    text: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
                         }
                         else if (update.CallbackQuery != null)
                         {
@@ -74,12 +90,27 @@ namespace FloristAI.Infrastructure
                                 await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
                             }
 
-                            await _botClient.SendMessage(
-                                chatId: chatId,
-                                text: result.Text,
-                                replyMarkup: result.ReplyMarkup,
-                                cancellationToken: token
-                            );
+                            // Если есть фото, отправляем его
+                            if (result.Photo?.ImageBytes != null)
+                            {
+                                using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                await _botClient.SendPhoto(
+                                    chatId: chatId,
+                                    photo: InputFile.FromStream(stream),
+                                    caption: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
+                            else
+                            {
+                                await _botClient.SendMessage(
+                                    chatId: chatId,
+                                    text: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
 
                             await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
                         }
