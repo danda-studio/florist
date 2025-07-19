@@ -39,6 +39,13 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     ReplyMarkup = null
                 };
             }
+
+            await _userService.SaveStep(new SaveStepRequest
+            {
+                ChatId = chatId,
+                Step = Step 
+            });
+
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Client") },
@@ -56,7 +63,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 ChatId = chatId,
                 FirstName = input,
-                Step = Step
+                Step = "become_partner_step_lastName"
             });
 
             // Переход к следующему шагу
