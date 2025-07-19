@@ -9,7 +9,7 @@ namespace FloristAI.Adapter.StepFlowBuilder
 {
     public interface IStepInitializer
     {
-        Task<PartnerFormProgress> EnsureStepInitialized(long chatId);
+        Task<GetStepResponse> EnsureStepInitialized(long chatId);
     }
 
 }
