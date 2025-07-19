@@ -18,7 +18,7 @@ namespace FloristAI.Tests
 
             var router = new AdapterRouter(new[] { mockAdapter.Object });
 
-            var result = await router.RouteAsync("/start", 123);
+            var result = await router.Route("/start", 123);
 
             Assert.Equal("Hello from start", result.Text);
         }
@@ -42,7 +42,7 @@ namespace FloristAI.Tests
 
             var router = new AdapterRouter(new[] { mockStart.Object, mockMenu.Object });
 
-            var result = await router.RouteAsync("/start", 123);
+            var result = await router.Route("/start", 123);
 
             Assert.Equal("Menu opened.", result.Text);
         }
@@ -56,7 +56,7 @@ namespace FloristAI.Tests
                 .ReturnsAsync(new MessageResult { Text = "Client role selected." });
 
             var router = new AdapterRouter(new[] { mockAdapter.Object });
-            var result = await router.RouteAsync("role_select:client", 123);
+            var result = await router.Route("role_select:client", 123);
 
             Assert.Equal("Client role selected.", result.Text);
         }
@@ -79,7 +79,7 @@ namespace FloristAI.Tests
 
             var router = new AdapterRouter(new[] { mockCallback.Object, mockAdmin.Object});
 
-            var result = await router.RouteAsync("role_select:admin", 123);
+            var result = await router.Route("role_select:admin", 123);
 
             Assert.Equal("Admin menu.", result.Text);
         }
@@ -89,7 +89,7 @@ namespace FloristAI.Tests
         {
             var router = new AdapterRouter(new IMessageAdapter[0]);
 
-            var result = await router.RouteAsync("/unknown", 123);
+            var result = await router.Route("/unknown", 123);
 
             Assert.Equal("Неизвестная команда", result.Text);
         }
@@ -101,7 +101,7 @@ namespace FloristAI.Tests
             var router = new AdapterRouter(new IMessageAdapter[0]);
 
             // Act
-            var result = await router.RouteAsync("nonexistent:command", 123);
+            var result = await router.Route("nonexistent:command", 123);
 
             // Assert
             Assert.Equal("Неизвестный callback", result.Text);

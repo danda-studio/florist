@@ -47,7 +47,7 @@ namespace FloristAI.Infrastructure
                         if (update.Message?.Text != null)
                         {
                             var message = update.Message;
-                            var result = await _router.RouteAsync(message.Text, message.Chat.Id);
+                            var result = await _router.Route(message.Text, message.Chat.Id);
 
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
@@ -67,7 +67,7 @@ namespace FloristAI.Infrastructure
 
                             string command = callback.Data ?? "";
 
-                            var result = await _router.RouteAsync(command, chatId);
+                            var result = await _router.Route(command, chatId);
 
                             if(messageId != 0)
                             {
