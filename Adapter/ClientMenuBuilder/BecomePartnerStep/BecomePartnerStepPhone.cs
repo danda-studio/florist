@@ -3,6 +3,7 @@ using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
+using FloristAI.Application.Validation;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -47,6 +48,25 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public async Task<MessageResult> HandleInput(string input, long chatId)
         {
+            var user = await _userService.GetUser(chatId);
+            if (user == null)
+            {
+                return new MessageResult
+                {
+                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                    ReplyMarkup = null
+                };
+            }
+
+            if (!Validator.IsValidPhone(input))
+            {
+                return new MessageResult
+                {
+                    Text = _localizationService.GetString("Phone_Validation_Error", user.LanguageCode),
+                    ReplyMarkup = null
+                };
+            }
+
             await _userService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
