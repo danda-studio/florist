@@ -106,7 +106,7 @@ namespace FloristAI.Infrastructure
                                 await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
                             }
 
-                            if (_lastBotMessages.TryGetValue(messageId, out var lastMessageId))
+                            if (_lastBotMessages.TryGetValue(chatId, out var lastMessageId))
                             {
                                 try
                                 {
