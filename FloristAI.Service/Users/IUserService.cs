@@ -41,5 +41,10 @@ namespace FloristAI.Application.Users
 
         Task<GetStepResponse> GetStep(long chatId);
         Task<bool> SaveStep(SaveStepRequest request);
+
+        string GetReferralLink(int Id);
+        byte[] GetReferralQrCode(int Id);
+
+        Task<bool> ClearStep(long chatId);
     }
 }

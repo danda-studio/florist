@@ -9,6 +9,7 @@ namespace FloristAI.Application.Users.Models.Request
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Phone { get; set; }
+        public int? LastMessageId { get; set; }
 
     }
 }
