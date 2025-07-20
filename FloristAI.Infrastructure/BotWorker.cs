@@ -12,6 +12,8 @@ namespace FloristAI.Infrastructure
     /// </summary>
     public class BotWorker : BackgroundService
     {
+
+        private static Dictionary<long, int> _lastBotMessages = new();
         /// <summary>
         /// Клиент Telegram-бота.
         /// </summary>
@@ -67,12 +69,14 @@ namespace FloristAI.Infrastructure
                             }
                             else
                             {
-                                await _botClient.SendMessage(
+                                var sentMessage = await _botClient.SendMessage(
                                     chatId: message.Chat.Id,
                                     text: result.Text,
                                     replyMarkup: result.ReplyMarkup,
                                     cancellationToken: token
                                 );
+
+                                _lastBotMessages[message.Chat.Id] = sentMessage.MessageId;
                             }
                         }
                         else if (update.CallbackQuery != null)

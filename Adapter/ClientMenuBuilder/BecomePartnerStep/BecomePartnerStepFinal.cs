@@ -59,6 +59,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
+            await _userService.ClearStep(chatId);
+
             return new MessageResult
             {
                 Text = referralText,
@@ -74,7 +76,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         public async Task<MessageResult> HandleInput(string input, long chatId)
         {
             // Никакой обработки ввода — просто повторяем финальное сообщение
-            await _userService.ClearStep(chatId);
             return await BuildMenu(chatId);
         }
     }
