@@ -1,8 +1,5 @@
-﻿
+﻿using FloristAI.Router;
 using Microsoft.Extensions.Hosting;
-using Router;
-using System;
-using System.Collections.Generic;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -15,6 +12,8 @@ namespace FloristAI.Infrastructure
     /// </summary>
     public class BotWorker : BackgroundService
     {
+
+        private static Dictionary<long, int> _lastBotMessages = new();
         /// <summary>
         /// Клиент Telegram-бота.
         /// </summary>
@@ -51,17 +50,46 @@ namespace FloristAI.Infrastructure
                         if (update.Message?.Text != null)
                         {
                             var message = update.Message;
-                            var result = await _router.RouteAsync(message.Text, message.Chat.Id);
+                            var result = await _router.Route(message.Text, message.Chat.Id);
 
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
 
-                            await _botClient.SendMessage(
-                                chatId: message.Chat.Id,
-                                text: result.Text,
-                                replyMarkup: result.ReplyMarkup,
-                                cancellationToken: token
-                            );
+                            if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
+                            {
+                                try
+                                {
+                                    await _botClient.DeleteMessage(message.Chat.Id, lastMessageId, cancellationToken: token);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
+                                }
+                            }
+
+                            // Если есть фото, отправляем его
+                            if (result.Photo?.ImageBytes != null)
+                            {
+                                using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                var sentPhoto = await _botClient.SendPhoto(
+                                    chatId: message.Chat.Id,
+                                    photo: InputFile.FromStream(stream),
+                                    caption: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
+                            else
+                            {
+                                var sentMessage = await _botClient.SendMessage(
+                                    chatId: message.Chat.Id,
+                                    text: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+
+                                _lastBotMessages[message.Chat.Id] = sentMessage.MessageId;
+                            }
                         }
                         else if (update.CallbackQuery != null)
                         {
@@ -71,19 +99,54 @@ namespace FloristAI.Infrastructure
 
                             string command = callback.Data ?? "";
 
-                            var result = await _router.RouteAsync(command, chatId);
+                            var result = await _router.Route(command, chatId);
 
                             if(messageId != 0)
                             {
-                                await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                                try
+                                {
+                                    await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Ошибка удаления сообщения с кнопкой: {ex.Message}");
+                                }
                             }
 
-                            await _botClient.SendMessage(
-                                chatId: chatId,
-                                text: result.Text,
-                                replyMarkup: result.ReplyMarkup,
-                                cancellationToken: token
-                            );
+                            if (_lastBotMessages.TryGetValue(chatId, out var lastMessageId))
+                            {
+                                try
+                                {
+                                    await _botClient.DeleteMessage(messageId, lastMessageId, cancellationToken: token);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
+                                }
+                            }
+
+                            // Если есть фото, отправляем его
+                            if (result.Photo?.ImageBytes != null)
+                            {
+                                using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                await _botClient.SendPhoto(
+                                    chatId: chatId,
+                                    photo: InputFile.FromStream(stream),
+                                    caption: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                            }
+                            else
+                            {
+                                var sentMessage = await _botClient.SendMessage(
+                                    chatId: chatId,
+                                    text: result.Text,
+                                    replyMarkup: result.ReplyMarkup,
+                                    cancellationToken: token
+                                );
+                                _lastBotMessages[chatId] = sentMessage.MessageId;
+                            }
 
                             await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
                         }

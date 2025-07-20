@@ -1,9 +1,7 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Application.Language;
-using FloristAI.Application.User;
+using FloristAI.Application.Users;
 using FloristAI.Core.Entities.Enums;
-using System.Linq;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter
@@ -105,7 +103,7 @@ namespace FloristAI.Adapter
         {
             return role switch
             {
-                RoleType.Client => "role_menu:Сlient",
+                RoleType.Client => "role_menu:Client",
                 RoleType.Admin => "role_menu:Admin",
                 RoleType.Partner => "role_menu:Partner",
                 RoleType.Florist => "role_menu:Florist",

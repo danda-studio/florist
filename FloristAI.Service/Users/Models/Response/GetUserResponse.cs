@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace FloristAI.Application.User.Models.Response
+﻿
+namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>
     /// Ответ сервиса с данными пользователя.

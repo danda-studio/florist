@@ -1,11 +1,17 @@
 ﻿using FloristAI.Adapter;
+using FloristAI.Adapter.ClientMenuBuilder;
+using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
+using FloristAI.Adapter.RoleMenuBuilder;
+using FloristAI.Adapter.StepFlowBuilder;
+using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
-using FloristAI.Application.User;
+using FloristAI.Application.Users;
 using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
+using FloristAI.Router;
 using Microsoft.EntityFrameworkCore;
-using Router;
+using StackExchange.Redis;
 using Telegram.Bot;
 
 namespace FloristAIBot
@@ -45,6 +51,14 @@ namespace FloristAIBot
                 options.UseNpgsql(connectionString,
                  b => b.MigrationsAssembly("FloristAI.Infrastructure")));
 
+
+            var redisConnectionString = Environment.GetEnvironmentVariable("RedisConnection")
+                ?? throw new Exception("RedisConnection переменная окружения не найдена");
+
+            // Регистрация Redis
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(redisConnectionString));
+
             // Регистрация Telegram-бота и бизнес-логики
             services.AddHostedService<BotWorker>();
             services.AddScoped<AdapterRouter>();
@@ -54,7 +68,24 @@ namespace FloristAIBot
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
             services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
+            services.AddScoped<IMessageAdapter, StepMenuAdapter>();
+            services.AddScoped<IMessageAdapter, StepMessageAdapter>();
+            services.AddScoped<IMessageAdapter, StepTextInputAdapter>();
+            services.AddScoped<IRoleMenuBuilder, ClientMenuBuilder>();
+            services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepFirstName>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepLastName>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepPhone>();
+            services.AddScoped<IStepFlowBuilder, BecomePartnerStepFinal>();
+            services.AddScoped<IRoleMenuBuilderProvider, RoleMenuBuilderProvider>();
+            services.AddScoped<IStepMenuProvider, StepMenuProvider>();
+            services.AddScoped<IStepFlowProvider, StepFlowProvider>();
+            services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICacheRepository, CacheRepository>();
+
+            services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
+                new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
 
             var token = Environment.GetEnvironmentVariable("Bot_token") ?? _configuration["Telegram:Token"];
             services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));

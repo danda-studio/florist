@@ -1,8 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
-using FloristAI.Application.Language;
-using FloristAI.Application.User;
-using System.Threading.Tasks;
-using Telegram.Bot.Types.ReplyMarkups;
+using FloristAI.Adapter.RoleMenuBuilder;
+
 
 namespace FloristAI.Adapter
 {
@@ -17,24 +15,18 @@ namespace FloristAI.Adapter
         public string RouteKey => "role_menu";
 
         /// <summary>
-        /// Сервис для получения данных по пользователю.
-        /// </summary>
-        private readonly IUserService _userService;
-
-        /// <summary>
         /// Сервис для получения перевода сообщения.
         /// </summary>
-        private readonly ILocalizationService _localizationService;
+        private readonly IRoleMenuBuilderProvider _builderProvider;
 
         /// <summary>
         /// Создаёт новый экземпляр <see cref="MenuRoleAdapter"/>.
         /// </summary>
         /// <param name="userService">Сервис для работы с пользователями.</param>
         /// <param name="localizationService">Сервис локализации текста.</param>
-        public MenuRoleAdapter(IUserService userService, ILocalizationService localizationService)
+        public MenuRoleAdapter(IRoleMenuBuilderProvider builderProvider)
         {
-            _userService = userService;
-            _localizationService = localizationService;
+            _builderProvider = builderProvider;
         }
 
         /// <summary>
@@ -45,46 +37,16 @@ namespace FloristAI.Adapter
         /// <returns>Объект <see cref="MessageResult"/> с текстом меню и кнопками.</returns>
         public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
         {
-            var user = await _userService.GetUser(chatId);
-
-            var keyboard = new[]
+            if(string.IsNullOrWhiteSpace(parameter))
             {
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Flower", user.LanguageCode),
-                    callbackData: "get_menu:flower")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Basket", user.LanguageCode),
-                    callbackData: "get_menu:basket")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:bouquet")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Create_Bouquet", user.LanguageCode),
-                    callbackData: "get_menu:createBouquet")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("My_Orders", user.LanguageCode),
-                    callbackData: "get_menu:myOrder")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("Become_Partner", user.LanguageCode),
-                    callbackData: "get_menu:becomePartner")
-                },
-                new[] { InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("LanguageSelection", user.LanguageCode),
-                    callbackData: "start")
-                },
-            };
-
-
-            return new MessageResult
+                return new MessageResult { Text = "Параметр не может быть пустым." };
+            }
+            var builder = _builderProvider.GetBuilder(parameter);
+            if (builder == null)
             {
-                Text = _localizationService.GetString("Menu_Client", user.LanguageCode),
-                ReplyMarkup = keyboard
-            };
+                return new MessageResult { Text = "Неизвестный шаг меню." };
+            }
+            return await builder.BuildMenu(chatId);
         }
     }
 }

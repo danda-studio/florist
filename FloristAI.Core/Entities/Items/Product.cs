@@ -1,5 +1,4 @@
 ﻿using FloristAI.Core.Entities.Enums;
-using System.Collections.Generic;
 
 namespace FloristAI.Core.Entities.Items
 {
