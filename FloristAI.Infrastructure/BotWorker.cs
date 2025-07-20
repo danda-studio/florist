@@ -54,7 +54,18 @@ namespace FloristAI.Infrastructure
 
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
-
+                            
+                            if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
+                            {
+                                try
+                                {
+                                    await _botClient.DeleteMessage(message.Chat.Id, lastMessageId, cancellationToken: token);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
+                                }
+                            }
                             // Если есть фото, отправляем его
                             if (result.Photo?.ImageBytes != null)
                             {
