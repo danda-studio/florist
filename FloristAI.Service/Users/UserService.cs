@@ -3,6 +3,7 @@ using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Store;
+using QRCoder;
 
 namespace FloristAI.Application.Users
 {
@@ -83,6 +84,15 @@ namespace FloristAI.Application.Users
                 Phone = request.Phone
             };
             return await _cacheRepository.SaveProgress(step);
+        }
+
+        public async Task<bool> ClearStep(long chatId)
+        {
+            if (chatId <= 0)
+            {
+                throw new ArgumentException("Неверный идентификатор чата");
+            }
+            return await _cacheRepository.ClearProgress(chatId);
         }
 
         /// <summary>
@@ -179,6 +189,23 @@ namespace FloristAI.Application.Users
                 UserId = user.UserId,
                 LanguageCode = languageCode
             };
+        }
+
+        public string GetReferralLink(int Id)
+        {
+            string botName = "FLowerKisaBot";
+            return $"https://t.me/{botName}?start={Id}";
+        }
+
+        public byte[] GetReferralQrCode(int id)
+        {
+            string link = GetReferralLink(id);
+
+            var generator = new QRCodeGenerator();
+            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
+
+            var renderer = new PngByteQRCode(data);
+            return renderer.GetGraphic(20);
         }
     }
 }

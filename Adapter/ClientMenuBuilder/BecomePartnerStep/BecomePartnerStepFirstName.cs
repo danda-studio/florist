@@ -1,11 +1,8 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
-using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
-using FloristAI.Core.Entities.Enums;
-using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -43,7 +40,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             await _userService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
-                Step = Step 
+                Step = Step,
+                LastMessageId = null
             });
 
             var keyboard = new[]
@@ -63,7 +61,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 ChatId = chatId,
                 FirstName = input,
-                Step = "become_partner_step_lastName"
+                Step = "become_partner_step_lastName",
+                LastMessageId = null
             });
 
             // Переход к следующему шагу

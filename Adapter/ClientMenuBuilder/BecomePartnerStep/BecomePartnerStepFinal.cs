@@ -1,9 +1,7 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
-using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
-using FloristAI.Application.Users.ReferralCode;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -11,14 +9,12 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
     public class BecomePartnerStepFinal : IStepFlowBuilder
     {
         private readonly IUserService _userService;
-        private readonly IReferralService _referralService;
         private readonly ILocalizationService _localizationService;
 
-        public BecomePartnerStepFinal(IUserService userService, ILocalizationService localizationService, IReferralService referralService)
+        public BecomePartnerStepFinal(IUserService userService, ILocalizationService localizationService)
         {
             _userService = userService;
             _localizationService = localizationService;
-            _referralService = referralService;
         }
 
         public string Step => "become_partner_step_final";
@@ -35,13 +31,12 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 };
             }
 
-            // Получаем QR-код в виде byte[]
-            byte[] qrBytes = _referralService.GetReferralQrCode(user.UserId);
+            byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
 
             var referralText = $"""
             {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
-            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_referralService.GetReferralLink(user.UserId)}
+            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_userService.GetReferralLink(user.UserId)}
 
             {_localizationService.GetString("Referral_Description", user.LanguageCode)}
             """;
@@ -79,6 +74,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         public async Task<MessageResult> HandleInput(string input, long chatId)
         {
             // Никакой обработки ввода — просто повторяем финальное сообщение
+            await _userService.ClearStep(chatId);
             return await BuildMenu(chatId);
         }
     }
