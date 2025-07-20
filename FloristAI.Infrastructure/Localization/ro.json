@@ -10,6 +10,8 @@
   "Role_Admin": "🔴 Administrator",
   "Reporting": "Raportare",
   "Referral_Link": "Link de referință",
+  "Referral_Link_Label": "🔗 Link de recomandare:",
+  "Referral_Description": "ℹ️ Partajați link-ul de recomandare sau codul QR cu prietenii dvs. și primiți 5% din toate achizițiile lor.\nProgramul de recomandare este valabil pe viață.\nRetragerea câștigurilor în cadrul programului de recomandare se efectuează în prima zi a fiecărei luni.",
   "Orders": "Comenzi",
   "My_Orders": "🧾 Comenzile mele ⏳",
   "Menu_Partner": "Sunteți în cabinetul personal al partenerului.",
@@ -36,6 +38,7 @@
   "Button_Back": "⬅️ Înapoi",
   "Partner_Input_FirstName": "Introduceți prenumele dvs.",
   "Partner_Input_LastName": "Introduceți numele de familie.",
-  "Become_Input_Phone": "Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373).",
+  "GoToPartner_Menu": "🔵 Mergeți la dulapul personal al partenerului dvs.",
+  "Become_Input_Phone": "📱 Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373).",
   "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes."
 }

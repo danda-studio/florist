@@ -32,7 +32,7 @@ namespace FloristAI.Adapter
             {
                 return new MessageResult
                 {
-                    Text = "Пользователь не найден или шаг не установлен."
+                    Text = "А что мы вводим, нажимай на кнопки :)"
                 };
             }
 
