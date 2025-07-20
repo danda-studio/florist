@@ -54,23 +54,12 @@ namespace FloristAI.Infrastructure
 
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
-                            
-                            if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
-                            {
-                                try
-                                {
-                                    await _botClient.DeleteMessage(message.Chat.Id, lastMessageId, cancellationToken: token);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
-                                }
-                            }
+
                             // Если есть фото, отправляем его
                             if (result.Photo?.ImageBytes != null)
                             {
                                 using var stream = new MemoryStream(result.Photo.ImageBytes);
-                                await _botClient.SendPhoto(
+                                var sentPhoto = await _botClient.SendPhoto(
                                     chatId: message.Chat.Id,
                                     photo: InputFile.FromStream(stream),
                                     caption: result.Text,
@@ -119,12 +108,14 @@ namespace FloristAI.Infrastructure
                             }
                             else
                             {
-                                await _botClient.SendMessage(
+                                var sentMessage = await _botClient.SendMessage(
                                     chatId: chatId,
                                     text: result.Text,
                                     replyMarkup: result.ReplyMarkup,
                                     cancellationToken: token
                                 );
+                                _lastBotMessages[messageId] = sentMessage.MessageId;
+
                             }
 
                             await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
