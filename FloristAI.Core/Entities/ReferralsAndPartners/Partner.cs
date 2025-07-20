@@ -1,5 +1,4 @@
 ﻿using FloristAI.Core.Entities.UserInfo;
-using System.Collections.Generic;
 
 namespace FloristAI.Core.Entities.ReferralsAndPartners
 {
@@ -17,6 +16,21 @@ namespace FloristAI.Core.Entities.ReferralsAndPartners
         /// Идентификатор пользователя, связанного с партнёром.
         /// </summary>
         public int UserId { get; set; }
+
+        /// <summary>
+        /// Имя партнёра.
+        /// </summary>
+        public string FirstName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Фамилия партнёра.
+        /// </summary>
+        public string LastName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Номер телефона партнёра.
+        /// </summary>
+        public string PhoneNumber { get; set; } = string.Empty;
 
         /// <summary>
         /// Пользователь, которому принадлежит статус партнёра.

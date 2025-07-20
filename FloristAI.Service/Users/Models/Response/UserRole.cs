@@ -1,7 +1,6 @@
 ﻿using FloristAI.Core.Entities.Enums;
-using System;
 
-namespace FloristAI.Application.User.Models.Response
+namespace FloristAI.Application.Users.Models.Response
 {
     /// <summary>
     /// Модель, представляющая роль пользователя.

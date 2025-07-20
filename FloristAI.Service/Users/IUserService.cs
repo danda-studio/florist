@@ -1,8 +1,7 @@
-﻿using FloristAI.Application.User.Models.Response;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using FloristAI.Application.Users.Models.Request;
+using FloristAI.Application.Users.Models.Response;
 
-namespace FloristAI.Application.User
+namespace FloristAI.Application.Users
 {
     /// <summary>
     /// Интерфейс сервиса для работы с пользователями.
@@ -39,5 +38,13 @@ namespace FloristAI.Application.User
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <returns>Модель с данными пользователя.</returns>
         Task<GetUserResponse> GetUser(long chatId);
+
+        Task<GetStepResponse> GetStep(long chatId);
+        Task<bool> SaveStep(SaveStepRequest request);
+
+        string GetReferralLink(int Id);
+        byte[] GetReferralQrCode(int Id);
+
+        Task<bool> ClearStep(long chatId);
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace FloristAI.Adapter.Models
 {
     /// <summary>
@@ -15,6 +10,11 @@ namespace FloristAI.Adapter.Models
         /// Ссылка на фото или file_id если TG
         /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// Бинарные данные изображения (если нет URL)
+        /// </summary>
+        public byte[]? ImageBytes { get; set; }
 
         /// <summary>
         /// Описание фото

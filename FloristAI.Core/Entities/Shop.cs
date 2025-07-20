@@ -1,4 +1,5 @@
-﻿namespace FloristAI.Core.Entities
+﻿
+namespace FloristAI.Core.Entities
 {
     /// <summary>
     /// Модель магазина

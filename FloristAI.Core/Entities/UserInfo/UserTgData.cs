@@ -1,4 +1,5 @@
-﻿namespace FloristAI.Core.Entities.UserInfo
+﻿
+namespace FloristAI.Core.Entities.UserInfo
 {
     /// <summary>
     /// Модель информации пользователя с Telegram

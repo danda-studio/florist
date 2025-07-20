@@ -1,12 +1,11 @@
 ﻿using FloristAI.Application.Language;
-using FloristAI.Application.User.Models;
-using FloristAI.Application.User.Models.Response;
+using FloristAI.Application.Users.Models.Request;
+using FloristAI.Application.Users.Models.Response;
+using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Store;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using QRCoder;
 
-namespace FloristAI.Application.User
+namespace FloristAI.Application.Users
 {
     /// <summary>
     /// Сервис для работы с пользователями
@@ -18,6 +17,8 @@ namespace FloristAI.Application.User
         /// </summary>
         public readonly IUserRepository _userRepository;
 
+        public readonly ICacheRepository _cacheRepository;
+
         /// <summary>
         /// Сервис локализации для получения локализованных строк.
         /// </summary>
@@ -28,10 +29,11 @@ namespace FloristAI.Application.User
         /// </summary>
         /// <param name="userRepository">Репозиторий пользователей.</param>
         /// <param name="localizationService">Сервис локализации.</param>
-        public UserService(IUserRepository userRepository, ILocalizationService localizationService)
+        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository)
         {
             _userRepository = userRepository;
             _localizationService = localizationService;
+            _cacheRepository = cacheRepository;
         }
 
 
@@ -49,6 +51,48 @@ namespace FloristAI.Application.User
 
             var user = await GetUser(chatId);
             return user ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
+        }
+
+        public async Task<GetStepResponse> GetStep(long chatId)
+        {
+           var step = await _cacheRepository.GetProgress(chatId);
+
+            return new GetStepResponse
+            {
+                ChatId = chatId,
+                Step = step?.Step, 
+                FirstName = step?.FirstName,
+                LastName = step?.LastName,
+                Phone = step?.Phone
+            };
+
+        }
+
+        public async Task<bool> SaveStep(SaveStepRequest request)
+        {
+            
+            if (request == null || request.ChatId <= 0)
+            {
+                throw new ArgumentException("Неверный запрос для сохранения шага");
+            }
+            var step = new Core.Entities.UserInfo.PartnerFormProgress
+            {
+                ChatId = request.ChatId,
+                Step = request.Step,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Phone = request.Phone
+            };
+            return await _cacheRepository.SaveProgress(step);
+        }
+
+        public async Task<bool> ClearStep(long chatId)
+        {
+            if (chatId <= 0)
+            {
+                throw new ArgumentException("Неверный идентификатор чата");
+            }
+            return await _cacheRepository.ClearProgress(chatId);
         }
 
         /// <summary>
@@ -114,7 +158,7 @@ namespace FloristAI.Application.User
 
             var roles = await _userRepository.GetRoles(user.UserId);
             var response = roles
-                .Select(r => new UserRole
+                .Select(r => new Models.Response.UserRole
                 {
                     RoleType = r.Role,
                     RoleName = _localizationService.GetString($"Role_{r.Role}", languageCode)
@@ -145,6 +189,23 @@ namespace FloristAI.Application.User
                 UserId = user.UserId,
                 LanguageCode = languageCode
             };
+        }
+
+        public string GetReferralLink(int Id)
+        {
+            string botName = "FLowerKisaBot";
+            return $"https://t.me/{botName}?start={Id}";
+        }
+
+        public byte[] GetReferralQrCode(int id)
+        {
+            string link = GetReferralLink(id);
+
+            var generator = new QRCodeGenerator();
+            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
+
+            var renderer = new PngByteQRCode(data);
+            return renderer.GetGraphic(20);
         }
     }
 }

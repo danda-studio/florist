@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace FloristAI.Core.Entities.Enums
 {
     /// <summary>
