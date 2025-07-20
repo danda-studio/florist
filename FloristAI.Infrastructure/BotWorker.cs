@@ -103,7 +103,14 @@ namespace FloristAI.Infrastructure
 
                             if(messageId != 0)
                             {
-                                await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                                try
+                                {
+                                    await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Ошибка удаления сообщения с кнопкой: {ex.Message}");
+                                }
                             }
 
                             if (_lastBotMessages.TryGetValue(chatId, out var lastMessageId))
@@ -138,7 +145,7 @@ namespace FloristAI.Infrastructure
                                     replyMarkup: result.ReplyMarkup,
                                     cancellationToken: token
                                 );
-                                _lastBotMessages[messageId] = sentMessage.MessageId;
+                                _lastBotMessages[chatId] = sentMessage.MessageId;
                             }
 
                             await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
