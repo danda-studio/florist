@@ -75,7 +75,7 @@ namespace FloristAI.Adapter
             {
                 InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("LanguageSelection", parameter),
-                    callbackData: "start"
+                    callbackData: "/start"
                 )
             };
 
