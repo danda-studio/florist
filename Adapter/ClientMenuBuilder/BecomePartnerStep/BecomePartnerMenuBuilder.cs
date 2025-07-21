@@ -37,7 +37,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 return new MessageResult
                 {
                     Text = _localizationService.GetString("IsPartner", user.LanguageCode),
-                    ReplyMarkup = null
+                    ReplyMarkup = backButton
                 };
             }
             
