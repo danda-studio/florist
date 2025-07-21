@@ -26,6 +26,21 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         public async Task<MessageResult> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
+            var isPartner = await _userService.CheckStatusPartner(chatId);
+            if (isPartner == true)
+            {
+                var backButton = new[]
+                {
+                    new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Client") }
+                };
+
+                return new MessageResult
+                {
+                    Text = _localizationService.GetString("IsPartner", user.LanguageCode),
+                    ReplyMarkup = null
+                };
+            }
+            
             if (user == null)
             {
                 return new MessageResult

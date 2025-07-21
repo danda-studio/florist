@@ -51,5 +51,6 @@ namespace FloristAI.Application.Users
         Task<Partner> AddPartner(AddPartnerRequest request);
 
         Task RegisterPartner(long chatId);
+        Task<bool> CheckStatusPartner(long chatId);
     }
 }
