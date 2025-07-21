@@ -70,6 +70,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             await _userService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
+                Phone = input,
                 Step = "become_partner_step_final"
             });
 
