@@ -3,6 +3,7 @@ using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Entities.ReferralsAndPartners;
+using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
 using QRCoder;
 
@@ -71,21 +72,32 @@ namespace FloristAI.Application.Users
 
         public async Task<bool> SaveStep(SaveStepRequest request)
         {
-            
             if (request == null || request.ChatId <= 0)
             {
                 throw new ArgumentException("Неверный запрос для сохранения шага");
             }
-            var step = new Core.Entities.UserInfo.PartnerFormProgress
-            {
-                ChatId = request.ChatId,
-                Step = request.Step,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Phone = request.Phone
-            };
-            return await _cacheRepository.SaveProgress(step);
+
+            // Получаем текущий прогресс
+            var progress = await _cacheRepository.GetProgress(request.ChatId)
+                           ?? new PartnerFormProgress { ChatId = request.ChatId };
+
+            // Обновляем только то, что пришло в запросе
+            if (request.Step != null)
+                progress.Step = request.Step;
+
+            if (!string.IsNullOrWhiteSpace(request.FirstName))
+                progress.FirstName = request.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(request.LastName))
+                progress.LastName = request.LastName;
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+                progress.Phone = request.Phone;
+
+            // сохраняем обновлённый прогресс
+            return await _cacheRepository.SaveProgress(progress);
         }
+
 
         public async Task<bool> ClearStep(long chatId)
         {

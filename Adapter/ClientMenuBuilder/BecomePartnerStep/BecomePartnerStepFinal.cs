@@ -59,6 +59,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
+            await _userService.GetStep(chatId);
             await _userService.ClearStep(chatId);
 
             return new MessageResult

@@ -51,6 +51,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             await _userService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
+                LastName = input,
                 Step = "become_partner_step_phone"
             });
 
