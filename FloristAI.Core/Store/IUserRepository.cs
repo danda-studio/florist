@@ -1,4 +1,5 @@
-﻿using FloristAI.Core.Entities.UserInfo;
+﻿using FloristAI.Core.Entities.ReferralsAndPartners;
+using FloristAI.Core.Entities.UserInfo;
 
 namespace FloristAI.Core.Store
 {
@@ -36,5 +37,7 @@ namespace FloristAI.Core.Store
         /// <param name="languageCode">Новый код языка интерфейса.</param>
         /// <returns>True, если обновление прошло успешно, иначе false.</returns>
         Task<bool> EditLanguageCode(int Id, string languageCode);
+
+        Task<Partner> AddPartner(Partner partner);
     }
 }

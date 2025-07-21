@@ -2,6 +2,7 @@
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Store;
 using QRCoder;
 
@@ -207,5 +208,24 @@ namespace FloristAI.Application.Users
             var renderer = new PngByteQRCode(data);
             return renderer.GetGraphic(20);
         }
+
+
+        public async Task<Partner> AddPartner(AddPartnerRequest request)
+        {
+            var user = await _userRepository.GetUserByChatId(request.ChatId);
+            if (user == null)
+                throw new Exception("User not found");
+
+            var partner = new Partner
+            {
+                UserId = user.Id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            return await _userRepository.AddPartner(partner);
+        }
+
     }
 }
