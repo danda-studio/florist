@@ -237,5 +237,28 @@ namespace FloristAI.Application.Users
             return await _userRepository.AddPartner(partner);
         }
 
+        public async Task RegisterPartner(long chatId)
+        {
+            var stepData = await GetStep(chatId);
+
+            if (stepData == null)
+            {
+                throw new InvalidOperationException($"Step data not found for chatId {chatId}");
+            }
+
+            var request = new AddPartnerRequest
+            {
+                ChatId = stepData.ChatId,
+                FirstName = stepData.FirstName ?? string.Empty,
+                LastName = stepData.LastName ?? string.Empty,
+                PhoneNumber = stepData.Phone ?? string.Empty
+            };
+
+            await AddPartner(request);
+            await ClearStep(chatId);
+        }
+
+
+
     }
 }
