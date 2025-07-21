@@ -75,7 +75,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public async Task<MessageResult> HandleInput(string input, long chatId)
         {
-            // Никакой обработки ввода — просто повторяем финальное сообщение
             return await BuildMenu(chatId);
         }
     }

@@ -212,10 +212,8 @@ namespace FloristAI.Application.Users
 
         public async Task<Partner> AddPartner(AddPartnerRequest request)
         {
-            var user = await _userRepository.GetUserByChatId(request.ChatId);
-            if (user == null)
-                throw new Exception("User not found");
 
+            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
             var partner = new Partner
             {
                 UserId = user.Id,
