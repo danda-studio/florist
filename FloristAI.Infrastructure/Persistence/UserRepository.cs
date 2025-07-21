@@ -93,10 +93,26 @@ namespace FloristAI.Infrastructure.Persistence
 
         public async Task<Partner> AddPartner(Partner partner)
         {
-            _dbContext.Partners.Add(partner);
+            await _dbContext.Partners.AddAsync(partner);
+
+            // Проверка наличия роли
+            bool hasPartnerRole = await _dbContext.UserRoles
+                .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
+
+            if (!hasPartnerRole)
+            {
+                _dbContext.UserRoles.Add(new UserRole
+                {
+                    UserId = partner.UserId,
+                    Role = RoleType.Partner
+                });
+            }
+
             await _dbContext.SaveChangesAsync();
+
             return partner;
         }
+
 
     }
 }
