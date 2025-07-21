@@ -43,5 +43,6 @@
   "Become_Input_LastName": "Introduceți numele dvs. de familie",
   "Become_Input_Phone": "📱 Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373).",
   "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes.",
-  "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”."
+  "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”.",
+  "IsPartner": "👤 "
 }

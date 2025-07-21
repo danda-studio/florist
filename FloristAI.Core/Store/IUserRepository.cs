@@ -39,5 +39,7 @@ namespace FloristAI.Core.Store
         Task<bool> EditLanguageCode(int Id, string languageCode);
 
         Task<Partner> AddPartner(Partner partner);
+
+        Task<bool> IsPartner(long chatId);
     }
 }
