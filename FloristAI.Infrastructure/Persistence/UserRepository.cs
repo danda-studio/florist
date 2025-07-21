@@ -1,6 +1,8 @@
 ﻿using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
+using FloristAI.Infrastructure.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FloristAI.Infrastructure.Persistence
@@ -89,5 +91,13 @@ namespace FloristAI.Infrastructure.Persistence
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        public async Task<Partner> AddPartner(Partner partner)
+        {
+            _dbContext.Partners.Add(partner);
+            await _dbContext.SaveChangesAsync();
+            return partner;
+        }
+
     }
 }
