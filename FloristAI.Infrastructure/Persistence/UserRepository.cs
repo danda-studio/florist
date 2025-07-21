@@ -113,10 +113,10 @@ namespace FloristAI.Infrastructure.Persistence
             return partner;
         }
 
-        public async Task<bool> IsPartner (long chatId)
+        public async Task<bool> IsPartner(long chatId)
         {
-            return await _dbContext.Users
-                    .AnyAsync(p => p.TgData != null && p.TgData.TelegramId == chatId && p.Partner != null);
+            return await _dbContext.Partners
+                .AnyAsync(p => p.User.TgData != null && p.User.TgData.TelegramId == chatId);
         }
 
 
