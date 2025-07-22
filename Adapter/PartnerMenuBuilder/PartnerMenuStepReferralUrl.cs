@@ -38,7 +38,6 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
             }
 
             byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
-
             var referralText = $"""
             {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
@@ -52,7 +51,7 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Partner") },
             };
 
-            new List<MessageResult>
+            return new List<MessageResult>
             {
                 new MessageResult
                 {
