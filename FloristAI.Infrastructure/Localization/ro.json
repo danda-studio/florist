@@ -32,7 +32,7 @@
   "Become_Partner": "🤝 Devino partener",
   "Basket": "🧺 Coșuri",
   "Become_Partner_Title": "✍️ Completați formularul în câțiva pași simpli și începeți să câștigați împreună cu noi.",
-  "Become_Partner_Description": "Distribuiți linkul dvs. de referință sau codul QR al botului cu prietenii și câștigați 5% din toate achizițiile lor.\n Programul de referință este valabil pe viață.\n Retragerea câștigurilor din programul de referință se efectuează în prima zi a fiecărei luni.",
+  "Become_Partner_Description": "ℹ️ Distribuiți linkul dvs. de referință sau codul QR al botului cu prietenii și câștigați 5% din toate achizițiile lor.\n Programul de referință este valabil pe viață.\n Retragerea câștigurilor din programul de referință se efectuează în prima zi a fiecărei luni.",
   "Become_Fill_Button": "✍️ Completați formularul",
   "Button_Menu": "☰ Meniu",
   "Button_Back": "⬅️ Înapoi",
@@ -44,5 +44,6 @@
   "Become_Input_Phone": "📱 Introduceți numărul dvs. începând cu codul de țară (de exemplu, +373).",
   "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes.",
   "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”.",
-  "IsPartner": "👤 Sunteți deja partener"
+  "IsPartner": "👤 Sunteți deja partener",
+  "Update_Data": "♻️ Actualizați datele"
 }

@@ -64,7 +64,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 Step = "become_partner_step_lastName",
             });
 
-            // Переход к следующему шагу
             var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_lastName");
             return await nextBuilder.BuildMenu(chatId);
         }

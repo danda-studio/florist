@@ -27,7 +27,7 @@ namespace FloristAI.Adapter
                 return new List<MessageResult> { new MessageResult { Text = "Неизвестный шаг меню." } };
             }
 
-            var result = await builder.BuildMenu(chatId); // уже List<MessageResult>
+            var result = await builder.BuildMenu(chatId); 
             return result;
         }
     }
