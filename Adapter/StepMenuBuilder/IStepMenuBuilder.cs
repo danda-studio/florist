@@ -6,7 +6,7 @@ namespace FloristAI.Adapter.StepMenuBuilder
     {
         string Step { get; }
 
-        Task<MessageResult> BuildMenu(long chatId);
+        Task<List<MessageResult>> BuildMenu(long chatId);
 
     }
 }

@@ -22,15 +22,18 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
         }
         public string Step => "referal_url";
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", "ru"),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
+                        ReplyMarkup = null
+                    }
                 };
             }
 
@@ -49,15 +52,18 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Partner") },
             };
 
-            return new MessageResult
+            new List<MessageResult>
             {
-                Text = referralText,
-                Photo = new PhotoContent
+                new MessageResult
                 {
-                    ImageBytes = qrBytes,  
-                    Description = referralText
-                },
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                    Text = referralText,
+                    Photo = new PhotoContent
+                    {
+                        ImageBytes = qrBytes,  
+                        Description = referralText
+                    },
+                    ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                }
             };
         }
     }
