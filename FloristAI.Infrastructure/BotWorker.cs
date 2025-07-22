@@ -50,9 +50,8 @@ namespace FloristAI.Infrastructure
                         if (update.Message?.Text != null)
                         {
                             var message = update.Message;
-                            var results = await _router.Route(message.Text, message.Chat.Id); // ← исправлено
+                            var results = await _router.Route(message.Text, message.Chat.Id); 
 
-                            // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
 
                             if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
@@ -67,7 +66,6 @@ namespace FloristAI.Infrastructure
                                 }
                             }
 
-                            // Отправка всех сообщений из results
                             foreach (var result in results)
                             {
                                 if (result.Photo?.ImageBytes != null)
@@ -83,7 +81,7 @@ namespace FloristAI.Infrastructure
                                 }
                                 else
                                 {
-                                    var sentMessage = await _botClient.SendMessage( // правильное имя метода
+                                    var sentMessage = await _botClient.SendMessage( 
                                         chatId: message.Chat.Id,
                                         text: result.Text,
                                         replyMarkup: result.ReplyMarkup,
@@ -102,7 +100,7 @@ namespace FloristAI.Infrastructure
 
                             string command = callback.Data ?? "";
 
-                            var results = await _router.Route(command, chatId); // ← исправлено на List<MessageResult>
+                            var results = await _router.Route(command, chatId); 
 
                             if (messageId != 0)
                             {
@@ -128,7 +126,6 @@ namespace FloristAI.Infrastructure
                                 }
                             }
 
-                            // Отправка всех сообщений из списка
                             foreach (var result in results)
                             {
                                 if (result.Photo?.ImageBytes != null)
@@ -166,7 +163,7 @@ namespace FloristAI.Infrastructure
                 HandleErrorAsync,
                 new ReceiverOptions
                 {
-                    AllowedUpdates = Array.Empty<UpdateType>() // получаем всё
+                    AllowedUpdates = Array.Empty<UpdateType>() 
                 },
                 cancellationToken: stoppingToken
             );

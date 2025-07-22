@@ -66,7 +66,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 Text = referralText,
                 Photo = new PhotoContent
                 {
-                    ImageBytes = qrBytes,  // Передаём бинарные данные
+                    ImageBytes = qrBytes,  
                     Description = referralText
                 },
                 ReplyMarkup = new InlineKeyboardMarkup(keyboard)

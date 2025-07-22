@@ -32,7 +32,7 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Referral_Link", user.LanguageCode), "step:referal_url") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Reporting", user.LanguageCode), "step:result") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Reporting", user.LanguageCode), "step:reporting") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Select_Room", user.LanguageCode), $"select_role:{user.LanguageCode}") },
 
             };
