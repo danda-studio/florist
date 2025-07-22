@@ -31,10 +31,10 @@ namespace FloristAI.Router
         /// <param name="message">Входящее сообщение или callback-данные.</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки в виде <see cref="MessageResult"/>.</returns>
-        public async Task<MessageResult> Route(string message, long chatId)
+        public async Task<List<MessageResult>> Route(string message, long chatId)
         {
             if (string.IsNullOrWhiteSpace(message))
-                return new MessageResult { Text = "Неизвестная команда" };
+                new List<MessageResult> { new MessageResult { Text = "Неизвестная команда" } };
 
             if (message.Contains(":"))
                 return await RouteCallback(message, chatId);
@@ -44,13 +44,16 @@ namespace FloristAI.Router
             return await RouteTextInput(message, chatId);
         }
 
-        private async Task<MessageResult> RouteTextInput(string message, long chatId)
+        private async Task<List<MessageResult>> RouteTextInput(string message, long chatId)
         {
             if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
             {
                 return await stepInputAdapter.ProcessMessage(message, chatId);
             }
-            return new MessageResult { Text = "Неизвестный шаг ввода текста" };
+            return new List<MessageResult>
+            {
+                new MessageResult { Text = "Неизвестный шаг ввода текста" }
+            };
         }
 
         /// <summary>
@@ -59,21 +62,24 @@ namespace FloristAI.Router
         /// <param name="message">Команда (например, "/start").</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки команды.</returns>
-        private async Task<MessageResult> RouteCommand(string message, long chatId)
+        private async Task<List<MessageResult>> RouteCommand(string message, long chatId)
         {
             var command = ExtractCommand(message); // убирает "/"
             if (_adapters.TryGetValue(command, out var adapter))
             {
                 var result = await adapter.ProcessMessage(message, chatId);
-                if (!string.IsNullOrWhiteSpace(result.RedirectRouteKey))
+
+                // Так как result — список, проверяем RedirectRouteKey у первого сообщения
+                var firstMessage = result.FirstOrDefault();
+
+                if (firstMessage != null && !string.IsNullOrWhiteSpace(firstMessage.RedirectRouteKey))
                 {
-                    return await Route(result.RedirectRouteKey, chatId);
+                    return await Route(firstMessage.RedirectRouteKey, chatId);
                 }
 
                 return result;
             }
-
-            return new MessageResult { Text = "Неизвестная команда" };
+            return new List<MessageResult> { new MessageResult { Text = $"Неизвестная команда: {command}" } };
         }
 
         /// <summary>
@@ -82,7 +88,7 @@ namespace FloristAI.Router
         /// <param name="callbackData">Данные callback (например, "role_select:admin").</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки callback.</returns>
-        private async Task<MessageResult> RouteCallback(string callbackData, long chatId)
+        private async Task<List<MessageResult>> RouteCallback(string callbackData, long chatId)
         {
             Console.WriteLine($"Пришел callback: {callbackData}");
 
@@ -101,17 +107,19 @@ namespace FloristAI.Router
 
             if (_adapters.TryGetValue(route, out var adapter))
             {
-                var result = await adapter.ProcessMessage(parameter, chatId);
+                var result = await adapter.ProcessMessage(route, chatId);
 
-                if (!string.IsNullOrEmpty(result.RedirectRouteKey))
+                // Так как result — список, проверяем RedirectRouteKey у первого сообщения
+                var firstMessage = result.FirstOrDefault();
+
+                if (firstMessage != null && !string.IsNullOrWhiteSpace(firstMessage.RedirectRouteKey))
                 {
-                    return await Route(result.RedirectRouteKey, chatId);
+                    return await Route(firstMessage.RedirectRouteKey, chatId);
                 }
 
                 return result;
             }
-
-            return new MessageResult { Text = "Неизвестный callback" };
+            return new List<MessageResult> { new MessageResult { Text = $"Неизвестный callback: {callbackData}" } };
         }
 
         /// <summary>

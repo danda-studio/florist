@@ -43,7 +43,7 @@ namespace FloristAI.Adapter
         /// <param name="parameter">Код языка, выбранный пользователем.</param>
         /// <param name="chatId">Идентификатор чата пользователя.</param>
         /// <returns>Сообщение с результатом: кнопки выбора ролей или редирект.</returns>
-        public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(string parameter, long chatId)
         {
             var role = await _userService.GetRolesByTelegramId(chatId, parameter);
             var langCode = await _userService.EditLanguageInterfaceUser(chatId, parameter);
@@ -54,12 +54,15 @@ namespace FloristAI.Adapter
 
                 string redirectKey = GetRouteKeyForRole(onlyRole.RoleType);
 
-                return new MessageResult
+                new List<MessageResult>
                 {
-                    Text = parameter == "ru"
-                        ? $"Ваша роль:{onlyRole.RoleName}. Открываю меню..."
-                        : $"Rolul dvs.: {onlyRole.RoleName}. Se deschide meniul...",
-                    RedirectRouteKey = redirectKey
+                    new MessageResult
+                    {
+                        Text = parameter == "ru"
+                            ? $"Вы выбрали роль: {onlyRole.RoleName}. Перенаправляю в меню..."
+                            : $"Ați selectat rolul: {onlyRole.RoleName}. Redirecționez către meniu...",
+                        RedirectRouteKey = redirectKey
+                    }
                 };
             }
 
@@ -81,16 +84,19 @@ namespace FloristAI.Adapter
 
             var keyboard = buttons.Append(languageButton).ToArray();
 
-            return new MessageResult
+            return new List<MessageResult>
             {
-                Text = role.Roles.Count > 1
-                    ? (parameter == "ru"
-                        ? "Вам доступно несколько ролей:"
-                        : "Aveți acces la mai multe roluri:")
-                    : (parameter == "ru"
-                        ? "Ваша роль:"
-                        : "Rolul dvs.:"),
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                new MessageResult
+                {
+                    Text = role.Roles.Count > 1
+                        ? (parameter == "ru"
+                            ? "Вам доступно несколько ролей:"
+                            : "Selectați un rol din listă:")
+                        : (parameter == "ru"
+                            ? "Ваша роль:"
+                            : "Rolul dvs.:"),
+                    ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                }
             };
         }
 

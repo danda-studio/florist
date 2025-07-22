@@ -195,7 +195,7 @@ namespace FloristAI.Application.Users
         public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
         {
             var user = await GetUser(chatId);
-            var success = await _userRepository.EditLanguageCode(user.UserId, languageCode);
+            await _userRepository.EditLanguageCode(user.UserId, languageCode);
 
             return new EditLanguageInterfaceUserResponse
             {
@@ -239,13 +239,7 @@ namespace FloristAI.Application.Users
 
         public async Task RegisterPartner(long chatId)
         {
-            var stepData = await GetStep(chatId);
-
-            if (stepData == null)
-            {
-                throw new InvalidOperationException($"Step data not found for chatId {chatId}");
-            }
-
+            var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
             var request = new AddPartnerRequest
             {
                 ChatId = stepData.ChatId,

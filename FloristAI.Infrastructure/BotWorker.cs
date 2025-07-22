@@ -50,7 +50,7 @@ namespace FloristAI.Infrastructure
                         if (update.Message?.Text != null)
                         {
                             var message = update.Message;
-                            var result = await _router.Route(message.Text, message.Chat.Id);
+                            var results = await _router.Route(message.Text, message.Chat.Id); // ← исправлено
 
                             // Удаляем входящее сообщение
                             await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
@@ -67,28 +67,31 @@ namespace FloristAI.Infrastructure
                                 }
                             }
 
-                            // Если есть фото, отправляем его
-                            if (result.Photo?.ImageBytes != null)
+                            // Отправка всех сообщений из results
+                            foreach (var result in results)
                             {
-                                using var stream = new MemoryStream(result.Photo.ImageBytes);
-                                var sentPhoto = await _botClient.SendPhoto(
-                                    chatId: message.Chat.Id,
-                                    photo: InputFile.FromStream(stream),
-                                    caption: result.Text,
-                                    replyMarkup: result.ReplyMarkup,
-                                    cancellationToken: token
-                                );
-                            }
-                            else
-                            {
-                                var sentMessage = await _botClient.SendMessage(
-                                    chatId: message.Chat.Id,
-                                    text: result.Text,
-                                    replyMarkup: result.ReplyMarkup,
-                                    cancellationToken: token
-                                );
+                                if (result.Photo?.ImageBytes != null)
+                                {
+                                    using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                    var sentPhoto = await _botClient.SendPhoto(
+                                        chatId: message.Chat.Id,
+                                        photo: InputFile.FromStream(stream),
+                                        caption: result.Text,
+                                        replyMarkup: result.ReplyMarkup,
+                                        cancellationToken: token
+                                    );
+                                }
+                                else
+                                {
+                                    var sentMessage = await _botClient.SendMessage( // правильное имя метода
+                                        chatId: message.Chat.Id,
+                                        text: result.Text,
+                                        replyMarkup: result.ReplyMarkup,
+                                        cancellationToken: token
+                                    );
 
-                                _lastBotMessages[message.Chat.Id] = sentMessage.MessageId;
+                                    _lastBotMessages[message.Chat.Id] = sentMessage.MessageId;
+                                }
                             }
                         }
                         else if (update.CallbackQuery != null)
@@ -99,9 +102,9 @@ namespace FloristAI.Infrastructure
 
                             string command = callback.Data ?? "";
 
-                            var result = await _router.Route(command, chatId);
+                            var results = await _router.Route(command, chatId); // ← исправлено на List<MessageResult>
 
-                            if(messageId != 0)
+                            if (messageId != 0)
                             {
                                 try
                                 {
@@ -117,7 +120,7 @@ namespace FloristAI.Infrastructure
                             {
                                 try
                                 {
-                                    await _botClient.DeleteMessage(messageId, lastMessageId, cancellationToken: token);
+                                    await _botClient.DeleteMessage(chatId, lastMessageId, cancellationToken: token);
                                 }
                                 catch (Exception ex)
                                 {
@@ -125,32 +128,35 @@ namespace FloristAI.Infrastructure
                                 }
                             }
 
-                            // Если есть фото, отправляем его
-                            if (result.Photo?.ImageBytes != null)
+                            // Отправка всех сообщений из списка
+                            foreach (var result in results)
                             {
-                                using var stream = new MemoryStream(result.Photo.ImageBytes);
-                                await _botClient.SendPhoto(
-                                    chatId: chatId,
-                                    photo: InputFile.FromStream(stream),
-                                    caption: result.Text,
-                                    replyMarkup: result.ReplyMarkup,
-                                    cancellationToken: token
-                                );
-                            }
-                            else
-                            {
-                                var sentMessage = await _botClient.SendMessage(
-                                    chatId: chatId,
-                                    text: result.Text,
-                                    replyMarkup: result.ReplyMarkup,
-                                    cancellationToken: token
-                                );
-                                _lastBotMessages[chatId] = sentMessage.MessageId;
+                                if (result.Photo?.ImageBytes != null)
+                                {
+                                    using var stream = new MemoryStream(result.Photo.ImageBytes);
+                                    await _botClient.SendPhoto(
+                                        chatId: chatId,
+                                        photo: InputFile.FromStream(stream),
+                                        caption: result.Text,
+                                        replyMarkup: result.ReplyMarkup,
+                                        cancellationToken: token
+                                    );
+                                }
+                                else
+                                {
+                                    var sentMessage = await _botClient.SendMessage(
+                                        chatId: chatId,
+                                        text: result.Text,
+                                        replyMarkup: result.ReplyMarkup,
+                                        cancellationToken: token
+                                    );
+
+                                    _lastBotMessages[chatId] = sentMessage.MessageId;
+                                }
                             }
 
                             await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
                         }
-
                     }
                     catch (Exception ex)
                     {

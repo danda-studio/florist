@@ -35,18 +35,19 @@ namespace FloristAI.Adapter
         /// <param name="parameter"></param>
         /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
         /// <returns>Объект <see cref="MessageResult"/> с текстом меню и кнопками.</returns>
-        public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(string parameter, long chatId)
         {
             if(string.IsNullOrWhiteSpace(parameter))
             {
-                return new MessageResult { Text = "Параметр не может быть пустым." };
+                return new List<MessageResult> { new MessageResult { Text = "Параметр не может быть пустым." } };
             }
             var builder = _builderProvider.GetBuilder(parameter);
             if (builder == null)
             {
-                return new MessageResult { Text = "Неизвестный шаг меню." };
+                return new List<MessageResult> { new MessageResult { Text = "Неизвестный шаг меню." } };
             }
-            return await builder.BuildMenu(chatId);
+            var result =  await builder.BuildMenu(chatId);
+            return new List<MessageResult> { result };
         }
     }
 }
