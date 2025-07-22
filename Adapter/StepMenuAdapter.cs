@@ -20,13 +20,15 @@ namespace FloristAI.Adapter
             {
                 return new List<MessageResult> { new MessageResult { Text = "Параметр не может быть пустым." } };
             }
+
             var builder = _stepMenuProvider.GetBuilder(parameter);
             if (builder == null)
             {
                 return new List<MessageResult> { new MessageResult { Text = "Неизвестный шаг меню." } };
             }
-            var result = await builder.BuildMenu(chatId);
-            return new List<MessageResult> { result };
+
+            var result = await builder.BuildMenu(chatId); // уже List<MessageResult>
+            return result;
         }
     }
 }
