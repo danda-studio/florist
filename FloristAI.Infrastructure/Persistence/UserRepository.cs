@@ -115,12 +115,18 @@ namespace FloristAI.Infrastructure.Persistence
 
         public async Task<bool> IsPartner(long chatId)
         {
+            var userId = await _dbContext.UserTgDatas
+                .Where(t => t.TelegramId == chatId)
+                .Select(t => t.UserId)
+                .FirstOrDefaultAsync();
+
+            if (userId == 0)
+                return false;
+
             return await _dbContext.Partners
-            .Include(p => p.User)
-            .ThenInclude(u => u.TgData)
-            .AnyAsync(p => p.User.TgData != null && 
-                          p.User.TgData.TelegramId == chatId); 
+                .AnyAsync(p => p.UserId == userId);
         }
+
 
 
     }
