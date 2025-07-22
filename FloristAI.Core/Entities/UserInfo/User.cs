@@ -15,7 +15,7 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Список ролей, назначенных пользователю.
         /// </summary>
-        public List<UserRole> Roles { get; set; } 
+        public List<UserRole> Roles { get; set; } = [];
 
         /// <summary>
         /// Информация о пользователе, связанная с Telegram.
@@ -45,6 +45,6 @@ namespace FloristAI.Core.Entities.UserInfo
         /// <summary>
         /// Код языка интерфейса пользователя
         /// </summary>
-        public string? LanguageCode { get; set; }
+        public string LanguageCode { get; set; } = "ru";
     }
 }

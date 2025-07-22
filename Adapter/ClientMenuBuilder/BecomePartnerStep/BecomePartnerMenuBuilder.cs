@@ -45,7 +45,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 return new MessageResult
                 {
-                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                    Text = _localizationService.GetString("UserNotFound", "ru"),
                     ReplyMarkup = null
                 };
             }
