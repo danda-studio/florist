@@ -261,8 +261,7 @@ namespace FloristAI.Application.Users
         public async Task<bool> CheckStatusPartner (long chatId)
         {
 
-            await _userRepository.IsPartner(chatId);
-            return true;
+            return await _userRepository.IsPartner(chatId);
 
         }
 
