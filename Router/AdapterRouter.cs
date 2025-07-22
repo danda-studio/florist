@@ -107,7 +107,7 @@ namespace FloristAI.Router
 
             if (_adapters.TryGetValue(route, out var adapter))
             {
-                var result = await adapter.ProcessMessage(route, chatId);
+                var result = await adapter.ProcessMessage(parameter, chatId);
 
                 // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
