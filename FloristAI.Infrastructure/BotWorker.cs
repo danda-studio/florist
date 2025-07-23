@@ -198,7 +198,7 @@ namespace FloristAI.Infrastructure
                                     {
                                         try
                                         {
-                                            await _botClient.UnpinChatMessage(chatId, pinnedId);
+                                            await _botClient.UnpinAllChatMessages(chatId);
                                             await _botClient.DeleteMessage(chatId, pinnedId);
                                             _pinnedMessages.Remove(chatId);
                                         }
