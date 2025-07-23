@@ -1,4 +1,5 @@
 ﻿using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
 using Microsoft.EntityFrameworkCore;
@@ -89,5 +90,44 @@ namespace FloristAI.Infrastructure.Persistence
             await _dbContext.SaveChangesAsync();
             return true;
         }
+
+        public async Task<Partner> AddPartner(Partner partner)
+        {
+            await _dbContext.Partners.AddAsync(partner);
+
+            // Проверка наличия роли
+            bool hasPartnerRole = await _dbContext.UserRoles
+                .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
+
+            if (!hasPartnerRole)
+            {
+                _dbContext.UserRoles.Add(new UserRole
+                {
+                    UserId = partner.UserId,
+                    Role = RoleType.Partner
+                });
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return partner;
+        }
+
+        public async Task<bool> IsPartner(long chatId)
+        {
+            var userId = await _dbContext.UserTgDatas
+                .Where(t => t.TelegramId == chatId)
+                .Select(t => t.UserId)
+                .FirstOrDefaultAsync();
+
+            if (userId == 0)
+                return false;
+
+            return await _dbContext.Partners
+                .AnyAsync(p => p.UserId == userId);
+        }
+
+
+
     }
 }

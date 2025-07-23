@@ -2,6 +2,8 @@
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
+using FloristAI.Core.Entities.ReferralsAndPartners;
+using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
 using QRCoder;
 
@@ -70,21 +72,32 @@ namespace FloristAI.Application.Users
 
         public async Task<bool> SaveStep(SaveStepRequest request)
         {
-            
             if (request == null || request.ChatId <= 0)
             {
                 throw new ArgumentException("Неверный запрос для сохранения шага");
             }
-            var step = new Core.Entities.UserInfo.PartnerFormProgress
-            {
-                ChatId = request.ChatId,
-                Step = request.Step,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Phone = request.Phone
-            };
-            return await _cacheRepository.SaveProgress(step);
+
+            // Получаем текущий прогресс
+            var progress = await _cacheRepository.GetProgress(request.ChatId)
+                           ?? new PartnerFormProgress { ChatId = request.ChatId };
+
+            // Обновляем только то, что пришло в запросе
+            if (request.Step != null)
+                progress.Step = request.Step;
+
+            if (!string.IsNullOrWhiteSpace(request.FirstName))
+                progress.FirstName = request.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(request.LastName))
+                progress.LastName = request.LastName;
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+                progress.Phone = request.Phone;
+
+            // сохраняем обновлённый прогресс
+            return await _cacheRepository.SaveProgress(progress);
         }
+
 
         public async Task<bool> ClearStep(long chatId)
         {
@@ -182,7 +195,7 @@ namespace FloristAI.Application.Users
         public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
         {
             var user = await GetUser(chatId);
-            var success = await _userRepository.EditLanguageCode(user.UserId, languageCode);
+            await _userRepository.EditLanguageCode(user.UserId, languageCode);
 
             return new EditLanguageInterfaceUserResponse
             {
@@ -207,5 +220,46 @@ namespace FloristAI.Application.Users
             var renderer = new PngByteQRCode(data);
             return renderer.GetGraphic(20);
         }
+
+
+        public async Task<Partner> AddPartner(AddPartnerRequest request)
+        {
+
+            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
+            var partner = new Partner
+            {
+                UserId = user.Id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            return await _userRepository.AddPartner(partner);
+        }
+
+        public async Task RegisterPartner(long chatId)
+        {
+            var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
+            var request = new AddPartnerRequest
+            {
+                ChatId = stepData.ChatId,
+                FirstName = stepData.FirstName ?? string.Empty,
+                LastName = stepData.LastName ?? string.Empty,
+                PhoneNumber = stepData.Phone ?? string.Empty
+            };
+
+            await AddPartner(request);
+            await ClearStep(chatId);
+        }
+
+        public async Task<bool> CheckStatusPartner (long chatId)
+        {
+
+            return await _userRepository.IsPartner(chatId);
+
+        }
+
+
+
     }
 }

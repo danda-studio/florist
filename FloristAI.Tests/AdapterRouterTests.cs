@@ -14,13 +14,16 @@ namespace FloristAI.Tests
             var mockAdapter = new Mock<IMessageAdapter>();
                 mockAdapter.Setup(a => a.RouteKey).Returns("start");
                 mockAdapter.Setup(a => a.ProcessMessage("/start", 123))
-                    .ReturnsAsync(new MessageResult { Text = "Hello from start" });
+                        .ReturnsAsync(new List<MessageResult> {
+                                new MessageResult { Text = "Hello from start" }
+                        });
+
 
             var router = new AdapterRouter(new[] { mockAdapter.Object });
 
             var result = await router.Route("/start", 123);
 
-            Assert.Equal("Hello from start", result.Text);
+            Assert.Equal("Hello from start", result[0].Text);
         }
 
         [Fact]
@@ -29,22 +32,24 @@ namespace FloristAI.Tests
             var mockStart = new Mock<IMessageAdapter>();
                 mockStart.Setup(a => a.RouteKey).Returns("start");
                 mockStart.Setup(a => a.ProcessMessage("/start", 123))
-                .ReturnsAsync(new MessageResult
-                {
-                    Text = "Redirecting...",
-                    RedirectRouteKey = "menu"
+                .ReturnsAsync(new List<MessageResult> { 
+                    new MessageResult
+                    {
+                        Text = "Redirecting...",
+                        RedirectRouteKey = "menu"
+                    }
                 });
             
             var mockMenu = new Mock<IMessageAdapter>();
                 mockMenu.Setup(a => a.RouteKey).Returns("menu");
                 mockMenu.Setup(a => a.ProcessMessage("menu", 123))
-                .ReturnsAsync(new MessageResult { Text = "Menu opened." });
+                .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Menu opened." } });
 
             var router = new AdapterRouter(new[] { mockStart.Object, mockMenu.Object });
 
             var result = await router.Route("/start", 123);
 
-            Assert.Equal("Menu opened.", result.Text);
+            Assert.Equal("Menu opened.", result[0].Text);
         }
 
         [Fact]
@@ -53,12 +58,12 @@ namespace FloristAI.Tests
             var mockAdapter = new Mock<IMessageAdapter>();
                 mockAdapter.Setup(a => a.RouteKey).Returns("role_select");
                 mockAdapter.Setup(a => a.ProcessMessage("client", 123))
-                .ReturnsAsync(new MessageResult { Text = "Client role selected." });
+                .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Client role selected." } });
 
             var router = new AdapterRouter(new[] { mockAdapter.Object });
             var result = await router.Route("role_select:client", 123);
 
-            Assert.Equal("Client role selected.", result.Text);
+            Assert.Equal("Client role selected.", result[0].Text);
         }
 
         [Fact]
@@ -67,21 +72,24 @@ namespace FloristAI.Tests
             var mockCallback = new Mock<IMessageAdapter>();
             mockCallback.Setup(a => a.RouteKey).Returns("role_select");
             mockCallback.Setup(a => a.ProcessMessage("admin", 123))
-                .ReturnsAsync(new MessageResult
-                {
-                    Text = "Redirecting to admin...",
-                    RedirectRouteKey = "admin_menu"
+                .ReturnsAsync(new List<MessageResult> 
+                { 
+                    new MessageResult
+                    {
+                        Text = "Redirecting to admin...",
+                        RedirectRouteKey = "admin_menu"
+                    }
                 });
             var mockAdmin = new Mock<IMessageAdapter>();
             mockAdmin.Setup(a => a.RouteKey).Returns("admin_menu");
             mockAdmin.Setup(a => a.ProcessMessage("admin_menu", 123))
-                .ReturnsAsync(new MessageResult { Text = "Admin menu." });
+                .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Admin menu." } });
 
             var router = new AdapterRouter(new[] { mockCallback.Object, mockAdmin.Object});
 
             var result = await router.Route("role_select:admin", 123);
 
-            Assert.Equal("Admin menu.", result.Text);
+            Assert.Equal("Admin menu.", result[0].Text);
         }
 
         [Fact]
@@ -91,7 +99,7 @@ namespace FloristAI.Tests
 
             var result = await router.Route("/unknown", 123);
 
-            Assert.Equal("Неизвестная команда", result.Text);
+            Assert.Equal("Неизвестная команда", result[0].Text);
         }
 
         [Fact]
@@ -104,7 +112,7 @@ namespace FloristAI.Tests
             var result = await router.Route("nonexistent:command", 123);
 
             // Assert
-            Assert.Equal("Неизвестный callback", result.Text);
+            Assert.Equal("Неизвестный callback", result[0].Text);
         }
     }
 }

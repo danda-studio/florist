@@ -1,5 +1,6 @@
 ﻿using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
+using FloristAI.Core.Entities.ReferralsAndPartners;
 
 namespace FloristAI.Application.Users
 {
@@ -46,5 +47,10 @@ namespace FloristAI.Application.Users
         byte[] GetReferralQrCode(int Id);
 
         Task<bool> ClearStep(long chatId);
+
+        Task<Partner> AddPartner(AddPartnerRequest request);
+
+        Task RegisterPartner(long chatId);
+        Task<bool> CheckStatusPartner(long chatId);
     }
 }

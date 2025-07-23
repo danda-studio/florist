@@ -1,6 +1,7 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
+using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
@@ -72,7 +73,9 @@ namespace FloristAIBot
             services.AddScoped<IMessageAdapter, StepMessageAdapter>();
             services.AddScoped<IMessageAdapter, StepTextInputAdapter>();
             services.AddScoped<IRoleMenuBuilder, ClientMenuBuilder>();
+            services.AddScoped<IRoleMenuBuilder, PartnerMenuBuilder>();
             services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
+            services.AddScoped<IStepMenuBuilder, PartnerMenuStepReferralUrl>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepFirstName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepLastName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepPhone>();
