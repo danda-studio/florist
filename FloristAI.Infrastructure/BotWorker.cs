@@ -75,7 +75,7 @@ namespace FloristAI.Infrastructure
                                 
                             }
 
-                            foreach (var result in results.OrderBy(r => r.PinnedMessage))
+                            foreach (var result in results)
                             {
                                 if (result.Photo?.ImageBytes != null)
                                 {
