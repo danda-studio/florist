@@ -103,11 +103,11 @@ namespace FloristAI.Infrastructure
                                         _pinnedMessages[message.Chat.Id] = sentMessage.MessageId;
                                     }
 
-                                    if (result.RemovePinnedMessage && _pinnedMessages.TryGetValue(message.Chat.Id, out var pinnedId))
+                                    if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(message.Chat.Id, out var pinnedId))
                                     {
                                         try
                                         {
-                                            await _botClient.UnpinChatMessage(message.Chat.Id, pinnedId);
+                                            await _botClient.UnpinAllChatMessages(message.Chat.Id);
                                             await _botClient.DeleteMessage(message.Chat.Id, pinnedId);
                                             _pinnedMessages.Remove(message.Chat.Id);
                                         }
