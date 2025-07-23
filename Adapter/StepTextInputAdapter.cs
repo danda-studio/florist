@@ -52,7 +52,7 @@ namespace FloristAI.Adapter
             }
 
             var result = await stepBuilder.HandleInput(text, chatId);
-            return new List<MessageResult> { result };
+            return result;
         }
 
 

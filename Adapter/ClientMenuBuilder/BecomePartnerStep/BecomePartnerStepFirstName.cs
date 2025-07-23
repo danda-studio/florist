@@ -25,15 +25,18 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public bool IsEntryPoint => true;
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", "ru"),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
+                        ReplyMarkup = null
+                    }
                 };
             }
 
@@ -44,18 +47,29 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 LastMessageId = null
             });
 
+            var messages = new List<MessageResult>();
+
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Client") },
             };
-            return new MessageResult
+
+            messages.Add(new MessageResult
+            {
+                Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
+                ReplyMarkup = null,
+                PinnedMessage = true 
+            });
+            messages.Add(new MessageResult
             {
                 Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
                 ReplyMarkup = keyboard
-            };
+            });
+
+            return messages;
         }
 
-        public async Task<MessageResult> HandleInput(string input, long chatId)
+        public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
             await _userService.SaveStep(new SaveStepRequest
             {
@@ -65,6 +79,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             });
 
             var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_lastName");
+            
             return await nextBuilder.BuildMenu(chatId);
         }
 

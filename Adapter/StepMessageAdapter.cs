@@ -31,7 +31,7 @@ namespace FloristAI.Adapter
             }
 
             var result = await builder.BuildMenu(chatId);
-            return new List<MessageResult> { result };
+            return result;
 
         }
     }
