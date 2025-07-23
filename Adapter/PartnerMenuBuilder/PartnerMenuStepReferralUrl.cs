@@ -1,30 +1,33 @@
 ﻿using FloristAI.Adapter.Models;
-using FloristAI.Adapter.StepFlowBuilder;
+using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
+namespace FloristAI.Adapter.PartnerMenuBuilder
 {
-    public class BecomePartnerStepFinal : IStepFlowBuilder
+    public class PartnerMenuStepReferralUrl : IStepMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-
-        public BecomePartnerStepFinal(IUserService userService, ILocalizationService localizationService)
+        public PartnerMenuStepReferralUrl(IUserService userService, ILocalizationService localizationService)
         {
             _userService = userService;
             _localizationService = localizationService;
         }
-
-        public string Step => "become_partner_step_final";
+        public string Step => "referal_url";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new List<MessageResult>
+                new List<MessageResult>
                 {
                     new MessageResult
                     {
@@ -35,7 +38,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             }
 
             byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
-
             var referralText = $"""
             {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
@@ -46,23 +48,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             var keyboard = new[]
             {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(
-                        _localizationService.GetString("GoToPartner_Menu", user.LanguageCode),
-                        "role_menu:Partner"
-                    )
-                },
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData(
-                        _localizationService.GetString("Button_Menu", user.LanguageCode),
-                        "role_menu:Client"
-                    )
-                }
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Partner") },
             };
-
-            await _userService.RegisterPartner(chatId);
 
             return new List<MessageResult>
             {
@@ -71,19 +58,12 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     Text = referralText,
                     Photo = new PhotoContent
                     {
-                        ImageBytes = qrBytes,
+                        ImageBytes = qrBytes,  
                         Description = referralText
                     },
-                    ReplyMarkup = new InlineKeyboardMarkup(keyboard),
-                    RemovePinnedMessage = true
+                    ReplyMarkup = new InlineKeyboardMarkup(keyboard)
                 }
             };
         }
-
-        public async Task<List<MessageResult>> HandleInput(string input, long chatId)
-        {
-            return await BuildMenu(chatId);
-        }
     }
-
 }

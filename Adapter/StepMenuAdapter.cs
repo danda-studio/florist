@@ -14,18 +14,21 @@ namespace FloristAI.Adapter
             _stepMenuProvider = stepMenuProvider;
         }
 
-        public async Task<MessageResult> ProcessMessage(string parameter, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(string parameter, long chatId)
         {
             if (string.IsNullOrWhiteSpace(parameter))
             {
-                return new MessageResult { Text = "Параметр не может быть пустым." };
+                return new List<MessageResult> { new MessageResult { Text = "Параметр не может быть пустым." } };
             }
+
             var builder = _stepMenuProvider.GetBuilder(parameter);
             if (builder == null)
             {
-                return new MessageResult { Text = "Неизвестный шаг меню." };
+                return new List<MessageResult> { new MessageResult { Text = "Неизвестный шаг меню." } };
             }
-            return await builder.BuildMenu(chatId);
+
+            var result = await builder.BuildMenu(chatId); 
+            return result;
         }
     }
 }

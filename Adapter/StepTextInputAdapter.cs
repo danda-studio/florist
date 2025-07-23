@@ -24,28 +24,35 @@ namespace FloristAI.Adapter
         public string RouteKey => "step_input";
 
 
-        public async Task<MessageResult> ProcessMessage(string text, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(string text, long chatId)
         {
             var userStep = await _userService.GetStep(chatId);
 
             if(userStep == null || string.IsNullOrEmpty(userStep.Step))
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = "А что мы вводим, нажимай на кнопки :)"
+                    new MessageResult
+                    {
+                        Text = "⚠️ Похоже, что вы не находитесь в процессе ввода данных. Пожалуйста, начните с шага меню."
+                    }
                 };
             }
 
             var stepBuilder = _stepFlowProvider.GetBuilder(userStep.Step);
             if (stepBuilder == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = "Неизвестный шаг меню."
+                    new MessageResult
+                    {
+                        Text = "🚫 Неизвестный шаг меню"
+                    }
                 };
             }
 
-            return await stepBuilder.HandleInput(text, chatId);
+            var result = await stepBuilder.HandleInput(text, chatId);
+            return result;
         }
 
 

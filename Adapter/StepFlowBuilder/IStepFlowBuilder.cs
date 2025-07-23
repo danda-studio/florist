@@ -13,8 +13,8 @@ namespace FloristAI.Adapter.StepFlowBuilder
 
         bool IsEntryPoint => false;
 
-        Task<MessageResult> BuildMenu(long chatId);
+        Task<List<MessageResult>> BuildMenu(long chatId);
 
-        Task<MessageResult> HandleInput(string input, long chatId);
+        Task<List<MessageResult>> HandleInput(string input, long chatId);
     }
 }

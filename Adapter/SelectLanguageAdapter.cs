@@ -36,7 +36,7 @@ namespace FloristAI.Adapter
         /// <returns>
         /// Объект <see cref="MessageResult"/>, содержащий текст и клавиатуру с выбором языка.
         /// </returns>
-        public async Task<MessageResult> ProcessMessage(string message, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(string message, long chatId)
         {
 
             var language = await _languageService.GetLanguageList(chatId);
@@ -51,11 +51,15 @@ namespace FloristAI.Adapter
                     }).ToArray()
             );
 
-            return new MessageResult
+            return new List<MessageResult>
             {
-                Text = "🌐 Выберите язык / Selectați o limbă",
-                ReplyMarkup = keyboard
+                new MessageResult
+                {
+                    Text = "🌐 Выберите язык / Selectați o limbă",
+                    ReplyMarkup = keyboard
+                }
             };
+            
         }
     }
 }

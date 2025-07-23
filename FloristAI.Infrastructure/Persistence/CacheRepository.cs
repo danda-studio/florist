@@ -26,7 +26,6 @@ namespace FloristAI.Infrastructure.Persistence
         {
             var json = JsonConvert.SerializeObject(progress);
             return await _cache.StringSetAsync(GetKey(progress.ChatId), json, TimeSpan.FromHours(1));
-
         }
 
         public async Task<bool> ClearProgress(long chatId)

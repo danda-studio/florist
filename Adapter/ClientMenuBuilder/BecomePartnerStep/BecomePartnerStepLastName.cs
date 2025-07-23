@@ -23,15 +23,18 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public string Step => "become_partner_step_lastName";
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
+                        ReplyMarkup = null
+                    }
                 };
             }
 
@@ -39,14 +42,17 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:become_partner_step_firstName") },
             };
-            return new MessageResult
+            return new List<MessageResult>
             {
-                Text = _localizationService.GetString("Become_Input_LastName", user.LanguageCode),
-                ReplyMarkup = keyboard
+                new MessageResult
+                {
+                    Text = _localizationService.GetString("Become_Input_LastName", user.LanguageCode),
+                    ReplyMarkup = keyboard
+                }
             };
         }
 
-        public async Task<MessageResult> HandleInput(string input, long chatId)
+        public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
             await _userService.SaveStep(new SaveStepRequest
             {
@@ -55,7 +61,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 Step = "become_partner_step_phone"
             });
 
-            // Переход к следующему шагу
             var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_phone");
             return await nextBuilder.BuildMenu(chatId);
         }

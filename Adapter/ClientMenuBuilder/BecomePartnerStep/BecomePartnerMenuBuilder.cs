@@ -23,28 +23,60 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         
         public string Step => "become_partner";
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
+            var isPartner = await _userService.CheckStatusPartner(chatId);
+
+            var messages = new List<MessageResult>();
+
+            if (isPartner)
+            {
+                var backButton = new[]
+                {
+                    new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Client") }
+                };
+
+                messages.Add(new MessageResult
+                {
+                    Text = _localizationService.GetString("IsPartner", user.LanguageCode),
+                    ReplyMarkup = backButton
+                });
+
+                return messages;
+            }
+
             if (user == null)
             {
-                return new MessageResult
+                messages.Add(new MessageResult
                 {
-                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                    Text = _localizationService.GetString("UserNotFound", "ru"),
                     ReplyMarkup = null
-                };
+                });
+                return messages;
             }
+
+            messages.Add(new MessageResult
+            {
+                Text = _localizationService.GetString("Become_Partner_Description", user.LanguageCode),
+                ReplyMarkup = null
+            });
+
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Become_Fill_Button", user.LanguageCode), "step_message:become_partner_step_firstName") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Client") },
             };
-            return new MessageResult
+
+            messages.Add(new MessageResult
             {
                 Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
                 ReplyMarkup = keyboard
-            };
+            });
+
+            return messages;
         }
+
 
     }
 }
