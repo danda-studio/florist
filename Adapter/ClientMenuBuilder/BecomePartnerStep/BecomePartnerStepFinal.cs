@@ -19,15 +19,18 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public string Step => "become_partner_step_final";
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", "ru"),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
+                        ReplyMarkup = null
+                    }
                 };
             }
 
@@ -61,20 +64,23 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             await _userService.RegisterPartner(chatId);
 
-            return new MessageResult
+            return new List<MessageResult>
             {
-                Text = referralText,
-                Photo = new PhotoContent
+                new MessageResult
                 {
-                    ImageBytes = qrBytes,  
-                    Description = referralText
-                },
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard),
-                RemovePinnedMessage = true
+                    Text = referralText,
+                    Photo = new PhotoContent
+                    {
+                        ImageBytes = qrBytes,
+                        Description = referralText
+                    },
+                    ReplyMarkup = new InlineKeyboardMarkup(keyboard),
+                    RemovePinnedMessage = true
+                }
             };
         }
 
-        public async Task<MessageResult> HandleInput(string input, long chatId)
+        public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
             return await BuildMenu(chatId);
         }

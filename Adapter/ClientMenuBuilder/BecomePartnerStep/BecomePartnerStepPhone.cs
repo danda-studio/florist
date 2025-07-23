@@ -24,47 +24,59 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public string Step => "become_partner_step_phone";
 
-        public async Task<MessageResult> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                        ReplyMarkup = null
+                    }
                 };
             }
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:become_partner_step_lastName") },
             };
-            return new MessageResult
+            return new List<MessageResult>
             {
-                Text = _localizationService.GetString("Become_Input_Phone", user.LanguageCode),
-                ReplyMarkup = keyboard
+                new MessageResult
+                {
+                    Text = _localizationService.GetString("Become_Input_Phone", user.LanguageCode),
+                    ReplyMarkup = keyboard
+                }
             };
         }
 
-        public async Task<MessageResult> HandleInput(string input, long chatId)
+        public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
-                    ReplyMarkup = null
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                        ReplyMarkup = null
+                    }
                 };
             }
 
             if (!Validator.IsValidPhone(input))
             {
-                return new MessageResult
+                return new List<MessageResult>
                 {
-                    Text = _localizationService.GetString("Phone_Validation_Error", user.LanguageCode),
-                    ReplyMarkup = null
-                };
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("Phone_Validation_Error", user.LanguageCode),
+                        ReplyMarkup = null
+                    }
+                };  
             }
 
             await _userService.SaveStep(new SaveStepRequest
