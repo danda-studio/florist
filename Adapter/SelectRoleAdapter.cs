@@ -71,31 +71,22 @@ namespace FloristAI.Adapter
                 InlineKeyboardButton.WithCallbackData(
                     text: r.RoleName,
                     callbackData: $"role_menu:{r.RoleType}"
-                )
-            }).ToArray();
-
-            var languageButton = new[]
-            {
+                ),
                 InlineKeyboardButton.WithCallbackData(
                     text: _localizationService.GetString("LanguageSelection", parameter),
                     callbackData: "/start"
                 )
-            };
+            }).ToArray();
 
-            var keyboard = buttons.Append(languageButton).ToArray();
 
             return new List<MessageResult>
             {
                 new MessageResult
                 {
                     Text = role.Roles.Count > 1
-                        ? (parameter == "ru"
-                            ? "Вам доступно несколько ролей:"
-                            : "Selectați un rol din listă:")
-                        : (parameter == "ru"
-                            ? "Ваша роль:"
-                            : "Rolul dvs.:"),
-                    ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                       ? "Вам доступно несколько ролей:"
+                       : "Selectați un rol din listă:",
+                    ReplyMarkup = new InlineKeyboardMarkup(buttons)
                 }
             };
         }
