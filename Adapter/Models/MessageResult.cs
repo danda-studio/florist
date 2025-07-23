@@ -27,5 +27,15 @@ namespace FloristAI.Adapter.Models
         /// Опциональный ключ маршрута, на который нужно сделать редирект
         /// </summary>
         public string? RedirectRouteKey { get; set; }
+
+        /// <summary>
+        /// Закрепить ли сообщение в чате
+        /// </summary>
+        public bool PinnedMessage { get; set; } = false;
+
+        /// <summary>
+        /// Удалить закрепленное сообщение
+        /// </summary>
+        public bool RemovePinnedMessage { get; set; } = false;
     }
 }

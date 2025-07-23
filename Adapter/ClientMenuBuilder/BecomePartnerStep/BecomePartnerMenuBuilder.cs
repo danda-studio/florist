@@ -71,7 +71,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             messages.Add(new MessageResult
             {
                 Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
-                ReplyMarkup = keyboard
+                ReplyMarkup = keyboard,
+                PinnedMessage = true
             });
 
             return messages;
