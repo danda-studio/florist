@@ -13,7 +13,7 @@ namespace FloristAI.Infrastructure
     public class BotWorker : BackgroundService
     {
 
-        private static Dictionary<long, int> _lastBotMessages = new();
+        private static Dictionary<long, List<int>> _lastBotMessages = new();
         /// <summary>
         /// Клиент Telegram-бота.
         /// </summary>
@@ -56,14 +56,18 @@ namespace FloristAI.Infrastructure
 
                             if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
                             {
-                                try
+                                foreach(var messageId in lastMessageId)
                                 {
-                                    await _botClient.DeleteMessage(message.Chat.Id, lastMessageId, cancellationToken: token);
+                                    try
+                                    {
+                                        await _botClient.DeleteMessage(message.Chat.Id, messageId, cancellationToken: token);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Ошибка удаления: {ex.Message}");
+                                    }
                                 }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
-                                }
+                                
                             }
 
                             foreach (var result in results)
@@ -88,7 +92,10 @@ namespace FloristAI.Infrastructure
                                         cancellationToken: token
                                     );
 
-                                    _lastBotMessages[message.Chat.Id] = sentMessage.MessageId;
+                                    if(!_lastBotMessages.ContainsKey(message.Chat.Id))
+                                    _lastBotMessages[message.Chat.Id] = new List<int>();
+
+                                    _lastBotMessages[message.Chat.Id].Add(sentMessage.MessageId);
                                 }
                             }
                         }
@@ -116,14 +123,18 @@ namespace FloristAI.Infrastructure
 
                             if (_lastBotMessages.TryGetValue(chatId, out var lastMessageId))
                             {
-                                try
+
+                                foreach(var messageIds in lastMessageId)
                                 {
-                                    await _botClient.DeleteMessage(chatId, lastMessageId, cancellationToken: token);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Ошибка удаления: {ex.Message}");
-                                }
+                                    try
+                                    {
+                                        await _botClient.DeleteMessage(chatId, messageIds, cancellationToken: token);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Ошибка удаления: {ex.Message}");
+                                    }
+                                } 
                             }
 
                             foreach (var result in results)
@@ -148,7 +159,10 @@ namespace FloristAI.Infrastructure
                                         cancellationToken: token
                                     );
 
-                                    _lastBotMessages[chatId] = sentMessage.MessageId;
+                                    if (!_lastBotMessages.ContainsKey(messageId))
+                                        _lastBotMessages[messageId] = new List<int>();
+
+                                    _lastBotMessages[chatId].Add(sentMessage.MessageId);
                                 }
                             }
 
