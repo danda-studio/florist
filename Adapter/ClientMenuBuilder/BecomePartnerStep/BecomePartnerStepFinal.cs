@@ -69,7 +69,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     ImageBytes = qrBytes,  
                     Description = referralText
                 },
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                ReplyMarkup = new InlineKeyboardMarkup(keyboard),
+                RemovePinnedMessage = true
             };
         }
 

@@ -14,6 +14,8 @@ namespace FloristAI.Infrastructure
     {
 
         private static Dictionary<long, List<int>> _lastBotMessages = new();
+        private static Dictionary<long, int> _pinnedMessages = new(); 
+
         /// <summary>
         /// Клиент Telegram-бота.
         /// </summary>
@@ -92,7 +94,27 @@ namespace FloristAI.Infrastructure
                                         cancellationToken: token
                                     );
 
-                                    if(!_lastBotMessages.ContainsKey(message.Chat.Id))
+                                    if (result.PinnedMessage)
+                                    {
+                                        await _botClient.PinChatMessage(message.Chat.Id, sentMessage.MessageId);
+                                        _pinnedMessages[message.Chat.Id] = sentMessage.MessageId;
+                                    }
+
+                                    if (result.RemovePinnedMessage && _pinnedMessages.TryGetValue(message.Chat.Id, out var pinnedId))
+                                    {
+                                        try
+                                        {
+                                            await _botClient.UnpinChatMessage(message.Chat.Id, pinnedId);
+                                            await _botClient.DeleteMessage(message.Chat.Id, pinnedId);
+                                            _pinnedMessages.Remove(message.Chat.Id);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine($"Ошибка при удалении закрепа: {ex.Message}");
+                                        }
+                                    }
+
+                                    if (!_lastBotMessages.ContainsKey(message.Chat.Id))
                                     _lastBotMessages[message.Chat.Id] = new List<int>();
 
                                     _lastBotMessages[message.Chat.Id].Add(sentMessage.MessageId);
@@ -158,6 +180,26 @@ namespace FloristAI.Infrastructure
                                         replyMarkup: result.ReplyMarkup,
                                         cancellationToken: token
                                     );
+
+                                    if (result.PinnedMessage)
+                                    {
+                                        await _botClient.PinChatMessage(messageId, sentMessage.MessageId);
+                                        _pinnedMessages[messageId] = sentMessage.MessageId;
+                                    }
+
+                                    if (result.RemovePinnedMessage && _pinnedMessages.TryGetValue(messageId, out var pinnedId))
+                                    {
+                                        try
+                                        {
+                                            await _botClient.UnpinChatMessage(messageId, pinnedId);
+                                            await _botClient.DeleteMessage(messageId, pinnedId);
+                                            _pinnedMessages.Remove(messageId);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine($"Ошибка при удалении закрепа: {ex.Message}");
+                                        }
+                                    }
 
                                     if (!_lastBotMessages.ContainsKey(messageId))
                                         _lastBotMessages[messageId] = new List<int>();
