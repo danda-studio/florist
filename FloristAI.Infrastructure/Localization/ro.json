@@ -45,5 +45,6 @@
   "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes.",
   "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”.",
   "IsPartner": "👤 Sunteți deja partener",
-  "Update_Data": "♻️ Actualizați datele"
+  "Update_Data": "♻️ Actualizați datele",
+  "Button_Go_To_Table": "📋 Mergeți la tabel"
 }
