@@ -75,7 +75,7 @@ namespace FloristAI.Infrastructure
                                 
                             }
 
-                            foreach (var result in results)
+                            foreach (var result in results.OrderBy(r => r.PinnedMessage))
                             {
                                 if (result.Photo?.ImageBytes != null)
                                 {
@@ -121,7 +121,7 @@ namespace FloristAI.Infrastructure
                                         _lastBotMessages[message.Chat.Id] = new List<int>();
 
                                     if(!result.PinnedMessage)
-                                        _lastBotMessages[message.Chat.Id].Add(sentMessage.MessageId);
+                                    _lastBotMessages[message.Chat.Id].Add(sentMessage.MessageId);
                                 }
                             }
                         }
