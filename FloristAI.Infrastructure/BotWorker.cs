@@ -190,17 +190,17 @@ namespace FloristAI.Infrastructure
 
                                     if (result.PinnedMessage)
                                     {
-                                        await _botClient.PinChatMessage(messageId, sentMessage.MessageId);
-                                        _pinnedMessages[messageId] = sentMessage.MessageId;
+                                        await _botClient.PinChatMessage(chatId, sentMessage.MessageId);
+                                        _pinnedMessages[chatId] = sentMessage.MessageId;
                                     }
 
-                                    if (result.RemovePinnedMessage && _pinnedMessages.TryGetValue(messageId, out var pinnedId))
+                                    if (result.RemovePinnedMessage && _pinnedMessages.TryGetValue(chatId, out var pinnedId))
                                     {
                                         try
                                         {
-                                            await _botClient.UnpinChatMessage(messageId, pinnedId);
-                                            await _botClient.DeleteMessage(messageId, pinnedId);
-                                            _pinnedMessages.Remove(messageId);
+                                            await _botClient.UnpinChatMessage(chatId, pinnedId);
+                                            await _botClient.DeleteMessage(chatId, pinnedId);
+                                            _pinnedMessages.Remove(chatId);
                                         }
                                         catch (Exception ex)
                                         {
@@ -208,8 +208,8 @@ namespace FloristAI.Infrastructure
                                         }
                                     }
 
-                                    if (!_lastBotMessages.ContainsKey(messageId))
-                                        _lastBotMessages[messageId] = new List<int>();
+                                    if (!_lastBotMessages.ContainsKey(chatId))
+                                        _lastBotMessages[chatId] = new List<int>();
 
                                     if (!result.PinnedMessage)
                                         _lastBotMessages[chatId].Add(sentMessage.MessageId);
