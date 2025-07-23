@@ -1,4 +1,5 @@
-﻿using FloristAI.Router;
+﻿using FloristAI.Adapter.Models;
+using FloristAI.Router;
 using Microsoft.Extensions.Hosting;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -7,41 +8,20 @@ using Telegram.Bot.Types.Enums;
 
 namespace FloristAI.Infrastructure
 {
-    /// <summary>
-    /// Фоновый сервис для запуска и обработки Telegram-бота.
-    /// </summary>
     public class BotWorker : BackgroundService
     {
+        private static readonly Dictionary<long, List<int>> _lastBotMessages = new();
+        private static readonly Dictionary<long, int> _pinnedMessages = new();
 
-        private static Dictionary<long, List<int>> _lastBotMessages = new();
-        private static Dictionary<long, int> _pinnedMessages = new(); 
-
-        /// <summary>
-        /// Клиент Telegram-бота.
-        /// </summary>
         private readonly ITelegramBotClient _botClient;
-
-        /// <summary>
-        /// Маршрутизатор сообщений.
-        /// </summary>
         private readonly AdapterRouter _router;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр <see cref="BotWorker"/>.
-        /// </summary>
-        /// <param name="botClient">Клиент Telegram-бота.</param>
-        /// <param name="router">Маршрутизатор сообщений.</param>
         public BotWorker(ITelegramBotClient botClient, AdapterRouter router)
         {
             _botClient = botClient;
             _router = router;
         }
 
-        /// <summary>
-        /// Основной метод сервиса, который запускает получение обновлений от Telegram.
-        /// </summary>
-        /// <param name="stoppingToken">Токен отмены для остановки сервиса.</param>
-        /// <returns>Задача, представляющая асинхронную операцию.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _botClient.StartReceiving(
@@ -51,197 +31,121 @@ namespace FloristAI.Infrastructure
                     {
                         if (update.Message?.Text != null)
                         {
-                            var message = update.Message;
-                            var results = await _router.Route(message.Text, message.Chat.Id); 
+                            var chatId = update.Message.Chat.Id;
+                            var input = update.Message.Text;
 
-                            await _botClient.DeleteMessage(message.Chat.Id, message.MessageId, cancellationToken: token);
+                            var results = await _router.Route(input, chatId);
+                            await _botClient.DeleteMessage(chatId, update.Message.MessageId);
 
-                            if (_lastBotMessages.TryGetValue(message.Chat.Id, out var lastMessageId))
-                            {
-                                foreach(var messageId in lastMessageId)
-                                {
-                                    if (_pinnedMessages.TryGetValue(message.Chat.Id, out var pinnedId) && pinnedId == messageId)
-                                        continue;
-
-                                    try
-                                    {
-                                        await _botClient.DeleteMessage(message.Chat.Id, messageId, cancellationToken: token);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Ошибка удаления: {ex.Message}");
-                                    }
-                                }
-                                
-                            }
-
-                            foreach (var result in results)
-                            {
-                                if (result.Photo?.ImageBytes != null)
-                                {
-                                    using var stream = new MemoryStream(result.Photo.ImageBytes);
-                                    var sentPhoto = await _botClient.SendPhoto(
-                                        chatId: message.Chat.Id,
-                                        photo: InputFile.FromStream(stream),
-                                        caption: result.Text,
-                                        replyMarkup: result.ReplyMarkup,
-                                        cancellationToken: token
-                                    );
-                                }
-                                else
-                                {
-                                    var sentMessage = await _botClient.SendMessage( 
-                                        chatId: message.Chat.Id,
-                                        text: result.Text,
-                                        replyMarkup: result.ReplyMarkup,
-                                        cancellationToken: token
-                                    );
-
-                                    if (result.PinnedMessage)
-                                    {
-                                        await _botClient.PinChatMessage(message.Chat.Id, sentMessage.MessageId);
-                                        _pinnedMessages[message.Chat.Id] = sentMessage.MessageId;
-                                    }
-
-                                    if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(message.Chat.Id, out var pinnedId))
-                                    {
-                                        try
-                                        {
-                                            await _botClient.UnpinAllChatMessages(message.Chat.Id);
-                                            await _botClient.DeleteMessage(message.Chat.Id, pinnedId);
-                                            _pinnedMessages.Remove(message.Chat.Id);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine($"Ошибка при удалении закрепа: {ex.Message}");
-                                        }
-                                    }
-
-                                    if (!_lastBotMessages.ContainsKey(message.Chat.Id))
-                                        _lastBotMessages[message.Chat.Id] = new List<int>();
-
-                                    if(!result.PinnedMessage)
-                                    _lastBotMessages[message.Chat.Id].Add(sentMessage.MessageId);
-                                }
-                            }
+                            await ProcessResults(chatId, results, token);
                         }
                         else if (update.CallbackQuery != null)
                         {
-                            var callback = update.CallbackQuery;
-                            var chatId = callback.Message?.Chat.Id ?? callback.From.Id;
-                            var messageId = callback.Message?.MessageId ?? 0;
+                            var chatId = update.CallbackQuery.Message?.Chat.Id ?? update.CallbackQuery.From.Id;
+                            var messageId = update.CallbackQuery.Message?.MessageId ?? 0;
+                            var command = update.CallbackQuery.Data ?? "";
 
-                            string command = callback.Data ?? "";
-
-                            var results = await _router.Route(command, chatId); 
+                            var results = await _router.Route(command, chatId);
 
                             if (messageId != 0)
                             {
                                 try
                                 {
-                                    await _botClient.DeleteMessage(chatId, messageId, cancellationToken: token);
+                                    await _botClient.DeleteMessage(chatId, messageId);
                                 }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine($"Ошибка удаления сообщения с кнопкой: {ex.Message}");
-                                }
+                                catch { }
                             }
 
-                            if (_lastBotMessages.TryGetValue(chatId, out var lastMessageId))
-                            {
-
-                                foreach(var messageIds in lastMessageId)
-                                {
-                                    if (_pinnedMessages.TryGetValue(chatId, out var pinnedId) && pinnedId == messageIds)
-                                        continue;
-
-                                    try
-                                    {
-                                        await _botClient.DeleteMessage(chatId, messageIds, cancellationToken: token);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine($"Ошибка удаления: {ex.Message}");
-                                    }
-                                } 
-                            }
-
-                            foreach (var result in results)
-                            {
-                                if (result.Photo?.ImageBytes != null)
-                                {
-                                    using var stream = new MemoryStream(result.Photo.ImageBytes);
-                                    await _botClient.SendPhoto(
-                                        chatId: chatId,
-                                        photo: InputFile.FromStream(stream),
-                                        caption: result.Text,
-                                        replyMarkup: result.ReplyMarkup,
-                                        cancellationToken: token
-                                    );
-                                }
-                                else
-                                {
-                                    var sentMessage = await _botClient.SendMessage(
-                                        chatId: chatId,
-                                        text: result.Text,
-                                        replyMarkup: result.ReplyMarkup,
-                                        cancellationToken: token
-                                    );
-
-                                    if (result.PinnedMessage)
-                                    {
-                                        await _botClient.PinChatMessage(chatId, sentMessage.MessageId);
-                                        _pinnedMessages[chatId] = sentMessage.MessageId;
-                                    }
-
-                                    if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(chatId, out var pinnedId))
-                                    {
-                                        try
-                                        {
-                                            await _botClient.UnpinAllChatMessages(chatId);
-                                            await _botClient.DeleteMessage(chatId, pinnedId);
-                                            _pinnedMessages.Remove(chatId);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine($"Ошибка при удалении закрепа: {ex.Message}");
-                                        }
-                                    }
-
-                                    if (!_lastBotMessages.ContainsKey(chatId))
-                                        _lastBotMessages[chatId] = new List<int>();
-
-                                    if (!result.PinnedMessage)
-                                        _lastBotMessages[chatId].Add(sentMessage.MessageId);
-                                }
-                            }
-
-                            await _botClient.AnswerCallbackQuery(callback.Id, cancellationToken: token);
+                            await ProcessResults(chatId, results, token);
+                            await _botClient.AnswerCallbackQuery(update.CallbackQuery.Id);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Ошибка при обработке сообщения: {ex.Message}");
+                        Console.WriteLine($"Ошибка при обработке обновления: {ex.Message}");
                     }
                 },
                 HandleErrorAsync,
-                new ReceiverOptions
-                {
-                    AllowedUpdates = Array.Empty<UpdateType>() 
-                },
-                cancellationToken: stoppingToken
+                new ReceiverOptions { AllowedUpdates = Array.Empty<UpdateType>() },
+                stoppingToken
             );
 
             await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 
         /// <summary>
-        /// Обработка ошибок, возникающих при работе Telegram-бота.
+        /// Общая обработка результатов: удаление старых сообщений, снятие закрепа, отправка новых.
         /// </summary>
-        /// <param name="botClient">Клиент Telegram-бота.</param>
-        /// <param name="exception">Возникшее исключение.</param>
-        /// <param name="token">Токен отмены.</param>
-        /// <returns>Задача, представляющая асинхронную операцию.</returns>
+        private async Task ProcessResults(long chatId, List<MessageResult> results, CancellationToken token)
+        {
+            // ✅ 1. Удаляем pinned, если нужно
+            if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(chatId, out var pinnedId))
+            {
+                try
+                {
+                    await _botClient.UnpinChatMessage(chatId, pinnedId, cancellationToken: token);
+                    await _botClient.DeleteMessage(chatId, pinnedId, cancellationToken: token);
+                    _pinnedMessages.Remove(chatId);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка при удалении закрепа: {ex.Message}");
+                }
+            }
+
+            // ✅ 2. Удаляем старые сообщения
+            if (_lastBotMessages.TryGetValue(chatId, out var oldMessages))
+            {
+                foreach (var oldId in oldMessages)
+                {
+                    try { await _botClient.DeleteMessage(chatId, oldId, cancellationToken: token); }
+                    catch { }
+                }
+                oldMessages.Clear();
+            }
+
+            // ✅ 3. Отправляем новые
+            foreach (var result in results)
+            {
+                Telegram.Bot.Types.Message sentMessage;
+
+                if (result.Photo?.ImageBytes != null)
+                {
+                    using var stream = new MemoryStream(result.Photo.ImageBytes);
+                    sentMessage = await _botClient.SendPhoto(
+                        chatId: chatId,
+                        photo: InputFile.FromStream(stream),
+                        caption: result.Text,
+                        replyMarkup: result.ReplyMarkup,
+                        cancellationToken: token
+                    );
+                }
+                else
+                {
+                    sentMessage = await _botClient.SendMessage(
+                        chatId: chatId,
+                        text: result.Text,
+                        replyMarkup: result.ReplyMarkup,
+                        cancellationToken: token
+                    );
+                }
+
+                // ✅ Закрепляем или запоминаем сообщение
+                if (result.PinnedMessage)
+                {
+                    await _botClient.PinChatMessage(chatId, sentMessage.MessageId, cancellationToken: token);
+                    _pinnedMessages[chatId] = sentMessage.MessageId;
+                }
+                else
+                {
+                    if (!_lastBotMessages.ContainsKey(chatId))
+                        _lastBotMessages[chatId] = new List<int>();
+
+                    _lastBotMessages[chatId].Add(sentMessage.MessageId);
+                }
+            }
+        }
+
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken token)
         {
             Console.WriteLine($"Ошибка Telegram: {exception.Message}");
