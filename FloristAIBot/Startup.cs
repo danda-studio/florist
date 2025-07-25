@@ -5,6 +5,7 @@ using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
+using FloristAI.Application.GoogkeSheets;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Core.Store;
@@ -65,6 +66,7 @@ namespace FloristAIBot
             services.AddScoped<AdapterRouter>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();

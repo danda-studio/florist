@@ -46,5 +46,6 @@
   "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”.",
   "IsPartner": "👤 Sunteți deja partener",
   "Update_Data": "♻️ Actualizați datele",
-  "Button_Go_To_Table": "📋 Mergeți la tabel"
+  "Button_Go_To_Table": "📋 Mergeți la tabel",
+  "Menu_Reporting": "ℹ️ Ați câștigat {0} pentru luna curentă."
 }

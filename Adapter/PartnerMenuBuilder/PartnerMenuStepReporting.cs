@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepMenuBuilder;
+using FloristAI.Application.GoogkeSheets;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using System;
@@ -16,11 +17,13 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
 
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
+        private readonly IGoogleSheetsService _googleSheetsService;
 
-        public PartnerMenuStepReporting(IUserService userService, ILocalizationService localizationService)
+        public PartnerMenuStepReporting(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
             _localizationService = localizationService;
+            _googleSheetsService = googleSheetsService;
         }
         public string Step => "reporting";
 
@@ -39,9 +42,16 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                     }
                 };
             }
+
+            var income = await _googleSheetsService.GetMonthlyIncome(user.UserId);
+            var template = _localizationService.GetString("Menu_Reporting", user.LanguageCode);
+            var messageText = string.Format(template, income);
+
+            var googleSheetsUrl = await _googleSheetsService.GetGoogleSheetsUrl(user.UserId);
+
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), "step:referal_url") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl)},
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Update_Data", user.LanguageCode), "step:reporting") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Partner") },
 
@@ -50,7 +60,7 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
             {
                 new MessageResult
                 {
-                    Text = _localizationService.GetString("Menu_Partner", user.LanguageCode),
+                    Text = messageText,
                     ReplyMarkup = keyboard
                 }
             };
