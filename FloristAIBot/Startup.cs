@@ -5,8 +5,10 @@ using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
-using FloristAI.Application.GoogkeSheets;
+using FloristAI.Application.GoogleDrive;
+using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
+using FloristAI.Application.Store;
 using FloristAI.Application.Users;
 using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
@@ -40,22 +42,44 @@ namespace FloristAIBot
         /// <param name="services">Коллекция сервисов.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // В продакшене берём из переменных окружения
-            var host = Environment.GetEnvironmentVariable("Host") ?? throw new Exception("Host не найдена");
-            var port = Environment.GetEnvironmentVariable("Port") ?? throw new Exception("Port не найдена");
-            var database = Environment.GetEnvironmentVariable("Database") ?? throw new Exception("Database не найдена");
-            var username = Environment.GetEnvironmentVariable("Username") ?? throw new Exception("Username не найдена");
-            var password = Environment.GetEnvironmentVariable("Password") ?? throw new Exception("Password не найдена");
+            string connectionString;
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables() 
+                .Build();
 
-            string connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+
+            
+            var host = Environment.GetEnvironmentVariable("Host");
+            var port = Environment.GetEnvironmentVariable("Port");
+            var database = Environment.GetEnvironmentVariable("Database");
+            var username = Environment.GetEnvironmentVariable("Username");
+            var password = Environment.GetEnvironmentVariable("Password");
+            if (!string.IsNullOrEmpty(host))
+            {
+                connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+            }
+            else
+            {
+                // Берем из appsettings.json
+                connectionString = configuration.GetConnectionString("DefaultConnection")
+                    ?? throw new Exception("Не найдена строка подключения");
+            }
+
 
             services.AddDbContext<PostgresDbContext>(options =>
                 options.UseNpgsql(connectionString,
                  b => b.MigrationsAssembly("FloristAI.Infrastructure")));
 
 
-            var redisConnectionString = Environment.GetEnvironmentVariable("RedisConnection")
-                ?? throw new Exception("RedisConnection переменная окружения не найдена");
+            var redisConnectionString = Environment.GetEnvironmentVariable("RedisConnection");
+            if(string.IsNullOrEmpty(redisConnectionString))
+            {
+                // Берем из appsettings.json
+                redisConnectionString = configuration.GetConnectionString("RedisConnection")
+                    ?? throw new Exception("Не найдена строка подключения к Redis");
+            }
 
             // Регистрация Redis
             services.AddSingleton<IConnectionMultiplexer>(
@@ -66,7 +90,8 @@ namespace FloristAIBot
             services.AddScoped<AdapterRouter>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
+            //services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
+            services.AddScoped<IGoogleDriveService, GoogleDriveService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
@@ -89,11 +114,19 @@ namespace FloristAIBot
             services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
+            services.AddScoped<IGoogleSheets, GoogleSheets>();
+            services.AddScoped<IGoogleDrive, GoogleDrive>();
 
             services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
                 new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
 
-            var token = Environment.GetEnvironmentVariable("Bot_token") ?? _configuration["Telegram:Token"];
+            var token = Environment.GetEnvironmentVariable("Bot_token");
+            if (string.IsNullOrEmpty(token))
+            {
+                // Берем из appsettings.json
+                token = configuration["Telegram:Token"]
+                    ?? throw new Exception("Не найден токен бота");
+            }
             services.AddSingleton<ITelegramBotClient>(new TelegramBotClient(token));
 
             // Заглушка для Render

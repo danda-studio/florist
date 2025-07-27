@@ -1,4 +1,4 @@
-﻿using FloristAI.Application.GoogkeSheets;
+﻿using FloristAI.Application.Store;
 using Google.Apis.Sheets.v4;
 using System;
 using System.Collections.Generic;
@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace FloristAI.Infrastructure
 {
-    public class GoogleSheetsService : IGoogleSheetsService
+    public class GoogleSheets : IGoogleSheets
     {
 
         private readonly SheetsService _googleSheetsService;
         private readonly string _spreadsheetId;
 
-        public GoogleSheetsService(SheetsService googleSheetsService, string spreadsheetId)
+        public GoogleSheets(SheetsService googleSheetsService, string spreadsheetId)
         {
             _googleSheetsService = googleSheetsService;
             _spreadsheetId = spreadsheetId;
@@ -41,5 +41,11 @@ namespace FloristAI.Infrastructure
         {
             return $"https://docs.google.com/spreadsheets/d/{_spreadsheetId}/edit";
         }
+
+        //public async Task<SaveDataPartnerResponse> SaveDataPartner(SaveDataPartnerRequest)
+        //{
+
+
+        //}
     }
 }

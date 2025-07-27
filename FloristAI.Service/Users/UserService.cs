@@ -1,10 +1,14 @@
-﻿using FloristAI.Application.Language;
+﻿using FloristAI.Application.GoogleDrive;
+using FloristAI.Application.GoogleSheets;
+using FloristAI.Application.Language;
+using FloristAI.Application.Store;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
+using Google.Apis.Sheets.v4;
 using QRCoder;
 
 namespace FloristAI.Application.Users
@@ -17,25 +21,30 @@ namespace FloristAI.Application.Users
         /// <summary>
         /// Репозиторий для работы с данными пользователей.
         /// </summary>
-        public readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public readonly ICacheRepository _cacheRepository;
+        private readonly ICacheRepository _cacheRepository;
+
+        private readonly IGoogleSheetsService _googleSheetsService;
+        private readonly IGoogleDriveService _googleDriveService;
 
         /// <summary>
         /// Сервис локализации для получения локализованных строк.
         /// </summary>
-        public readonly ILocalizationService _localizationService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="UserService"/>.
         /// </summary>
         /// <param name="userRepository">Репозиторий пользователей.</param>
         /// <param name="localizationService">Сервис локализации.</param>
-        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository)
+        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository, IGoogleSheetsService googleSheetsService, IGoogleDriveService googleDriveService)
         {
             _userRepository = userRepository;
             _localizationService = localizationService;
             _cacheRepository = cacheRepository;
+            _googleSheetsService = googleSheetsService;
+            _googleDriveService = googleDriveService;
         }
 
 
@@ -152,10 +161,13 @@ namespace FloristAI.Application.Users
             var user = await _userRepository.GetUserByChatId(chatId)
                 ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
 
+            var isPartner = await _userRepository.IsPartner(chatId);
+
             return new GetUserResponse
             {
                 UserId = user.Id,
-                LanguageCode = user.LanguageCode
+                LanguageCode = user.LanguageCode,
+                IsPartner = isPartner
             };
         }
 
@@ -195,12 +207,14 @@ namespace FloristAI.Application.Users
         public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
         {
             var user = await GetUser(chatId);
+            var isPartner = await _userRepository.IsPartner(chatId);
             await _userRepository.EditLanguageCode(user.UserId, languageCode);
 
             return new EditLanguageInterfaceUserResponse
             {
                 UserId = user.UserId,
-                LanguageCode = languageCode
+                LanguageCode = languageCode,
+                IsPartner = isPartner
             };
         }
 
@@ -222,21 +236,6 @@ namespace FloristAI.Application.Users
         }
 
 
-        public async Task<Partner> AddPartner(AddPartnerRequest request)
-        {
-
-            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
-            var partner = new Partner
-            {
-                UserId = user.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PhoneNumber = request.PhoneNumber
-            };
-
-            return await _userRepository.AddPartner(partner);
-        }
-
         public async Task RegisterPartner(long chatId)
         {
             var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
@@ -252,14 +251,43 @@ namespace FloristAI.Application.Users
             await ClearStep(chatId);
         }
 
-        public async Task<bool> CheckStatusPartner (long chatId)
+        public async Task CreateStructureFolderAndSheetPartner(CreateStructureFolderAndSheetPartnerRequest request)
         {
+            //var privateFolderId = await _googleDriveService.GetPrivateFolderId();
+            //var partnerFolderId = await _googleDriveService.CreateFolder(request.Name, privateFolderId); 
+            //var spreadsheetUrl = await _googleSheetsService.CreateSpreadsheet();
 
-            return await _userRepository.IsPartner(chatId);
+            //var spreadsheetId = ExtractSpreadsheetId(spreadsheetUrl);
+            //foreach (var month in GetMonths())
+            //{
+            //    await _googleSheetsService.AddSheet(spreadsheetId, month);
+            //}
 
+            //await _userRepository.EditPartnerInfo();
         }
 
+        private string ExtractSpreadsheetId(string url)
+        {
+            var parts = url.Split('/');
+            var index = Array.IndexOf(parts, "d");
+            return index >= 0 && parts.Length > index + 1 ? parts[index + 1] : throw new Exception("Invalid URL");
+        }
 
+        private async Task<Partner> AddPartner(AddPartnerRequest request)
+        {
 
+            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
+            var partner = new Partner
+            {
+                UserId = user.Id,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            var spreadsheetName = $"{partner.Id}/{partner.FirstName}/{partner.LastName}/{DateTime.UtcNow:yyyy}";
+
+            return await _userRepository.AddPartner(partner);
+        }
     }
 }

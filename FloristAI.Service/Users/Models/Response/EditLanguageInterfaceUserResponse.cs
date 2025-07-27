@@ -15,5 +15,7 @@ namespace FloristAI.Application.Users.Models.Response
         /// Код выбранного языка интерфейса (например, "ru", "ro").
         /// </summary>
         public string LanguageCode { get; set; }
+
+        public bool IsPartner { get; set; }
     }
 }
