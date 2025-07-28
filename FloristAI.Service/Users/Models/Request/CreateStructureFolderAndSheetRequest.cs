@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FloristAI.Application.Users.Models.Request
 {
-    public class CreateStructureFolderAndSheetPartnerRequest
+    public class CreateStructureFolderAndSheetRequest
     {
         public int PartnerId { get; set; }
         public string FirstName { get; set; }

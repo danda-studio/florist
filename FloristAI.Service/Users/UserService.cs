@@ -251,26 +251,24 @@ namespace FloristAI.Application.Users
             await ClearStep(chatId);
         }
 
-        public async Task CreateStructureFolderAndSheetPartner(CreateStructureFolderAndSheetPartnerRequest request)
+        public async Task CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
         {
-            //var privateFolderId = await _googleDriveService.GetPrivateFolderId();
-            //var partnerFolderId = await _googleDriveService.CreateFolder(request.Name, privateFolderId); 
-            //var spreadsheetUrl = await _googleSheetsService.CreateSpreadsheet();
+            string reportRootId = "1_Mbpr5Y9wVK3AnLdSnpL9Eg4WhV9xdGD";
 
-            //var spreadsheetId = ExtractSpreadsheetId(spreadsheetUrl);
-            //foreach (var month in GetMonths())
-            //{
-            //    await _googleSheetsService.AddSheet(spreadsheetId, month);
-            //}
+            var yearFolder = await _googleDriveService.CreateFolder(DateTime.Now.Year.ToString(), reportRootId);
 
-            //await _userRepository.EditPartnerInfo();
-        }
+            // 3. Папки внутри года
+            var partnersFolder = await _googleDriveService.CreateFolder("Партнеры", yearFolder);
+            var privateFolder = await _googleDriveService.CreateFolder("Приватная часть", partnersFolder);
+            var publicFolder = await _googleDriveService.CreateFolder("Публичная часть", partnersFolder);
 
-        private string ExtractSpreadsheetId(string url)
-        {
-            var parts = url.Split('/');
-            var index = Array.IndexOf(parts, "d");
-            return index >= 0 && parts.Length > index + 1 ? parts[index + 1] : throw new Exception("Invalid URL");
+            // 4. Таблицы
+            var publicSpreadsheet = await _googleSheetsService.CreateSpreadsheet($"{request.PartnerId}/{request.FirstName} {request.LastName}/{DateTime.Now.Year}", publicFolder);
+            var privateUserSpreadsheet = await _googleSheetsService.CreateSpreadsheet($"{request.PartnerId}/{request.FirstName} {request.LastName}/{DateTime.Now.Year}", privateFolder);
+            var privateSpreadsheet = await _googleSheetsService.CreateSpreadsheet("Общая информация", privateFolder);
+
+            // 5. Добавляем лист для текущего месяца
+            await _googleSheetsService.AddSheet(privateSpreadsheet, DateTime.Now.ToString("MMMM yyyy"));
         }
 
         private async Task<Partner> AddPartner(AddPartnerRequest request)
@@ -284,8 +282,6 @@ namespace FloristAI.Application.Users
                 LastName = request.LastName,
                 PhoneNumber = request.PhoneNumber
             };
-
-            var spreadsheetName = $"{partner.Id}/{partner.FirstName}/{partner.LastName}/{DateTime.UtcNow:yyyy}";
 
             return await _userRepository.AddPartner(partner);
         }

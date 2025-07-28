@@ -14,6 +14,9 @@ using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
 using FloristAI.Router;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Drive.v3;
+using Google.Apis.Sheets.v4;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Telegram.Bot;
@@ -49,8 +52,6 @@ namespace FloristAIBot
                 .AddEnvironmentVariables() 
                 .Build();
 
-
-            
             var host = Environment.GetEnvironmentVariable("Host");
             var port = Environment.GetEnvironmentVariable("Port");
             var database = Environment.GetEnvironmentVariable("Database");
@@ -85,12 +86,49 @@ namespace FloristAIBot
             services.AddSingleton<IConnectionMultiplexer>(
                 ConnectionMultiplexer.Connect(redisConnectionString));
 
+            services.AddSingleton(provider =>
+            {
+                var credentialsPath = Path.Combine(Directory.GetCurrentDirectory(), "kisaflori-24bbff4b2544.json");
+                var credential = GoogleCredential.FromFile(credentialsPath)
+                    .CreateScoped(new[]
+                    {
+                        SheetsService.Scope.Spreadsheets,
+                        DriveService.Scope.Drive
+                    });
+
+                return new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = "FloristAI"
+                });
+            });
+
+            services.AddSingleton(provider =>
+            {
+                var credentialsPath = Path.Combine(Directory.GetCurrentDirectory(), "kisaflori-24bbff4b2544.json");
+                var credential = GoogleCredential.FromFile(credentialsPath)
+                    .CreateScoped(new[]
+                    {
+                        SheetsService.Scope.Spreadsheets,
+                        DriveService.Scope.Drive
+                    });
+
+                return new DriveService(new Google.Apis.Services.BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = "FloristAI"
+                });
+            });
+
+
             // Регистрация Telegram-бота и бизнес-логики
             services.AddHostedService<BotWorker>();
             services.AddScoped<AdapterRouter>();
+            services.AddScoped<IGoogleSheets, GoogleSheets>();
+            services.AddScoped<IGoogleDrive, GoogleDrive>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
-            //services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
+            services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
             services.AddScoped<IGoogleDriveService, GoogleDriveService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
@@ -114,8 +152,6 @@ namespace FloristAIBot
             services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
-            services.AddScoped<IGoogleSheets, GoogleSheets>();
-            services.AddScoped<IGoogleDrive, GoogleDrive>();
 
             services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
                 new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
@@ -138,18 +174,18 @@ namespace FloristAIBot
         /// </summary>
         /// <param name="app">Приложение для конфигурации конвейера запросов.</param>
         /// <param name="env">Среда выполнения веб-приложения.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // Заглушка для Render
-            app.UseRouting();
+        //public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        //{
+        //    // Заглушка для Render
+        //    app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Bot is running.");
-                });
-            });
-        }
+        //    app.UseEndpoints(endpoints =>
+        //    {
+        //        endpoints.MapGet("/", async context =>
+        //        {
+        //            await context.Response.WriteAsync("Bot is running.");
+        //        });
+        //    });
+        //}
     }
 }

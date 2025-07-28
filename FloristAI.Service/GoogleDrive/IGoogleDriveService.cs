@@ -8,5 +8,6 @@ namespace FloristAI.Application.GoogleDrive
 {
     public interface IGoogleDriveService
     {
+        Task<string> CreateFolder(string name, string? parentFolderId = null);
     }
 }

@@ -1,51 +1,74 @@
 ﻿using FloristAI.Application.Store;
+using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
 using Google.Apis.Sheets.v4;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Google.Apis.Sheets.v4.Data;
 
 namespace FloristAI.Infrastructure
 {
     public class GoogleSheets : IGoogleSheets
     {
+        private readonly SheetsService _sheetsService;
+        private readonly DriveService _driveService;
 
-        private readonly SheetsService _googleSheetsService;
-        private readonly string _spreadsheetId;
-
-        public GoogleSheets(SheetsService googleSheetsService, string spreadsheetId)
+        public GoogleSheets(SheetsService sheetsService, DriveService driveService)
         {
-            _googleSheetsService = googleSheetsService;
-            _spreadsheetId = spreadsheetId;
+            _sheetsService = sheetsService;
+            _driveService = driveService;
         }
 
-        public async Task<decimal> GetMonthlyIncome(int userId)
+        /// <summary>
+        /// Создает таблицу в Google Sheets и перемещает её в указанную папку.
+        /// </summary>
+        public async Task<string> CreateSpreadsheet(string name, string parentFolderId)
         {
+            // 1. Создаем таблицу
+            var spreadsheet = new Spreadsheet
+            {
+                Properties = new SpreadsheetProperties
+                {
+                    Title = name
+                }
+            };
 
-            throw new NotImplementedException();
+            var createRequest = _sheetsService.Spreadsheets.Create(spreadsheet);
+            var spreadsheetResponse = await createRequest.ExecuteAsync();
+            var spreadsheetId = spreadsheetResponse.SpreadsheetId;
+
+            // 2. Перемещаем таблицу в папку Google Drive
+            if (!string.IsNullOrEmpty(parentFolderId))
+            {
+                var updateRequest = _driveService.Files.Update(new Google.Apis.Drive.v3.Data.File(), spreadsheetId);
+                updateRequest.AddParents = parentFolderId;
+                await updateRequest.ExecuteAsync();
+            }
+
+            return spreadsheetId;
         }
 
-        public async Task<string> GetGoogleSheetsUrl(int userId)
+        /// <summary>
+        /// Добавляет новый лист в существующую таблицу.
+        /// </summary>
+        public async Task AddSheet(string spreadsheetId, string sheetName)
         {
+            var addSheetRequest = new Request
+            {
+                AddSheet = new AddSheetRequest
+                {
+                    Properties = new SheetProperties
+                    {
+                        Title = sheetName
+                    }
+                }
+            };
 
-            return $"https://docs.google.com/spreadsheets/d/{_spreadsheetId}/edit#gid={userId}";
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request> { addSheetRequest }
+            };
+
+            var request = _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, spreadsheetId);
+            await request.ExecuteAsync();
         }
-
-        public async Task<string> CreateFolder(string FirstName, string LastName, int userId)
-        {
-            return $"https://drive.google.com/drive/folders/{userId}";
-        }
-
-        public async Task<string> CreateSpreadsheet()
-        {
-            return $"https://docs.google.com/spreadsheets/d/{_spreadsheetId}/edit";
-        }
-
-        //public async Task<SaveDataPartnerResponse> SaveDataPartner(SaveDataPartnerRequest)
-        //{
-
-
-        //}
     }
 }

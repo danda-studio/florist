@@ -46,5 +46,6 @@ namespace FloristAI.Core.Entities.UserInfo
         /// Код языка интерфейса пользователя
         /// </summary>
         public string LanguageCode { get; set; } = "ru";
+
     }
 }

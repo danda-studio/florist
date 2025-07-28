@@ -8,9 +8,7 @@ namespace FloristAI.Application.Store
 {
     public interface IGoogleSheets
     {
-        Task<decimal> GetMonthlyIncome(int userId);
-        Task<string> GetGoogleSheetsUrl(int userId);
-        Task<string> CreateFolder(string FirstName, string LastName, int userId);
-        Task<string> CreateSpreadsheet();
+        Task<string> CreateSpreadsheet(string name, string parentFolderId);
+        Task AddSheet(string spreadsheetId, string sheetName);
     }
 }

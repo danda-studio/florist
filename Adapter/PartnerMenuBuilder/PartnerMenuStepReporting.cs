@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepMenuBuilder;
+using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Users;
@@ -17,9 +18,9 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
 
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
-        private readonly IGoogleSheets _googleSheetsService;
+        private readonly IGoogleSheetsService _googleSheetsService;
 
-        public PartnerMenuStepReporting(IUserService userService, ILocalizationService localizationService, IGoogleSheets googleSheetsService)
+        public PartnerMenuStepReporting(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
             _localizationService = localizationService;
