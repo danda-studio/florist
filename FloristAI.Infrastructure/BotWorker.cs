@@ -78,7 +78,6 @@ namespace FloristAI.Infrastructure
         /// </summary>
         private async Task ProcessResults(long chatId, List<MessageResult> results, CancellationToken token)
         {
-            // ✅ 1. Удаляем pinned, если нужно
             if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(chatId, out var pinnedId))
             {
                 try
@@ -93,7 +92,6 @@ namespace FloristAI.Infrastructure
                 }
             }
 
-            // ✅ 2. Удаляем старые сообщения
             if (_lastBotMessages.TryGetValue(chatId, out var oldMessages))
             {
                 foreach (var oldId in oldMessages)
@@ -104,7 +102,6 @@ namespace FloristAI.Infrastructure
                 oldMessages.Clear();
             }
 
-            // ✅ 3. Отправляем новые
             foreach (var result in results)
             {
                 Telegram.Bot.Types.Message sentMessage;
@@ -130,7 +127,6 @@ namespace FloristAI.Infrastructure
                     );
                 }
 
-                // ✅ Закрепляем или запоминаем сообщение
                 if (result.PinnedMessage)
                 {
                     await _botClient.PinChatMessage(chatId, sentMessage.MessageId, cancellationToken: token);

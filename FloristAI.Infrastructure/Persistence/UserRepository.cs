@@ -128,6 +128,14 @@ namespace FloristAI.Infrastructure.Persistence
         }
 
 
+        public async Task<string?> GetSpreadsheetId(int userId)
+        {
+            return await _dbContext.Partners
+                 .Where(p => p.UserId == userId)
+                 .Select(p => p.SpreadsheetId)
+                 .FirstOrDefaultAsync();
+        }
+
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FloristAI.Application.GoogleDrive;
 using FloristAI.Application.GoogleSheets;
+using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Users.Models.Request;
@@ -66,12 +67,12 @@ namespace FloristAI.Application.Users
 
         public async Task<GetStepResponse> GetStep(long chatId)
         {
-           var step = await _cacheRepository.GetProgress(chatId);
+            var step = await _cacheRepository.GetProgress(chatId);
 
             return new GetStepResponse
             {
                 ChatId = chatId,
-                Step = step?.Step, 
+                Step = step?.Step,
                 FirstName = step?.FirstName,
                 LastName = step?.LastName,
                 Phone = step?.Phone
@@ -236,7 +237,7 @@ namespace FloristAI.Application.Users
         }
 
 
-        public async Task RegisterPartner(long chatId)
+        public async Task RegisterPartner(long chatId, string spreadSheetId)
         {
             var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
             var request = new AddPartnerRequest
@@ -244,31 +245,28 @@ namespace FloristAI.Application.Users
                 ChatId = stepData.ChatId,
                 FirstName = stepData.FirstName ?? string.Empty,
                 LastName = stepData.LastName ?? string.Empty,
-                PhoneNumber = stepData.Phone ?? string.Empty
+                PhoneNumber = stepData.Phone ?? string.Empty,
+                SpreadSheetId = spreadSheetId
             };
 
             await AddPartner(request);
             await ClearStep(chatId);
         }
 
-        public async Task CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
+        public async Task<string> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
         {
-            string reportRootId = "1_Mbpr5Y9wVK3AnLdSnpL9Eg4WhV9xdGD";
+            var folder = await _googleDriveService.CreateStructureFolder();
 
-            var yearFolder = await _googleDriveService.CreateFolder(DateTime.Now.Year.ToString(), reportRootId);
+            var sheetsParams = new SheetsCreationParams(
+                PartnerId: request.PartnerId,
+                FirstName: request.FirstName,
+                LastName: request.LastName,
+                PublicFolderId: folder.PublicFolderId,
+                PrivateFolderId: folder.PrivateFolderId
+            );
 
-            // 3. Папки внутри года
-            var partnersFolder = await _googleDriveService.CreateFolder("Партнеры", yearFolder);
-            var privateFolder = await _googleDriveService.CreateFolder("Приватная часть", partnersFolder);
-            var publicFolder = await _googleDriveService.CreateFolder("Публичная часть", partnersFolder);
+            return await _googleSheetsService.CreateStructureSheet(sheetsParams);
 
-            // 4. Таблицы
-            var publicSpreadsheet = await _googleSheetsService.CreateSpreadsheet($"{request.PartnerId}/{request.FirstName} {request.LastName}/{DateTime.Now.Year}", publicFolder);
-            var privateUserSpreadsheet = await _googleSheetsService.CreateSpreadsheet($"{request.PartnerId}/{request.FirstName} {request.LastName}/{DateTime.Now.Year}", privateFolder);
-            var privateSpreadsheet = await _googleSheetsService.CreateSpreadsheet("Общая информация", privateFolder);
-
-            // 5. Добавляем лист для текущего месяца
-            await _googleSheetsService.AddSheet(privateSpreadsheet, DateTime.Now.ToString("MMMM yyyy"));
         }
 
         private async Task<Partner> AddPartner(AddPartnerRequest request)
@@ -278,9 +276,10 @@ namespace FloristAI.Application.Users
             var partner = new Partner
             {
                 UserId = user.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PhoneNumber = request.PhoneNumber
+                FirstName = request.FirstName ?? string.Empty,
+                LastName = request.LastName ?? string.Empty,
+                PhoneNumber = request.PhoneNumber ?? string.Empty,
+                SpreadsheetId = request.SpreadSheetId
             };
 
             return await _userRepository.AddPartner(partner);

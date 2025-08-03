@@ -2,6 +2,7 @@
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
+using FloristAI.Application.Users.Models.Request;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -62,7 +63,18 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
-            await _userService.RegisterPartner(chatId);
+            var userInfo = await _userService.GetStep(chatId); // или через другой метод, если есть PartnerId
+
+            var request = new CreateStructureFolderAndSheetRequest
+            {
+                PartnerId = user.UserId, 
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+            };
+
+            var sheetId = await _userService.CreateStructureFolderAndSheet(request);
+
+            await _userService.RegisterPartner(chatId, sheetId);
 
             return new List<MessageResult>
             {

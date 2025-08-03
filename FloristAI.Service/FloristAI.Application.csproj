@@ -11,13 +11,18 @@
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.70.0.3806" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.7" />
     <PackageReference Include="Telegram.Bot" Version="22.5.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FloristAI.Core\FloristAI.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GoogleSheets\Models\Response\" />
+    <Folder Include="GoogleSheets\Новая папка\" />
   </ItemGroup>
 
 </Project>

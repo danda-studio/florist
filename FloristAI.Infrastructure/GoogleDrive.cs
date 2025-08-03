@@ -42,5 +42,27 @@ namespace FloristAI.Infrastructure
 
             return folder.Id;
         }
+
+        public async Task<(string Id, string Name)?> FindFolderByName(string name, string parentFolderId)
+        {
+            try
+            {
+                var request = _driveService.Files.List();
+                request.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
+                request.Fields = "files(id, name)";
+                request.SupportsAllDrives = true;
+                request.IncludeItemsFromAllDrives = true;
+
+                var result = await request.ExecuteAsync();
+                var file = result.Files.FirstOrDefault();
+
+                return file != null ? (file.Id, file.Name) : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при поиске папки: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

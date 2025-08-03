@@ -41,5 +41,7 @@ namespace FloristAI.Core.Store
         Task<Partner> AddPartner(Partner partner);
 
         Task<bool> IsPartner(long chatId);
+        Task<string?> GetSpreadsheetId(int userId);
+
     }
 }

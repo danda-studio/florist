@@ -16,7 +16,9 @@ using FloristAI.Infrastructure.Persistence;
 using FloristAI.Router;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
+using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Util.Store;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Telegram.Bot;
@@ -88,15 +90,9 @@ namespace FloristAIBot
 
             services.AddSingleton(provider =>
             {
-                var credentialsPath = Path.Combine(Directory.GetCurrentDirectory(), "kisaflori-24bbff4b2544.json");
-                var credential = GoogleCredential.FromFile(credentialsPath)
-                    .CreateScoped(new[]
-                    {
-                        SheetsService.Scope.Spreadsheets,
-                        DriveService.Scope.Drive
-                    });
+                var credential = GetOAuthCredential().Result;
 
-                return new SheetsService(new Google.Apis.Services.BaseClientService.Initializer()
+                return new DriveService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "FloristAI"
@@ -105,20 +101,30 @@ namespace FloristAIBot
 
             services.AddSingleton(provider =>
             {
-                var credentialsPath = Path.Combine(Directory.GetCurrentDirectory(), "kisaflori-24bbff4b2544.json");
-                var credential = GoogleCredential.FromFile(credentialsPath)
-                    .CreateScoped(new[]
-                    {
-                        SheetsService.Scope.Spreadsheets,
-                        DriveService.Scope.Drive
-                    });
+                var credential = GetOAuthCredential().Result;
 
-                return new DriveService(new Google.Apis.Services.BaseClientService.Initializer()
+                return new SheetsService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "FloristAI"
                 });
             });
+
+            static async Task<UserCredential> GetOAuthCredential()
+            {
+                using var stream = new FileStream("client_secret_2_845291149186-prkk1vvk046gn50illkjhmvekpb19h0g.apps.googleusercontent.com.json", FileMode.Open, FileAccess.Read);
+
+                var credPath = Path.Combine(Directory.GetCurrentDirectory(), "token.json");
+
+                var googleSecrets = await GoogleClientSecrets.FromStreamAsync(stream);
+
+                return await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    googleSecrets.Secrets, 
+                    new[] { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets },
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore(credPath, true));
+            }
 
 
             // Регистрация Telegram-бота и бизнес-логики

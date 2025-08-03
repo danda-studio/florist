@@ -27,7 +27,7 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
             var user = await _userService.GetUser(chatId);
             if (user == null)
             {
-                new List<MessageResult>
+                return new List<MessageResult>
                 {
                     new MessageResult
                     {

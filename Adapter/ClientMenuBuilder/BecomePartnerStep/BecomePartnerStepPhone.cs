@@ -33,7 +33,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 {
                     new MessageResult
                     {
-                        Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
                         ReplyMarkup = null
                     }
                 };
@@ -61,7 +61,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 {
                     new MessageResult
                     {
-                        Text = _localizationService.GetString("UserNotFound", user.LanguageCode),
+                        Text = _localizationService.GetString("UserNotFound", "ru"),
                         ReplyMarkup = null
                     }
                 };

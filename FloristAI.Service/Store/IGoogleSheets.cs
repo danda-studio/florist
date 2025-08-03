@@ -10,5 +10,6 @@ namespace FloristAI.Application.Store
     {
         Task<string> CreateSpreadsheet(string name, string parentFolderId);
         Task AddSheet(string spreadsheetId, string sheetName);
+        Task<IList<IList<object>>> GetValues(string spreadsheetId, string range);
     }
 }
