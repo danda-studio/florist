@@ -136,6 +136,45 @@ namespace FloristAI.Infrastructure.Persistence
                  .FirstOrDefaultAsync();
         }
 
+        public async Task<Referal> AddReferal(Referal referal, int partnerId)
+        {
+            var existingReferal = await _dbContext.Referals
+                .Include(r => r.PartnerReferal)
+                .FirstOrDefaultAsync(r => r.ReferalId == referal.ReferalId);
+
+            if (existingReferal != null)
+            {
+                // Если связь уже есть — просто вернуть
+                if (existingReferal.PartnerReferal != null)
+                    return existingReferal;
+
+                // Иначе создать связь и сохранить
+                var partnerReferal = new PartnerReferal
+                {
+                    PartnerId = partnerId,
+                    ReferalId = existingReferal.ReferalId
+                };
+
+                _dbContext.PartnerReferals.Add(partnerReferal);
+                await _dbContext.SaveChangesAsync();
+
+                return existingReferal;
+            }
+
+            // Создаем новый реферал с привязанной связью
+            referal.PartnerReferal = new PartnerReferal
+            {
+                PartnerId = partnerId,
+                ReferalId = referal.ReferalId
+            };
+
+            await _dbContext.Referals.AddAsync(referal);
+            await _dbContext.SaveChangesAsync();
+
+            return referal;
+        }
+
+
 
     }
 }

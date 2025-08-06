@@ -1,11 +1,11 @@
 ﻿using FloristAI.Core.Entities.UserInfo;
 
-namespace FloristAI.Core.Store
+namespace FloristAI.Application.Store
 {
     public interface ICacheRepository
     {
-        Task<PartnerFormProgress?> GetProgress(long chatId);
-        Task <bool> SaveProgress(PartnerFormProgress progress);
-        Task <bool> ClearProgress(long chatId);
+        Task<PartnerFormProgress?> GetStepFlowBecomePartnerProgress(long chatId);
+        Task<bool> SaveStepFlowBecomePartnerProgress(PartnerFormProgress progress);
+        Task<bool> ClearProgress(long chatId);
     }
 }

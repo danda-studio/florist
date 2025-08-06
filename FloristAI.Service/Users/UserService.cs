@@ -49,7 +49,7 @@ namespace FloristAI.Application.Users
         }
 
 
-        private async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
+        public async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
         {
             if (!await CheckUserInSystem(chatId))
             {
@@ -67,7 +67,7 @@ namespace FloristAI.Application.Users
 
         public async Task<GetStepResponse> GetStep(long chatId)
         {
-            var step = await _cacheRepository.GetProgress(chatId);
+            var step = await _cacheRepository.GetStepFlowBecomePartnerProgress(chatId);
 
             return new GetStepResponse
             {
@@ -88,7 +88,7 @@ namespace FloristAI.Application.Users
             }
 
             // Получаем текущий прогресс
-            var progress = await _cacheRepository.GetProgress(request.ChatId)
+            var progress = await _cacheRepository.GetStepFlowBecomePartnerProgress(request.ChatId)
                            ?? new PartnerFormProgress { ChatId = request.ChatId };
 
             // Обновляем только то, что пришло в запросе
@@ -105,7 +105,7 @@ namespace FloristAI.Application.Users
                 progress.Phone = request.Phone;
 
             // сохраняем обновлённый прогресс
-            return await _cacheRepository.SaveProgress(progress);
+            return await _cacheRepository.SaveStepFlowBecomePartnerProgress(progress);
         }
 
 
@@ -284,5 +284,22 @@ namespace FloristAI.Application.Users
 
             return await _userRepository.AddPartner(partner);
         }
+
+        public async Task ProcessReferral(ProcessReferralRequest request)
+        {
+
+            var referal = new Referal
+            {
+                ReferalId = request.UserId,
+                PartnerReferal = new PartnerReferal
+                {
+                    PartnerId = request.PartnerId,
+                    ReferalId = request.UserId
+                }
+            };
+
+            await _userRepository.AddReferal(referal, request.PartnerId);
+        }
+
     }
 }

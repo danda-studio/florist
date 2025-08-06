@@ -42,6 +42,7 @@ namespace FloristAI.Core.Store
 
         Task<bool> IsPartner(long chatId);
         Task<string?> GetSpreadsheetId(int userId);
+        Task<Referal> AddReferal(Referal referal, int partnerId);
 
     }
 }

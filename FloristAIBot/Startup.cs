@@ -91,6 +91,7 @@ namespace FloristAIBot
             services.AddSingleton(provider =>
             {
                 var credential = GetOAuthCredential().Result;
+                //var credential = GetServiceAccountCredential();
 
                 return new DriveService(new BaseClientService.Initializer()
                 {
@@ -102,6 +103,7 @@ namespace FloristAIBot
             services.AddSingleton(provider =>
             {
                 var credential = GetOAuthCredential().Result;
+                //var credential = GetServiceAccountCredential();
 
                 return new SheetsService(new BaseClientService.Initializer()
                 {
@@ -119,7 +121,7 @@ namespace FloristAIBot
                 var googleSecrets = await GoogleClientSecrets.FromStreamAsync(stream);
 
                 return await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    googleSecrets.Secrets, 
+                    googleSecrets.Secrets,
                     new[] { DriveService.Scope.Drive, SheetsService.Scope.Spreadsheets },
                     "user",
                     CancellationToken.None,
@@ -173,6 +175,20 @@ namespace FloristAIBot
 
             // Заглушка для Render
             services.AddRouting();
+        }
+
+
+
+        private static GoogleCredential GetServiceAccountCredential()
+        {
+            var keyFilePath = Path.Combine(AppContext.BaseDirectory, "kisaflori-8a9b4bc9ff09.json");
+
+            return GoogleCredential.FromFile(keyFilePath)
+                .CreateScoped(new[]
+                {
+                DriveService.Scope.Drive,
+                SheetsService.Scope.Spreadsheets
+                });
         }
 
         /// <summary>

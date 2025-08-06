@@ -48,7 +48,10 @@ namespace FloristAI.Router
         {
             if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
             {
-                return await stepInputAdapter.ProcessMessage(message, chatId);
+                return await stepInputAdapter.ProcessMessage(new MessageContext 
+                { 
+                    Message = message, ChatId = chatId 
+                });
             }
             return new List<MessageResult>
             {
@@ -64,14 +67,20 @@ namespace FloristAI.Router
         /// <returns>Результат обработки команды.</returns>
         private async Task<List<MessageResult>> RouteCommand(string message, long chatId)
         {
-            var command = ExtractCommand(message); // убирает "/"
+            var (command, param) = ExtractCommand(message); // вернет (start, "123" или null)
+
+
+            // Остальные команды
             if (_adapters.TryGetValue(command, out var adapter))
             {
-                var result = await adapter.ProcessMessage(message, chatId);
+                var result = await adapter.ProcessMessage(new MessageContext
+                {
+                    Message = command,
+                    ChatId = chatId,
+                    Parameter = param
+                });
 
-                // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
-
                 if (firstMessage != null && !string.IsNullOrWhiteSpace(firstMessage.RedirectRouteKey))
                 {
                     return await Route(firstMessage.RedirectRouteKey, chatId);
@@ -79,8 +88,10 @@ namespace FloristAI.Router
 
                 return result;
             }
+
             return new List<MessageResult> { new MessageResult { Text = $"Неизвестная команда: {command}" } };
         }
+
 
         /// <summary>
         /// Обрабатывает callback с параметрами в формате "route:param".
@@ -98,7 +109,13 @@ namespace FloristAI.Router
 
                 if (_adapters.TryGetValue("step_message", out var stepAdapter))
                 {
-                    return await stepAdapter.ProcessMessage(step, chatId);
+                    return await stepAdapter.ProcessMessage(new MessageContext
+                    { 
+                        Message =  step, 
+                        ChatId =  chatId 
+                    
+                    });
+
                 }
             }
             var parts = callbackData.Split(':', 2);
@@ -107,7 +124,11 @@ namespace FloristAI.Router
 
             if (_adapters.TryGetValue(route, out var adapter))
             {
-                var result = await adapter.ProcessMessage(parameter, chatId);
+                var result = await adapter.ProcessMessage(new MessageContext
+                { 
+                    Message = parameter, 
+                    ChatId = chatId 
+                });
 
                 // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
@@ -127,11 +148,27 @@ namespace FloristAI.Router
         /// </summary>
         /// <param name="message">Входящее сообщение.</param>
         /// <returns>Чистая команда без символа "/".</returns>
-        private static string ExtractCommand(string message)
+        private static (string command, string? param) ExtractCommand(string message)
         {
-            return message.Split(' ')[0]
-                          .TrimStart('/')
-                          .ToLowerInvariant();
+            var trimmed = message.TrimStart('/').Trim();
+            var parts = trimmed.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+            var command = parts[0].ToLowerInvariant();
+            string? param = parts.Length > 1 ? parts[1] : null;
+
+            return (command, param);
+        }
+
+        private bool TryExtractPartnerId(string message, out int partnerId)
+        {
+            partnerId = 0;
+            var parts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 1 && int.TryParse(parts[1], out int pid))
+            {
+                partnerId = pid;
+                return true;
+            }
+            return false;
         }
     }
 }

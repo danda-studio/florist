@@ -22,7 +22,7 @@ namespace FloristAI.Infrastructure
             // 1. Ищем папку по имени
             var request = _driveService.Files.List();
             request.Q = $"name='{name}' and mimeType='application/vnd.google-apps.folder'" +
-                        (parentId != null ? $" and '{parentId}' in parents" : "");
+                        (parentId != null ? $" and '{parentId}' in parents and trashed = false" : "");
             var result = await request.ExecuteAsync();
 
             if (result.Files.Count > 0)
@@ -48,7 +48,7 @@ namespace FloristAI.Infrastructure
             try
             {
                 var request = _driveService.Files.List();
-                request.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder'";
+                request.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
                 request.Fields = "files(id, name)";
                 request.SupportsAllDrives = true;
                 request.IncludeItemsFromAllDrives = true;

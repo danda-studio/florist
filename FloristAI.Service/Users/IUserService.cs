@@ -50,5 +50,8 @@ namespace FloristAI.Application.Users
 
         Task RegisterPartner(long chatId, string spreadSheetId);
         Task<string> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request);
+        Task ProcessReferral(ProcessReferralRequest request);
+
+        Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
     }
 }

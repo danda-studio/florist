@@ -1,4 +1,5 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.Store.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace FloristAI.Application.GoogleSheets
 {
     public interface IGoogleSheetsService
     {
-        Task<string> CreateSpreadsheet(string name, string parentFolderId);
+        Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId);
         Task<string> CreateStructureSheet(SheetsCreationParams parameters);
         Task AddSheet(string spreadsheetId, string sheetName);
         Task<decimal> GetMonthlyIncome(int userId);

@@ -104,7 +104,7 @@ namespace FloristAI.Infrastructure
 
             foreach (var result in results)
             {
-                Telegram.Bot.Types.Message sentMessage;
+                Message sentMessage;
 
                 if (result.Photo?.ImageBytes != null)
                 {

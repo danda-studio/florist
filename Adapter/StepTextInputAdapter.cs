@@ -24,9 +24,9 @@ namespace FloristAI.Adapter
         public string RouteKey => "step_input";
 
 
-        public async Task<List<MessageResult>> ProcessMessage(string text, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-            var userStep = await _userService.GetStep(chatId);
+            var userStep = await _userService.GetStep(context.ChatId);
 
             if(userStep == null || string.IsNullOrEmpty(userStep.Step))
             {
@@ -51,7 +51,7 @@ namespace FloristAI.Adapter
                 };
             }
 
-            var result = await stepBuilder.HandleInput(text, chatId);
+            var result = await stepBuilder.HandleInput(context.Message, context.ChatId);
             return result;
         }
 

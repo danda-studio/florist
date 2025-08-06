@@ -16,21 +16,21 @@ namespace FloristAI.Adapter
             _menuProvider = menuProvider;
         }
 
-        public async Task<List<MessageResult>> ProcessMessage(string stepName, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-            var builder = _menuProvider.GetBuilder(stepName);
+            var builder = _menuProvider.GetBuilder(context.Message);
             if (builder == null)
             {
                 return new List<MessageResult>
                 {
                     new MessageResult
                     {
-                        Text = $"Step '{stepName}' not found."
+                        Text = $"Step '{context.Message}' not found."
                     }
                 };
             }
 
-            var result = await builder.BuildMenu(chatId);
+            var result = await builder.BuildMenu(context.ChatId);
             return result;
 
         }

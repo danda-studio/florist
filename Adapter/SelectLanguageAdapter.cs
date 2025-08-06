@@ -1,6 +1,9 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using FloristAI.Adapter.Models;
 using FloristAI.Application.Language;
-using FloristAI.Adapter.Models;
+using FloristAI.Application.Users;
+using FloristAI.Application.Users.Models.Request;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter
 {
@@ -14,6 +17,8 @@ namespace FloristAI.Adapter
         /// </summary>
         private readonly ILanguageService _languageService;
 
+        private readonly IUserService _userService;
+
         /// <summary>
         /// Ключ маршрута, соответствующий команде.
         /// </summary>
@@ -23,9 +28,10 @@ namespace FloristAI.Adapter
         /// Инициализирует новый экземпляр <see cref="SelectLanguageAdapter"/>.
         /// </summary>
         /// <param name="languageService">Сервис для получения списка поддерживаемых языков.</param>
-        public SelectLanguageAdapter(ILanguageService languageService)
+        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService)
         {
             _languageService = languageService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -36,10 +42,21 @@ namespace FloristAI.Adapter
         /// <returns>
         /// Объект <see cref="MessageResult"/>, содержащий текст и клавиатуру с выбором языка.
         /// </returns>
-        public async Task<List<MessageResult>> ProcessMessage(string message, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
+            var user = await _userService.GetOrCreateUser(context.ChatId, "ru");
+            if (!string.IsNullOrEmpty(context.Parameter) && int.TryParse(context.Parameter, out int partnerId))
+            {
+                await _userService.ProcessReferral(new ProcessReferralRequest
+                {
+                    UserId = user.UserId,
+                    PartnerId = partnerId
 
-            var language = await _languageService.GetLanguageList(chatId);
+                });
+
+            }
+
+            var language = await _languageService.GetLanguageList(context.ChatId);
 
             var keyboard = new InlineKeyboardMarkup(
                 language.Select(lang =>

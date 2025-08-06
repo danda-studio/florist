@@ -52,7 +52,7 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
 
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl)},
+                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl)},
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Update_Data", user.LanguageCode), "step:reporting") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Partner") },
 

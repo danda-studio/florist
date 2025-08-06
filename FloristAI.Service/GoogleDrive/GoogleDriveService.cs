@@ -25,7 +25,7 @@ namespace FloristAI.Application.GoogleDrive
         public async Task<CreateStructureFolderResponse> CreateStructureFolder()
         {
             string reportRootId = "1_Mbpr5Y9wVK3AnLdSnpL9Eg4WhV9xdGD";
-            string currentYear = DateTime.Now.Year.ToString("yyyy");
+            string currentYear = DateTime.Now.Year.ToString();
 
             // 1. Проверяем и создаем папку года
             var yearFolder = await FindOrCreateFolder(currentYear, reportRootId);

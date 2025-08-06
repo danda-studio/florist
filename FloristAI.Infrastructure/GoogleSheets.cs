@@ -1,9 +1,12 @@
 ﻿using FloristAI.Application.Store;
+using FloristAI.Application.Store.Models.Response;
+using FloristAI.Infrastructure.Models.Response;
 using Google;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using System;
 
 namespace FloristAI.Infrastructure
 {
@@ -21,7 +24,7 @@ namespace FloristAI.Infrastructure
         /// <summary>
         /// Создает таблицу в Google Sheets и перемещает её в указанную папку.
         /// </summary>
-        public async Task<string> CreateSpreadsheet(string name, string parentFolderId)
+        public async Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId)
         {
             try
             {
@@ -29,10 +32,29 @@ namespace FloristAI.Infrastructure
 
                 if (success && existingFile != null)
                 {
-                    return existingFile.Id;
+                    return new CreateSpreadsheetResponse
+                    { 
+                        SpreadsheetId = existingFile.Id,
+                        IsNew = false,
+                    };
+
                 }
 
                 await Task.Delay(1500);
+
+                //var fileMetadata = new Google.Apis.Drive.v3.Data.File()
+                //{
+                //    Name = name,
+                //    MimeType = "application/vnd.google-apps.spreadsheet",
+                //    Parents = new List<string> { parentFolderId }
+                //};
+
+                //var createRequest = _driveService.Files.Create(fileMetadata);
+                //createRequest.SupportsAllDrives = true; 
+                //var file = await createRequest.ExecuteAsync();
+                //return file.Id;
+
+
                 var fileMetadata = new Google.Apis.Drive.v3.Data.File
                 {
                     Name = name,
@@ -43,7 +65,11 @@ namespace FloristAI.Infrastructure
                 var request = _driveService.Files.Create(fileMetadata);
                 request.SupportsAllDrives = true;
                 var file = await request.ExecuteAsync();
-                return file.Id;
+                return new CreateSpreadsheetResponse
+                {
+                    SpreadsheetId = file.Id,
+                    IsNew = true,
+                };
             }
             catch (GoogleApiException ex) when (ex.Error.Code == 403)
             {
@@ -59,7 +85,7 @@ namespace FloristAI.Infrastructure
         /// <summary>
         /// Добавляет новый лист в существующую таблицу.
         /// </summary>
-        public async Task AddSheet(string spreadsheetId, string sheetName)
+        public async Task<string> AddSheet(string spreadsheetId, string sheetName)
         {
             var addSheetRequest = new Request
             {
@@ -79,6 +105,8 @@ namespace FloristAI.Infrastructure
 
             var request = _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, spreadsheetId);
             await request.ExecuteAsync();
+
+            return request.SpreadsheetId;
         }
 
         /// <summary>
@@ -89,7 +117,7 @@ namespace FloristAI.Infrastructure
             try
             {
                 var listRequest = _driveService.Files.List();
-                listRequest.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.spreadsheet'";
+                listRequest.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
                 listRequest.SupportsAllDrives = true;
                 listRequest.IncludeItemsFromAllDrives = true;
                 listRequest.Fields = "files(id, name)";
@@ -107,6 +135,28 @@ namespace FloristAI.Infrastructure
                 Console.WriteLine($"{ex}, Ошибка при поиске таблицы {name} в папке {parentFolderId}");
                 return (false, null);
             }
+        }
+
+
+        public async Task AddHeaders(string spreadsheetId, string range, List<string[]> headers)
+        {
+            if (headers == null || !headers.Any())
+                throw new ArgumentException("Заголовки не могут быть пустыми.", nameof(headers));
+
+            var values = headers
+                .Select(row => row.Cast<object>().ToList())
+                .ToList<IList<object>>();
+
+            var valueRange = new ValueRange
+            {
+                Range = range,
+                Values = values
+            };
+
+            var updateRequest = _sheetsService.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.RAW;
+
+            await updateRequest.ExecuteAsync();
         }
 
         public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
