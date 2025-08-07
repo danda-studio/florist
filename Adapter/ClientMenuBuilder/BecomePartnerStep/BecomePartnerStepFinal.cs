@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
+using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
@@ -63,7 +64,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
-            var userInfo = await _userService.GetStep(chatId); // или через другой метод, если есть PartnerId
+            var userInfo = await _userService.GetStep(chatId); 
 
             var request = new CreateStructureFolderAndSheetRequest
             {
@@ -72,9 +73,26 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 LastName = userInfo.LastName,
             };
 
-            var sheetId = await _userService.CreateStructureFolderAndSheet(request);
+            var sheet = await _userService.CreateStructureFolderAndSheet(request);
 
-            await _userService.RegisterPartner(chatId, sheetId);
+            var SheetId = sheet.FirstOrDefault(s => s.FileName == "Общая информация" || s.SheetName == "Общая информация") ?? throw new Exception("Не удалось найти таблицу");
+            var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception ("Не удалось найти публичную таблицу");
+
+            await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId);
+
+            await _userService.AddDataInRow(
+                new AddDataRequest
+                {
+                    UserId = user.UserId,
+                    SpreadsheetId = SheetId.SpreadsheetId,
+                    SheetName = SheetId.SheetName,
+                    UserData = new UserData
+                    {
+                        NameAndSurname = $"{userInfo.FirstName} {userInfo.LastName}",
+                        PhoneNumber = userInfo.Phone,
+                        TelegramId = chatId
+                    }
+                });
 
             return new List<MessageResult>
             {

@@ -1,7 +1,9 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
 using FloristAI.Core.Store;
+using Google.Apis.Sheets.v4.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace FloristAI.Application.GoogleSheets
             _userRepository = userRepository;
         }
 
-        public async Task<string> CreateStructureSheet(SheetsCreationParams parameters)
+        public async Task<List<CreateStructureSheetResponse>> CreateStructureSheet(SheetsCreationParams parameters)
         {
             // Создаём все таблицы, но сохраняем ID публичной
             var spreadsheetsToCreate = new[]
@@ -66,7 +68,7 @@ namespace FloristAI.Application.GoogleSheets
                 }
             };
 
-            string publicSpreadsheetId = "";
+            var result = new List<CreateStructureSheetResponse>();
             var monthSheetName = DateTime.Now.ToString("MMMM");
 
             foreach (var spreadsheet in spreadsheetsToCreate)
@@ -74,7 +76,17 @@ namespace FloristAI.Application.GoogleSheets
                 // Проверяем, существует ли уже таблица
                 var sheetInfo = await CreateSpreadsheet(spreadsheet.name, spreadsheet.folderId);
                 if (sheetInfo.IsNew == false)
-                    return sheetInfo.SpreadsheetId;
+                {
+                    result.Add(new CreateStructureSheetResponse
+                    {
+                        SpreadsheetId = sheetInfo.SpreadsheetId,
+                        IsPublic = spreadsheet.IsPublic,
+                        FileName = spreadsheet.name,
+                        SheetName = monthSheetName
+                    });
+                    continue;
+                }
+                    
 
                 await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, monthSheetName);
 
@@ -96,13 +108,21 @@ namespace FloristAI.Application.GoogleSheets
                     await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, "Итог");
                 }
 
-                if (spreadsheet.IsPublic)
+                result.Add(new CreateStructureSheetResponse
                 {
-                    publicSpreadsheetId = sheetInfo.SpreadsheetId;
-                }
+                    SpreadsheetId = sheetInfo.SpreadsheetId,
+                    IsPublic = spreadsheet.IsPublic,
+                    FileName = spreadsheet.name,
+                    SheetName = monthSheetName
+                });
             }
 
-            return publicSpreadsheetId ?? throw new InvalidOperationException("Не удалось создать публичную таблицу");
+            if (result.Count == 0)
+            {
+                throw new InvalidOperationException("Не удалось создать или найти ни одной таблицы");
+            }
+
+            return result;
         }
 
 
@@ -120,6 +140,29 @@ namespace FloristAI.Application.GoogleSheets
         public async Task AddSheet(string spreadSheetId, string sheetName)
         {
             await _googleSheets.AddSheet(spreadSheetId, sheetName);
+        }
+
+        public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
+        {
+            await _googleSheets.AddData(request);
+
+            //// Аналогично для листа "Итог"
+            //var summaryRequest = new AddDataRequest
+            //{
+            //    SpreadsheetId = request.SpreadsheetId,
+            //    SheetName = "Итог",
+            //    UserId = request.UserId,
+            //    UserData = request.UserData 
+            //};
+
+            //await _googleSheets.AddData(summaryRequest);
+
+            return new AddDataInRowResponse 
+            {
+                UserId = request.UserId,
+                SpreadsheetId = request.SpreadsheetId,
+                Success = true 
+            };
         }
 
         public async Task<decimal> GetMonthlyIncome(int userId)
@@ -152,7 +195,6 @@ namespace FloristAI.Application.GoogleSheets
             return total;
         }
 
-
         public async Task<string> GetGoogleSheetsUrl(int userId)
         {
             var spreadsheetId = await _userRepository.GetSpreadsheetId(userId);
@@ -161,7 +203,6 @@ namespace FloristAI.Application.GoogleSheets
 
             return $"https://docs.google.com/spreadsheets/d/{spreadsheetId}";
         }
-
 
         private static string GetColumnLetter(int columnIndex)
         {

@@ -1,15 +1,15 @@
 ﻿using FloristAI.Application.GoogleDrive;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
+using FloristAI.Application.Store.Models.Response;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
-using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
-using Google.Apis.Sheets.v4;
 using QRCoder;
 
 namespace FloristAI.Application.Users
@@ -72,10 +72,10 @@ namespace FloristAI.Application.Users
             return new GetStepResponse
             {
                 ChatId = chatId,
-                Step = step?.Step,
-                FirstName = step?.FirstName,
-                LastName = step?.LastName,
-                Phone = step?.Phone
+                Step = step.Step,
+                FirstName = step.FirstName,
+                LastName = step.LastName,
+                Phone = step.Phone
             };
 
         }
@@ -253,7 +253,7 @@ namespace FloristAI.Application.Users
             await ClearStep(chatId);
         }
 
-        public async Task<string> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
+        public async Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
         {
             var folder = await _googleDriveService.CreateStructureFolder();
 
@@ -301,5 +301,15 @@ namespace FloristAI.Application.Users
             await _userRepository.AddReferal(referal, request.PartnerId);
         }
 
+        public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.SpreadsheetId) || string.IsNullOrWhiteSpace(request.SheetName))
+            {
+                throw new ArgumentException("Неверный запрос для добавления данных в строку");
+            }
+            var response = await _googleSheetsService.AddDataInRow(request);
+            return response;
+
+        }
     }
 }

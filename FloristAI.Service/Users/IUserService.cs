@@ -1,4 +1,7 @@
-﻿using FloristAI.Application.Users.Models.Request;
+﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
+using FloristAI.Application.Store.Models.Response;
+using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.ReferralsAndPartners;
 
@@ -49,9 +52,11 @@ namespace FloristAI.Application.Users
         Task<bool> ClearStep(long chatId);
 
         Task RegisterPartner(long chatId, string spreadSheetId);
-        Task<string> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request);
+        Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request);
         Task ProcessReferral(ProcessReferralRequest request);
 
         Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
+
+        Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
     }
 }

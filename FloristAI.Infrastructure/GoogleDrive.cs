@@ -40,8 +40,49 @@ namespace FloristAI.Infrastructure
             createRequest.Fields = "id";
             var folder = await createRequest.ExecuteAsync();
 
+            // 3. Назначаем права доступа
+            if (name == "Приватная часть")
+            {
+                // Удаляем публичные разрешения (anyone и domain)
+                var permissions = await _driveService.Permissions.List(folder.Id).ExecuteAsync();
+                foreach (var permissionPrivate in permissions.Permissions)
+                {
+                    if (permissionPrivate.Type == "anyone" || permissionPrivate.Type == "domain")
+                    {
+                        await _driveService.Permissions.Delete(folder.Id, permissionPrivate.Id).ExecuteAsync();
+                    }
+                }
+
+                // Добавляем доступ конкретному пользователю
+                var permission = new Google.Apis.Drive.v3.Data.Permission()
+                {
+                    Type = "user",
+                    Role = "reader",       
+                    EmailAddress = "downh068@gmail.com"
+                };
+
+                var permissionRequest = _driveService.Permissions.Create(permission, folder.Id);
+                permissionRequest.Fields = "id";
+                await permissionRequest.ExecuteAsync();
+            }
+            else
+            {
+                // Папка публичная — расшариваем для всех
+                var permissionPublic = new Google.Apis.Drive.v3.Data.Permission()
+                {
+                    Type = "anyone",
+                    Role = "reader"
+                };
+
+                var permissionRequest = _driveService.Permissions.Create(permissionPublic, folder.Id);
+                permissionRequest.Fields = "id";
+                await permissionRequest.ExecuteAsync();
+            }
+
             return folder.Id;
         }
+
+
 
         public async Task<(string Id, string Name)?> FindFolderByName(string name, string parentFolderId)
         {

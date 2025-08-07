@@ -4,7 +4,7 @@ namespace FloristAI.Application.Store
 {
     public interface ICacheRepository
     {
-        Task<PartnerFormProgress?> GetStepFlowBecomePartnerProgress(long chatId);
+        Task<PartnerFormProgress> GetStepFlowBecomePartnerProgress(long chatId);
         Task<bool> SaveStepFlowBecomePartnerProgress(PartnerFormProgress progress);
         Task<bool> ClearProgress(long chatId);
     }

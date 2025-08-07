@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="GoogleSheets\Models\Response\" />
     <Folder Include="GoogleSheets\Новая папка\" />
   </ItemGroup>
 

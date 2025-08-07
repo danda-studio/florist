@@ -1,12 +1,10 @@
-﻿using FloristAI.Application.Store;
+﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
-using FloristAI.Infrastructure.Models.Response;
 using Google;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using System;
 
 namespace FloristAI.Infrastructure
 {
@@ -140,7 +138,7 @@ namespace FloristAI.Infrastructure
 
         public async Task AddHeaders(string spreadsheetId, string range, List<string[]> headers)
         {
-            if (headers == null || !headers.Any())
+            if (headers == null || headers.Count == 0)
                 throw new ArgumentException("Заголовки не могут быть пустыми.", nameof(headers));
 
             var values = headers
@@ -158,6 +156,35 @@ namespace FloristAI.Infrastructure
 
             await updateRequest.ExecuteAsync();
         }
+
+        public async Task AddData(AddDataRequest request)
+        {
+
+            var rowValues = new List<object>
+            {
+                request.UserId,
+                request.UserData.NameAndSurname,
+                request.UserData.PhoneNumber,
+                request.UserData.TelegramId,
+                request.UserData.TelegramUsername,
+                request.UserData.CountReferals,
+                request.UserData.TotalPartnerIncome,
+                request.UserData.TotalIncomeWithoutСommissionPartner,
+                request.UserData.TotalIncome,
+            };
+
+            var valueRange = new ValueRange
+            {
+                Values = new List<IList<object>> { rowValues }
+            };
+
+            var appendRequest = _sheetsService.Spreadsheets.Values.Append(valueRange, request.SpreadsheetId, $"{request.SheetName}!A2");
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
+            appendRequest.InsertDataOption = SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum.INSERTROWS;
+
+            await appendRequest.ExecuteAsync();
+        }
+
 
         public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
         {
