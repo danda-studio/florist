@@ -24,7 +24,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public string Step => "become_partner_step_phone";
 
-        public async Task<List<MessageResult>> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId, string? username = null)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)

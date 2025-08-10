@@ -12,5 +12,7 @@ namespace FloristAI.Adapter.Models
         public long ChatId { get; set; }
         public string? Parameter { get; set; } = string.Empty;
 
+        public string? Username { get; set; } = string.Empty;
+
     }
 }

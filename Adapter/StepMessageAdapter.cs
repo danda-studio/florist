@@ -30,7 +30,7 @@ namespace FloristAI.Adapter
                 };
             }
 
-            var result = await builder.BuildMenu(context.ChatId);
+            var result = await builder.BuildMenu(context.ChatId, context.Username);
             return result;
 
         }

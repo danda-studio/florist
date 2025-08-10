@@ -63,6 +63,7 @@ namespace FloristAI.Infrastructure
                 var request = _driveService.Files.Create(fileMetadata);
                 request.SupportsAllDrives = true;
                 var file = await request.ExecuteAsync();
+
                 return new CreateSpreadsheetResponse
                 {
                     SpreadsheetId = file.Id,
@@ -191,6 +192,32 @@ namespace FloristAI.Infrastructure
             var request = _sheetsService.Spreadsheets.Values.Get(spreadsheetId, range);
             var response = await request.ExecuteAsync();
             return response.Values ?? new List<IList<object>>();
+        }
+
+        public async Task DeleteDefaultSheet(string spreadsheetId)
+        {
+            // Получаем ID первого листа
+            var spreadsheet = await _sheetsService.Spreadsheets.Get(spreadsheetId).ExecuteAsync();
+            var sheetId = spreadsheet.Sheets.First().Properties.SheetId;
+
+            // Формируем запрос на удаление
+            var requestBody = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new List<Request>
+                {
+                    new Request
+                    {
+                        DeleteSheet = new DeleteSheetRequest
+                        {
+                            SheetId = sheetId
+                        }
+                    }
+                }
+            };
+
+            // Отправляем запрос
+            var deleteRequest = _sheetsService.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
+            await deleteRequest.ExecuteAsync();
         }
     }
 }

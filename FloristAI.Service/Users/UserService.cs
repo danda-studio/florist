@@ -75,7 +75,8 @@ namespace FloristAI.Application.Users
                 Step = step.Step,
                 FirstName = step.FirstName,
                 LastName = step.LastName,
-                Phone = step.Phone
+                Phone = step.Phone,
+                Username = step.Username
             };
 
         }
@@ -103,6 +104,9 @@ namespace FloristAI.Application.Users
 
             if (!string.IsNullOrWhiteSpace(request.Phone))
                 progress.Phone = request.Phone;
+
+            if (!string.IsNullOrWhiteSpace(request.TgUserName))
+                progress.Username = request.TgUserName;
 
             // сохраняем обновлённый прогресс
             return await _cacheRepository.SaveStepFlowBecomePartnerProgress(progress);

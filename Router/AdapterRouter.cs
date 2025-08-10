@@ -31,26 +31,28 @@ namespace FloristAI.Router
         /// <param name="message">Входящее сообщение или callback-данные.</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки в виде <see cref="MessageResult"/>.</returns>
-        public async Task<List<MessageResult>> Route(string message, long chatId)
+        public async Task<List<MessageResult>> Route(string message, long chatId, string? username = null)
         {
             if (string.IsNullOrWhiteSpace(message))
                 new List<MessageResult> { new MessageResult { Text = "Неизвестная команда" } };
 
             if (message.Contains(":"))
-                return await RouteCallback(message, chatId);
+                return await RouteCallback(message, chatId, username);
             else if (message.StartsWith("/"))
                 return await RouteCommand(message, chatId);
 
-            return await RouteTextInput(message, chatId);
+            return await RouteTextInput(message, chatId, username);
         }
 
-        private async Task<List<MessageResult>> RouteTextInput(string message, long chatId)
+        private async Task<List<MessageResult>> RouteTextInput(string message, long chatId, string? username = null)
         {
             if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
             {
                 return await stepInputAdapter.ProcessMessage(new MessageContext 
                 { 
-                    Message = message, ChatId = chatId 
+                    Message = message, 
+                    ChatId = chatId,
+                    Username = username
                 });
             }
             return new List<MessageResult>
@@ -99,7 +101,7 @@ namespace FloristAI.Router
         /// <param name="callbackData">Данные callback (например, "role_select:admin").</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки callback.</returns>
-        private async Task<List<MessageResult>> RouteCallback(string callbackData, long chatId)
+        private async Task<List<MessageResult>> RouteCallback(string callbackData, long chatId, string? username = null)
         {
             Console.WriteLine($"Пришел callback: {callbackData}");
 
@@ -112,8 +114,9 @@ namespace FloristAI.Router
                     return await stepAdapter.ProcessMessage(new MessageContext
                     { 
                         Message =  step, 
-                        ChatId =  chatId 
-                    
+                        ChatId =  chatId,
+                        Username = username
+
                     });
 
                 }
@@ -127,7 +130,8 @@ namespace FloristAI.Router
                 var result = await adapter.ProcessMessage(new MessageContext
                 { 
                     Message = parameter, 
-                    ChatId = chatId 
+                    ChatId = chatId,
+                    Username = username
                 });
 
                 // Так как result — список, проверяем RedirectRouteKey у первого сообщения

@@ -13,5 +13,7 @@ namespace FloristAI.Application.GoogleSheets
         Task<decimal> GetMonthlyIncome(int userId);
         Task<string> GetGoogleSheetsUrl(int userId);
         Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
+
+        Task DeleteDefaultSheet(string spreadsheetId);
     }
 }

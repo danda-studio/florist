@@ -108,6 +108,7 @@ namespace FloristAI.Application.GoogleSheets
                     await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, "Итог");
                 }
 
+                await DeleteDefaultSheet(sheetInfo.SpreadsheetId);
                 result.Add(new CreateStructureSheetResponse
                 {
                     SpreadsheetId = sheetInfo.SpreadsheetId,
@@ -167,33 +168,21 @@ namespace FloristAI.Application.GoogleSheets
 
         public async Task<decimal> GetMonthlyIncome(int userId)
         {
-
             var spreadsheetId = await _userRepository.GetSpreadsheetId(userId);
             if (string.IsNullOrEmpty(spreadsheetId))
                 throw new InvalidOperationException("Spreadsheet ID not found for user");
 
-            var values = await _googleSheets.GetValues(spreadsheetId, "A:B");
+            var values = await _googleSheets.GetValues(spreadsheetId, "B1");
 
-            if (values.Count == 0)
+            if (values.Count == 0 || values[0].Count == 0)
                 return 0m;
 
-            decimal total = 0m;
-            var currentMonth = DateTime.Now.Month;
+            if (decimal.TryParse(values[0][0]?.ToString(), out var total))
+                return total;
 
-            foreach (var row in values.Skip(1))
-            {
-                if (row.Count < 2) continue;
-
-                if (DateTime.TryParse(row[0]?.ToString(), out var date) &&
-                    decimal.TryParse(row[1]?.ToString(), out var amount))
-                {
-                    if (date.Month == currentMonth)
-                        total += amount;
-                }
-            }
-
-            return total;
+            return 0m;
         }
+
 
         public async Task<string> GetGoogleSheetsUrl(int userId)
         {
@@ -217,6 +206,20 @@ namespace FloristAI.Application.GoogleSheets
             }
 
             return result;
+        }
+
+        public async Task DeleteDefaultSheet(string spreadsheetId)
+        {
+            if (string.IsNullOrEmpty(spreadsheetId))
+                throw new ArgumentException("Spreadsheet ID cannot be null or empty.", nameof(spreadsheetId));
+            try
+            {
+                await _googleSheets.DeleteDefaultSheet(spreadsheetId);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to delete default sheet.", ex);
+            }
         }
     }
 

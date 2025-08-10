@@ -11,5 +11,7 @@ namespace FloristAI.Application.Store
         Task AddHeaders(string spreadsheetId, string range, List<string[]> headers);
         Task AddData(AddDataRequest request);
         Task<IList<IList<object>>> GetValues(string spreadsheetId, string range);
+
+        Task DeleteDefaultSheet(string spreadsheetId);
     }
 }

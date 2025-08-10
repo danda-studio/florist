@@ -33,8 +33,9 @@ namespace FloristAI.Infrastructure
                         {
                             var chatId = update.Message.Chat.Id;
                             var input = update.Message.Text;
+                            var username = string.IsNullOrWhiteSpace(update.Message.From?.Username) ? "unknown" : update.Message.From.Username;
 
-                            var results = await _router.Route(input, chatId);
+                            var results = await _router.Route(input, chatId, username);
                             await _botClient.DeleteMessage(chatId, update.Message.MessageId);
 
                             await ProcessResults(chatId, results, token);
@@ -44,8 +45,9 @@ namespace FloristAI.Infrastructure
                             var chatId = update.CallbackQuery.Message?.Chat.Id ?? update.CallbackQuery.From.Id;
                             var messageId = update.CallbackQuery.Message?.MessageId ?? 0;
                             var command = update.CallbackQuery.Data ?? "";
+                            var username = string.IsNullOrWhiteSpace(update.CallbackQuery.From.Username) ? "unknown": update.CallbackQuery.From.Username;
 
-                            var results = await _router.Route(command, chatId);
+                            var results = await _router.Route(command, chatId, username);
 
                             if (messageId != 0)
                             {
