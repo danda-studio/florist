@@ -13,6 +13,17 @@ namespace FloristAI.Application.Users
     public interface IUserService
     {
         /// <summary>
+        /// Получает информацию о пользователе по chatId Telegram.
+        /// </summary>
+        /// <param name="chatId">Идентификатор чата Telegram.</param>
+        /// <returns>Модель с данными пользователя.</returns>
+        Task<GetUserResponse> GetUser(long chatId);
+        Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
+        Task<GetStepResponse> GetStep(long chatId);
+        string GetReferralLink(int Id);
+        byte[] GetReferralQrCode(int Id);
+
+        /// <summary>
         /// Получает список ролей пользователя по его Telegram chatId.
         /// </summary>
         /// <param name="chatId">Идентификатор чата пользователя в Telegram.</param>
@@ -27,6 +38,7 @@ namespace FloristAI.Application.Users
         /// <param name="languageCode">Код языка интерфейса.</param>
         /// <returns>Ответ с информацией о созданном пользователе.</returns>
         Task<AddUserResponse> AddUser(long chatId, string languageCode);
+        Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
 
         /// <summary>
         /// Изменяет язык интерфейса пользователя.
@@ -35,28 +47,11 @@ namespace FloristAI.Application.Users
         /// <param name="languageCode">Новый код языка интерфейса.</param>
         /// <returns>Ответ с подтверждением изменения языка.</returns>
         Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode);
-
-        /// <summary>
-        /// Получает информацию о пользователе по chatId Telegram.
-        /// </summary>
-        /// <param name="chatId">Идентификатор чата Telegram.</param>
-        /// <returns>Модель с данными пользователя.</returns>
-        Task<GetUserResponse> GetUser(long chatId);
-
-        Task<GetStepResponse> GetStep(long chatId);
-        Task<bool> SaveStep(SaveStepRequest request);
-
-        string GetReferralLink(int Id);
-        byte[] GetReferralQrCode(int Id);
-
-        Task<bool> ClearStep(long chatId);
-
-        Task RegisterPartner(long chatId, string spreadSheetId);
         Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request);
+        Task<bool> SaveStep(SaveStepRequest request);
+        Task<bool> ClearStep(long chatId);
+        Task RegisterPartner(long chatId, string spreadSheetId);
         Task ProcessReferral(ProcessReferralRequest request);
 
-        Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
-
-        Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
     }
 }

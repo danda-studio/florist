@@ -19,66 +19,18 @@ namespace FloristAI.Infrastructure
             _driveService = driveService;
         }
 
-        /// <summary>
-        /// Создает таблицу в Google Sheets и перемещает её в указанную папку.
-        /// </summary>
-        public async Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId)
+        public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
         {
-            try
-            {
-                var (success, existingFile) = await FindSpreadsheet(name, parentFolderId);
+            var request = _sheetsService.Spreadsheets.Values.Get(spreadsheetId, range);
+            var response = await request.ExecuteAsync();
+            return response.Values ?? new List<IList<object>>();
+        }
 
-                if (success && existingFile != null)
-                {
-                    return new CreateSpreadsheetResponse
-                    { 
-                        SpreadsheetId = existingFile.Id,
-                        IsNew = false,
-                    };
-
-                }
-
-                await Task.Delay(1500);
-
-                //var fileMetadata = new Google.Apis.Drive.v3.Data.File()
-                //{
-                //    Name = name,
-                //    MimeType = "application/vnd.google-apps.spreadsheet",
-                //    Parents = new List<string> { parentFolderId }
-                //};
-
-                //var createRequest = _driveService.Files.Create(fileMetadata);
-                //createRequest.SupportsAllDrives = true; 
-                //var file = await createRequest.ExecuteAsync();
-                //return file.Id;
-
-
-                var fileMetadata = new Google.Apis.Drive.v3.Data.File
-                {
-                    Name = name,
-                    MimeType = "application/vnd.google-apps.spreadsheet",
-                    Parents = new List<string> { parentFolderId }
-                };
-
-                var request = _driveService.Files.Create(fileMetadata);
-                request.SupportsAllDrives = true;
-                var file = await request.ExecuteAsync();
-
-                return new CreateSpreadsheetResponse
-                {
-                    SpreadsheetId = file.Id,
-                    IsNew = true,
-                };
-            }
-            catch (GoogleApiException ex) when (ex.Error.Code == 403)
-            {
-                throw new Exception($"Ошибка доступа (403). Детали:\n" +
-                                   $"• Сообщение ошибки: {ex.Message}\n");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Неожиданная ошибка: {ex.Message}");
-            }
+        public async Task<IList<Sheet>> GetSheets(string spreadsheetId)
+        {
+            var request = _sheetsService.Spreadsheets.Get(spreadsheetId);
+            var response = await request.ExecuteAsync();
+            return response.Sheets;
         }
 
         /// <summary>
@@ -107,35 +59,6 @@ namespace FloristAI.Infrastructure
 
             return request.SpreadsheetId;
         }
-
-        /// <summary>
-        /// Поиск таблицы по имени и родительской папке
-        /// </summary>
-        private async Task<(bool Success, Google.Apis.Drive.v3.Data.File? File)> FindSpreadsheet(string name, string parentFolderId)
-        {
-            try
-            {
-                var listRequest = _driveService.Files.List();
-                listRequest.Q = $"name = '{name}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
-                listRequest.SupportsAllDrives = true;
-                listRequest.IncludeItemsFromAllDrives = true;
-                listRequest.Fields = "files(id, name)";
-
-                var result = await listRequest.ExecuteAsync();
-                var file = result.Files.FirstOrDefault();
-
-                return file != null
-                    ? (true, file)
-                    : (false, null);
-            }
-            catch (Exception ex)
-            {
-                // Логируем ошибку, но не прерываем выполнение
-                Console.WriteLine($"{ex}, Ошибка при поиске таблицы {name} в папке {parentFolderId}");
-                return (false, null);
-            }
-        }
-
 
         public async Task AddHeaders(string spreadsheetId, string range, List<string[]> headers)
         {
@@ -186,12 +109,78 @@ namespace FloristAI.Infrastructure
             await appendRequest.ExecuteAsync();
         }
 
-
-        public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
+        /// <summary>
+        /// Создает таблицу в Google Sheets и перемещает её в указанную папку.
+        /// </summary>
+        public async Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId)
         {
-            var request = _sheetsService.Spreadsheets.Values.Get(spreadsheetId, range);
-            var response = await request.ExecuteAsync();
-            return response.Values ?? new List<IList<object>>();
+            try
+            {
+                var (success, existingFile) = await FindSpreadsheet(name, parentFolderId);
+
+                if (success && existingFile != null)
+                {
+                    return new CreateSpreadsheetResponse
+                    {
+                        SpreadsheetId = existingFile.Id,
+                        IsNew = false,
+                    };
+
+                }
+
+                await Task.Delay(1500);
+
+                //var fileMetadata = new Google.Apis.Drive.v3.Data.File()
+                //{
+                //    Name = name,
+                //    MimeType = "application/vnd.google-apps.spreadsheet",
+                //    Parents = new List<string> { parentFolderId }
+                //};
+
+                //var createRequest = _driveService.Files.Create(fileMetadata);
+                //createRequest.SupportsAllDrives = true; 
+                //var file = await createRequest.ExecuteAsync();
+                //return file.Id;
+
+
+                var fileMetadata = new Google.Apis.Drive.v3.Data.File
+                {
+                    Name = name,
+                    MimeType = "application/vnd.google-apps.spreadsheet",
+                    Parents = new List<string> { parentFolderId }
+                };
+
+                var request = _driveService.Files.Create(fileMetadata);
+                request.SupportsAllDrives = true;
+                var file = await request.ExecuteAsync();
+
+                return new CreateSpreadsheetResponse
+                {
+                    SpreadsheetId = file.Id,
+                    IsNew = true,
+                };
+            }
+            catch (GoogleApiException ex) when (ex.Error.Code == 403)
+            {
+                throw new Exception($"Ошибка доступа (403). Детали:\n" +
+                                   $"• Сообщение ошибки: {ex.Message}\n");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Неожиданная ошибка: {ex.Message}");
+            }
+        }
+
+        public async Task UpdateValue(string spreadsheetId, string range, string value)
+        {
+            var body = new ValueRange
+            {
+                Values = new List<IList<object>> { new List<object> { value } }
+            };
+
+            var request = _sheetsService.Spreadsheets.Values.Update(body, spreadsheetId, range);
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            await request.ExecuteAsync();
         }
 
         public async Task DeleteDefaultSheet(string spreadsheetId)
@@ -219,5 +208,41 @@ namespace FloristAI.Infrastructure
             var deleteRequest = _sheetsService.Spreadsheets.BatchUpdate(requestBody, spreadsheetId);
             await deleteRequest.ExecuteAsync();
         }
+        
+        /// <summary>
+        /// Поиск таблицы по имени и родительской папке
+        /// </summary>
+        public async Task<(bool Success, Google.Apis.Drive.v3.Data.File? File)> FindSpreadsheet(string name, string? parentFolderId = null)
+        {
+            try
+            {
+                // Защита от одиночных кавычек в имени
+                var safeName = (name ?? string.Empty).Replace("'", "\\'");
+
+                // Формируем запрос в зависимости от наличия parentFolderId
+                string query = $"name = '{safeName}' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
+                if (!string.IsNullOrEmpty(parentFolderId))
+                {
+                    query = $"name = '{safeName}' and '{parentFolderId}' in parents and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false";
+                }
+
+                var listRequest = _driveService.Files.List();
+                listRequest.Q = query;
+                listRequest.SupportsAllDrives = true;
+                listRequest.IncludeItemsFromAllDrives = true;
+                listRequest.Fields = "files(id, name)";
+
+                var result = await listRequest.ExecuteAsync();
+                var file = result.Files?.FirstOrDefault();
+
+                return file != null ? (true, file) : (false, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex}, Ошибка при поиске таблицы '{name}'{(string.IsNullOrEmpty(parentFolderId) ? "" : $" в папке {parentFolderId}")}");
+                return (false, null);
+            }
+        }
+
     }
 }

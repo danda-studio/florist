@@ -58,17 +58,17 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             messages.Add(new MessageResult
             {
-                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
-                ReplyMarkup = keyboard
-            });
-
-            messages.Add(new MessageResult
-            {
                 Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
                 ReplyMarkup = null,
                 PinnedMessage = true 
             });
-            
+
+            messages.Add(new MessageResult
+            {
+                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
+                ReplyMarkup = keyboard
+            });
+
 
             return messages;
         }

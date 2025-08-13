@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
@@ -18,6 +19,8 @@ namespace FloristAI.Adapter
         private readonly ILanguageService _languageService;
 
         private readonly IUserService _userService;
+        
+        private readonly IGoogleSheetsService _googleSheetsService;
 
         /// <summary>
         /// Ключ маршрута, соответствующий команде.
@@ -28,10 +31,11 @@ namespace FloristAI.Adapter
         /// Инициализирует новый экземпляр <see cref="SelectLanguageAdapter"/>.
         /// </summary>
         /// <param name="languageService">Сервис для получения списка поддерживаемых языков.</param>
-        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService)
+        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService, IGoogleSheetsService googleSheetsService)
         {
             _languageService = languageService;
             _userService = userService;
+            _googleSheetsService = googleSheetsService;
         }
 
         /// <summary>
@@ -45,7 +49,9 @@ namespace FloristAI.Adapter
         public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
             var user = await _userService.GetOrCreateUser(context.ChatId, "ru");
-            if (!string.IsNullOrEmpty(context.Parameter) && int.TryParse(context.Parameter, out int partnerId))
+
+            int partnerId = 0;
+            if (!string.IsNullOrEmpty(context.Parameter) && int.TryParse(context.Parameter, out partnerId))
             {
                 await _userService.ProcessReferral(new ProcessReferralRequest
                 {
@@ -56,6 +62,32 @@ namespace FloristAI.Adapter
 
             }
 
+            var spreadsheetId = await _googleSheetsService.FindSpreadsheet("Общая информация");
+            if (!string.IsNullOrEmpty(spreadsheetId))
+            {
+                var sheetName = await _googleSheetsService.GetSheetIdByMonth(spreadsheetId, DateTime.Now);
+
+                var rows = await _googleSheetsService.GetValues(spreadsheetId, $"{sheetName}!A2:I");
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    if (rows[i][0]?.ToString() == partnerId.ToString())
+                    {
+                        int currentCount = 0;
+                        if (rows[i].Count > 5 && int.TryParse(rows[i][5]?.ToString(), out var count))
+                            currentCount = count;
+
+                        currentCount++;
+
+                        await _googleSheetsService.UpdateValue(
+                            spreadsheetId,
+                            $"{sheetName}!F{i + 2}", 
+                            currentCount.ToString()
+                        );
+                    }
+                }
+                
+            }
+
             var language = await _languageService.GetLanguageList(context.ChatId);
 
             var keyboard = new InlineKeyboardMarkup(
@@ -63,7 +95,7 @@ namespace FloristAI.Adapter
                     new[] {
                         InlineKeyboardButton.WithCallbackData(
                             text: lang.Name,
-                            callbackData: $"select_role:{lang.Code}" // например, "select_language:ru"
+                            callbackData: $"select_role:{lang.Code}" 
                         )
                     }).ToArray()
             );

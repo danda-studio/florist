@@ -30,6 +30,33 @@ namespace FloristAI.Application.Language
         }
 
         /// <summary>
+        /// Получает локализованную строку по ключу и коду языка.
+        /// </summary>
+        /// <param name="key">Ключ строки (например, "Menu_Title").</param>
+        /// <param name="languageCode">Код языка (например, "ru").</param>
+        /// <returns>Локализованная строка, если найдена, иначе возвращается сам ключ.</returns>
+        public string GetString(string key, string languageCode)
+        {
+            if (_locales.TryGetValue(languageCode, out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                {
+                    return value;
+                }
+                else
+                {
+                    Console.WriteLine($"[i18n] Ключ не найден: {key} в языке {languageCode}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"[i18n] Язык не найден: {languageCode}");
+            }
+
+            return key;
+        }
+
+        /// <summary>
         /// Пытается загрузить локализационный файл для указанного языка.
         /// </summary>
         /// <param name="logger">Логгер для записи информации и ошибок.</param>
@@ -58,33 +85,6 @@ namespace FloristAI.Application.Language
                 logger.LogError(ex, "Ошибка при загрузке локализации для языка {Language}", lang);
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Получает локализованную строку по ключу и коду языка.
-        /// </summary>
-        /// <param name="key">Ключ строки (например, "Menu_Title").</param>
-        /// <param name="languageCode">Код языка (например, "ru").</param>
-        /// <returns>Локализованная строка, если найдена, иначе возвращается сам ключ.</returns>
-        public string GetString(string key, string languageCode)
-        {
-            if (_locales.TryGetValue(languageCode, out var dict))
-            {
-                if (dict.TryGetValue(key, out var value))
-                {
-                    return value;
-                }
-                else
-                {
-                    Console.WriteLine($"[i18n] Ключ не найден: {key} в языке {languageCode}");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"[i18n] Язык не найден: {languageCode}");
-            }
-
-            return key;
         }
     }
 }

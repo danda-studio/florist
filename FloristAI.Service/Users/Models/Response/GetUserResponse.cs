@@ -17,5 +17,7 @@ namespace FloristAI.Application.Users.Models.Response
         public string LanguageCode { get; set; } = "ru";
 
         public bool IsPartner { get; set; }
+
+        public List<string> Roles { get; set; } = new List<string>();
     }
 }
