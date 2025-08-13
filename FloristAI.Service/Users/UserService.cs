@@ -1,4 +1,10 @@
-﻿using FloristAI.Application.Language;
+﻿using FloristAI.Application.GoogleDrive;
+using FloristAI.Application.GoogleSheets;
+using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
+using FloristAI.Application.Language;
+using FloristAI.Application.Store;
+using FloristAI.Application.Store.Models.Response;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
 using FloristAI.Core.Entities.Enums;
@@ -17,29 +23,33 @@ namespace FloristAI.Application.Users
         /// <summary>
         /// Репозиторий для работы с данными пользователей.
         /// </summary>
-        public readonly IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public readonly ICacheRepository _cacheRepository;
+        private readonly ICacheRepository _cacheRepository;
+
+        private readonly IGoogleSheetsService _googleSheetsService;
+        private readonly IGoogleDriveService _googleDriveService;
 
         /// <summary>
         /// Сервис локализации для получения локализованных строк.
         /// </summary>
-        public readonly ILocalizationService _localizationService;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="UserService"/>.
         /// </summary>
         /// <param name="userRepository">Репозиторий пользователей.</param>
         /// <param name="localizationService">Сервис локализации.</param>
-        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository)
+        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository, IGoogleSheetsService googleSheetsService, IGoogleDriveService googleDriveService)
         {
             _userRepository = userRepository;
             _localizationService = localizationService;
             _cacheRepository = cacheRepository;
+            _googleSheetsService = googleSheetsService;
+            _googleDriveService = googleDriveService;
         }
 
-
-        private async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
+        public async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
         {
             if (!await CheckUserInSystem(chatId))
             {
@@ -55,92 +65,6 @@ namespace FloristAI.Application.Users
             return user ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
         }
 
-        public async Task<GetStepResponse> GetStep(long chatId)
-        {
-           var step = await _cacheRepository.GetProgress(chatId);
-
-            return new GetStepResponse
-            {
-                ChatId = chatId,
-                Step = step?.Step, 
-                FirstName = step?.FirstName,
-                LastName = step?.LastName,
-                Phone = step?.Phone
-            };
-
-        }
-
-        public async Task<bool> SaveStep(SaveStepRequest request)
-        {
-            if (request == null || request.ChatId <= 0)
-            {
-                throw new ArgumentException("Неверный запрос для сохранения шага");
-            }
-
-            // Получаем текущий прогресс
-            var progress = await _cacheRepository.GetProgress(request.ChatId)
-                           ?? new PartnerFormProgress { ChatId = request.ChatId };
-
-            // Обновляем только то, что пришло в запросе
-            if (request.Step != null)
-                progress.Step = request.Step;
-
-            if (!string.IsNullOrWhiteSpace(request.FirstName))
-                progress.FirstName = request.FirstName;
-
-            if (!string.IsNullOrWhiteSpace(request.LastName))
-                progress.LastName = request.LastName;
-
-            if (!string.IsNullOrWhiteSpace(request.Phone))
-                progress.Phone = request.Phone;
-
-            // сохраняем обновлённый прогресс
-            return await _cacheRepository.SaveProgress(progress);
-        }
-
-
-        public async Task<bool> ClearStep(long chatId)
-        {
-            if (chatId <= 0)
-            {
-                throw new ArgumentException("Неверный идентификатор чата");
-            }
-            return await _cacheRepository.ClearProgress(chatId);
-        }
-
-        /// <summary>
-        /// Добавляет пользователя с указанным chatId и языком интерфейса.
-        /// </summary>
-        /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
-        /// <param name="languageCode">Код языка интерфейса пользователя.</param>
-        /// <returns>Информация о созданном или существующем пользователе.</returns>
-        public async Task<AddUserResponse> AddUser(long chatId, string languageCode)
-        {
-            var user = await _userRepository.CreateUserWithChatData(chatId, languageCode);
-
-            return new AddUserResponse
-            {
-                Id = user.Id,
-                LanguageCode = user.LanguageCode
-            };
-        }
-
-        /// <summary>
-        /// Проверка, есть ли пользователь в системе по chatId.
-        /// </summary>
-        /// <param name="chatId"></param>
-        /// <returns></returns>
-        private async Task<bool> CheckUserInSystem(long chatId)
-        {
-            var user = await _userRepository.GetUserByChatId(chatId);
-            if (user == null)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         /// <summary>
         /// Получает информацию о пользователе по chatId.
         /// </summary>
@@ -152,10 +76,14 @@ namespace FloristAI.Application.Users
             var user = await _userRepository.GetUserByChatId(chatId)
                 ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
 
+            var isPartner = await _userRepository.IsPartner(chatId);
+
             return new GetUserResponse
             {
                 UserId = user.Id,
-                LanguageCode = user.LanguageCode
+                LanguageCode = user.LanguageCode,
+                IsPartner = isPartner,
+                Roles = user.Roles.Select(r => r.Role.ToString()).ToList()
             };
         }
 
@@ -185,25 +113,6 @@ namespace FloristAI.Application.Users
             };
         }
 
-
-        /// <summary>
-        /// Изменяет язык интерфейса пользователя.
-        /// </summary>
-        /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
-        /// <param name="languageCode">Новый код языка интерфейса.</param>
-        /// <returns>Результат изменения с информацией о пользователе и новом языке.</returns>
-        public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
-        {
-            var user = await GetUser(chatId);
-            await _userRepository.EditLanguageCode(user.UserId, languageCode);
-
-            return new EditLanguageInterfaceUserResponse
-            {
-                UserId = user.UserId,
-                LanguageCode = languageCode
-            };
-        }
-
         public string GetReferralLink(int Id)
         {
             string botName = "FLowerKisaBot";
@@ -221,23 +130,76 @@ namespace FloristAI.Application.Users
             return renderer.GetGraphic(20);
         }
 
-
-        public async Task<Partner> AddPartner(AddPartnerRequest request)
+        public async Task<GetStepResponse> GetStep(long chatId)
         {
+            var step = await _cacheRepository.GetStepFlowBecomePartnerProgress(chatId);
 
-            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
-            var partner = new Partner
+            return new GetStepResponse
             {
-                UserId = user.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PhoneNumber = request.PhoneNumber
+                ChatId = chatId,
+                Step = step.Step,
+                FirstName = step.FirstName,
+                LastName = step.LastName,
+                Phone = step.Phone,
+                Username = step.Username
             };
 
-            return await _userRepository.AddPartner(partner);
         }
 
-        public async Task RegisterPartner(long chatId)
+        /// <summary>
+        /// Добавляет пользователя с указанным chatId и языком интерфейса.
+        /// </summary>
+        /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
+        /// <param name="languageCode">Код языка интерфейса пользователя.</param>
+        /// <returns>Информация о созданном или существующем пользователе.</returns>
+        public async Task<AddUserResponse> AddUser(long chatId, string languageCode)
+        {
+            var user = await _userRepository.CreateUserWithChatData(chatId, languageCode);
+
+            return new AddUserResponse
+            {
+                Id = user.Id,
+                LanguageCode = user.LanguageCode
+            };
+        }
+
+        /// <summary>
+        /// Изменяет язык интерфейса пользователя.
+        /// </summary>
+        /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
+        /// <param name="languageCode">Новый код языка интерфейса.</param>
+        /// <returns>Результат изменения с информацией о пользователе и новом языке.</returns>
+        public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
+        {
+            var user = await GetUser(chatId);
+            var isPartner = await _userRepository.IsPartner(chatId);
+            await _userRepository.EditLanguageCode(user.UserId, languageCode);
+
+            return new EditLanguageInterfaceUserResponse
+            {
+                UserId = user.UserId,
+                LanguageCode = languageCode,
+                IsPartner = isPartner
+            };
+        }
+
+        public async Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
+        {
+            var folder = await _googleDriveService.CreateStructureFolder();
+
+            var sheetsParams = new SheetsCreationParams(
+                PartnerId: request.PartnerId,
+                FirstName: request.FirstName,
+                LastName: request.LastName,
+                PublicFolderId: folder.PublicFolderId,
+                PrivateFolderId: folder.PrivateFolderId
+            );
+
+            return await _googleSheetsService.CreateStructureSheet(sheetsParams);
+
+        }
+
+        public async Task RegisterPartner(long chatId, string spreadSheetId)
         {
             var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
             var request = new AddPartnerRequest
@@ -245,21 +207,112 @@ namespace FloristAI.Application.Users
                 ChatId = stepData.ChatId,
                 FirstName = stepData.FirstName ?? string.Empty,
                 LastName = stepData.LastName ?? string.Empty,
-                PhoneNumber = stepData.Phone ?? string.Empty
+                PhoneNumber = stepData.Phone ?? string.Empty,
+                SpreadSheetId = spreadSheetId
             };
 
             await AddPartner(request);
             await ClearStep(chatId);
         }
 
-        public async Task<bool> CheckStatusPartner (long chatId)
+        public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
         {
-
-            return await _userRepository.IsPartner(chatId);
+            if (request == null || string.IsNullOrWhiteSpace(request.SpreadsheetId) || string.IsNullOrWhiteSpace(request.SheetName))
+            {
+                throw new ArgumentException("Неверный запрос для добавления данных в строку");
+            }
+            var response = await _googleSheetsService.AddDataInRow(request);
+            return response;
 
         }
 
+        public async Task ProcessReferral(ProcessReferralRequest request)
+        {
 
+            var referal = new Referal
+            {
+                ReferalId = request.UserId,
+                PartnerReferal = new PartnerReferal
+                {
+                    PartnerId = request.PartnerId,
+                    ReferalId = request.UserId
+                }
+            };
+
+            await _userRepository.AddReferal(referal, request.PartnerId);
+        }
+
+        public async Task<bool> SaveStep(SaveStepRequest request)
+        {
+            if (request == null || request.ChatId <= 0)
+            {
+                throw new ArgumentException("Неверный запрос для сохранения шага");
+            }
+
+            // Получаем текущий прогресс
+            var progress = await _cacheRepository.GetStepFlowBecomePartnerProgress(request.ChatId)
+                           ?? new PartnerFormProgress { ChatId = request.ChatId };
+
+            // Обновляем только то, что пришло в запросе
+            if (request.Step != null)
+                progress.Step = request.Step;
+
+            if (!string.IsNullOrWhiteSpace(request.FirstName))
+                progress.FirstName = request.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(request.LastName))
+                progress.LastName = request.LastName;
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+                progress.Phone = request.Phone;
+
+            if (!string.IsNullOrWhiteSpace(request.TgUserName))
+                progress.Username = request.TgUserName;
+
+            // сохраняем обновлённый прогресс
+            return await _cacheRepository.SaveStepFlowBecomePartnerProgress(progress);
+        }
+
+        public async Task<bool> ClearStep(long chatId)
+        {
+            if (chatId <= 0)
+            {
+                throw new ArgumentException("Неверный идентификатор чата");
+            }
+            return await _cacheRepository.ClearProgress(chatId);
+        }
+
+        private async Task<Partner> AddPartner(AddPartnerRequest request)
+        {
+
+            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
+            var partner = new Partner
+            {
+                UserId = user.Id,
+                FirstName = request.FirstName ?? string.Empty,
+                LastName = request.LastName ?? string.Empty,
+                PhoneNumber = request.PhoneNumber ?? string.Empty,
+                SpreadsheetId = request.SpreadSheetId
+            };
+
+            return await _userRepository.AddPartner(partner);
+        }
+
+        /// <summary>
+        /// Проверка, есть ли пользователь в системе по chatId.
+        /// </summary>
+        /// <param name="chatId"></param>
+        /// <returns></returns>
+        private async Task<bool> CheckUserInSystem(long chatId)
+        {
+            var user = await _userRepository.GetUserByChatId(chatId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
     }
 }

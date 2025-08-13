@@ -31,24 +31,29 @@ namespace FloristAI.Router
         /// <param name="message">Входящее сообщение или callback-данные.</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки в виде <see cref="MessageResult"/>.</returns>
-        public async Task<List<MessageResult>> Route(string message, long chatId)
+        public async Task<List<MessageResult>> Route(string message, long chatId, string? username = null)
         {
             if (string.IsNullOrWhiteSpace(message))
                 new List<MessageResult> { new MessageResult { Text = "Неизвестная команда" } };
 
             if (message.Contains(":"))
-                return await RouteCallback(message, chatId);
+                return await RouteCallback(message, chatId, username);
             else if (message.StartsWith("/"))
                 return await RouteCommand(message, chatId);
 
-            return await RouteTextInput(message, chatId);
+            return await RouteTextInput(message, chatId, username);
         }
 
-        private async Task<List<MessageResult>> RouteTextInput(string message, long chatId)
+        private async Task<List<MessageResult>> RouteTextInput(string message, long chatId, string? username = null)
         {
             if (_adapters.TryGetValue("step_input", out var stepInputAdapter))
             {
-                return await stepInputAdapter.ProcessMessage(message, chatId);
+                return await stepInputAdapter.ProcessMessage(new MessageContext 
+                { 
+                    Message = message, 
+                    ChatId = chatId,
+                    Username = username
+                });
             }
             return new List<MessageResult>
             {
@@ -64,10 +69,18 @@ namespace FloristAI.Router
         /// <returns>Результат обработки команды.</returns>
         private async Task<List<MessageResult>> RouteCommand(string message, long chatId)
         {
-            var command = ExtractCommand(message); // убирает "/"
+            var (command, param) = ExtractCommand(message); // вернет (start, "123" или null)
+
+
+            // Остальные команды
             if (_adapters.TryGetValue(command, out var adapter))
             {
-                var result = await adapter.ProcessMessage(message, chatId);
+                var result = await adapter.ProcessMessage(new MessageContext
+                {
+                    Message = command,
+                    ChatId = chatId,
+                    Parameter = param
+                });
 
                 // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
@@ -79,8 +92,10 @@ namespace FloristAI.Router
 
                 return result;
             }
+
             return new List<MessageResult> { new MessageResult { Text = $"Неизвестная команда: {command}" } };
         }
+
 
         /// <summary>
         /// Обрабатывает callback с параметрами в формате "route:param".
@@ -88,7 +103,7 @@ namespace FloristAI.Router
         /// <param name="callbackData">Данные callback (например, "role_select:admin").</param>
         /// <param name="chatId">ID чата Telegram.</param>
         /// <returns>Результат обработки callback.</returns>
-        private async Task<List<MessageResult>> RouteCallback(string callbackData, long chatId)
+        private async Task<List<MessageResult>> RouteCallback(string callbackData, long chatId, string? username = null)
         {
             Console.WriteLine($"Пришел callback: {callbackData}");
 
@@ -98,7 +113,14 @@ namespace FloristAI.Router
 
                 if (_adapters.TryGetValue("step_message", out var stepAdapter))
                 {
-                    return await stepAdapter.ProcessMessage(step, chatId);
+                    return await stepAdapter.ProcessMessage(new MessageContext
+                    { 
+                        Message =  step, 
+                        ChatId =  chatId,
+                        Username = username
+
+                    });
+
                 }
             }
             var parts = callbackData.Split(':', 2);
@@ -107,7 +129,12 @@ namespace FloristAI.Router
 
             if (_adapters.TryGetValue(route, out var adapter))
             {
-                var result = await adapter.ProcessMessage(parameter, chatId);
+                var result = await adapter.ProcessMessage(new MessageContext
+                { 
+                    Message = parameter, 
+                    ChatId = chatId,
+                    Username = username
+                });
 
                 // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
@@ -127,11 +154,27 @@ namespace FloristAI.Router
         /// </summary>
         /// <param name="message">Входящее сообщение.</param>
         /// <returns>Чистая команда без символа "/".</returns>
-        private static string ExtractCommand(string message)
+        private static (string command, string? param) ExtractCommand(string message)
         {
-            return message.Split(' ')[0]
-                          .TrimStart('/')
-                          .ToLowerInvariant();
+            var trimmed = message.TrimStart('/').Trim();
+            var parts = trimmed.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+            var command = parts[0].ToLowerInvariant();
+            string? param = parts.Length > 1 ? parts[1] : null;
+
+            return (command, param);
+        }
+
+        private bool TryExtractPartnerId(string message, out int partnerId)
+        {
+            partnerId = 0;
+            var parts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 1 && int.TryParse(parts[1], out int pid))
+            {
+                partnerId = pid;
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace FloristAI.Tests
         {
             var mockAdapter = new Mock<IMessageAdapter>();
                 mockAdapter.Setup(a => a.RouteKey).Returns("start");
-                mockAdapter.Setup(a => a.ProcessMessage("/start", 123))
+                mockAdapter.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message =="/start" && c.ChatId == 123)))
                         .ReturnsAsync(new List<MessageResult> {
                                 new MessageResult { Text = "Hello from start" }
                         });
@@ -31,7 +31,7 @@ namespace FloristAI.Tests
         {
             var mockStart = new Mock<IMessageAdapter>();
                 mockStart.Setup(a => a.RouteKey).Returns("start");
-                mockStart.Setup(a => a.ProcessMessage("/start", 123))
+                mockStart.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message == "/start" && c.ChatId == 123)))
                 .ReturnsAsync(new List<MessageResult> { 
                     new MessageResult
                     {
@@ -42,7 +42,7 @@ namespace FloristAI.Tests
             
             var mockMenu = new Mock<IMessageAdapter>();
                 mockMenu.Setup(a => a.RouteKey).Returns("menu");
-                mockMenu.Setup(a => a.ProcessMessage("menu", 123))
+                mockMenu.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message == "menu" && c.ChatId == 123)))
                 .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Menu opened." } });
 
             var router = new AdapterRouter(new[] { mockStart.Object, mockMenu.Object });
@@ -57,7 +57,7 @@ namespace FloristAI.Tests
         {
             var mockAdapter = new Mock<IMessageAdapter>();
                 mockAdapter.Setup(a => a.RouteKey).Returns("role_select");
-                mockAdapter.Setup(a => a.ProcessMessage("client", 123))
+                mockAdapter.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message == "client" && c.ChatId == 123)))
                 .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Client role selected." } });
 
             var router = new AdapterRouter(new[] { mockAdapter.Object });
@@ -71,7 +71,7 @@ namespace FloristAI.Tests
         {
             var mockCallback = new Mock<IMessageAdapter>();
             mockCallback.Setup(a => a.RouteKey).Returns("role_select");
-            mockCallback.Setup(a => a.ProcessMessage("admin", 123))
+            mockCallback.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message == "admin" && c.ChatId == 123)))
                 .ReturnsAsync(new List<MessageResult> 
                 { 
                     new MessageResult
@@ -82,7 +82,7 @@ namespace FloristAI.Tests
                 });
             var mockAdmin = new Mock<IMessageAdapter>();
             mockAdmin.Setup(a => a.RouteKey).Returns("admin_menu");
-            mockAdmin.Setup(a => a.ProcessMessage("admin_menu", 123))
+            mockAdmin.Setup(a => a.ProcessMessage(It.Is<MessageContext>(c => c.Message == "admin_menu" && c.ChatId == 123)))
                 .ReturnsAsync(new List<MessageResult> { new MessageResult { Text = "Admin menu." } });
 
             var router = new AdapterRouter(new[] { mockCallback.Object, mockAdmin.Object});

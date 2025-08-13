@@ -128,6 +128,37 @@ namespace FloristAI.Infrastructure.Persistence
         }
 
 
+        public async Task<string?> GetSpreadsheetId(int userId)
+        {
+            return await _dbContext.Partners
+                 .Where(p => p.UserId == userId)
+                 .Select(p => p.SpreadsheetId)
+                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Referal> AddReferal(Referal referal, int partnerId)
+        {
+            // Проверка существующего реферала
+            var existing = await _dbContext.Referals
+                .Include(r => r.PartnerReferal)
+                .FirstOrDefaultAsync(r => r.ReferalId == referal.ReferalId);
+
+            if (existing != null)
+                return existing;
+
+            var partner = await _dbContext.Partners.FirstOrDefaultAsync(p => p.UserId == partnerId) ?? throw new InvalidOperationException($"Партнёр с UserId {partnerId} не найден");
+            referal.PartnerReferal = new PartnerReferal
+            {
+                PartnerId = partner.Id,  
+                ReferalId = referal.ReferalId
+            };
+
+            await _dbContext.Referals.AddAsync(referal);
+            await _dbContext.SaveChangesAsync();
+
+            return referal;
+        }
+
 
     }
 }

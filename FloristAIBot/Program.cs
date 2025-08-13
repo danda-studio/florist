@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
 Host.CreateDefaultBuilder(args)
-    .ConfigureWebHostDefaults(webBuilder =>
+    .ConfigureServices((context, services) =>
     {
-        webBuilder.UseStartup<Startup>();
+        var startup = new Startup(context.Configuration);
+        startup.ConfigureServices(services);
     })
     .Build()
     .Run();

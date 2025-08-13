@@ -1,5 +1,5 @@
-﻿using FloristAI.Core.Entities.UserInfo;
-using FloristAI.Core.Store;
+﻿using FloristAI.Application.Store;
+using FloristAI.Core.Entities.UserInfo;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 
@@ -16,17 +16,18 @@ namespace FloristAI.Infrastructure.Persistence
 
         private string GetKey(long chatId) => $"partner_form:{chatId}";
 
-        public async Task<PartnerFormProgress?> GetProgress(long chatId)
+        public async Task<PartnerFormProgress?> GetStepFlowBecomePartnerProgress(long chatId)
         {
             var json = await _cache.StringGetAsync(GetKey(chatId));
             return string.IsNullOrEmpty(json) ? null : JsonConvert.DeserializeObject<PartnerFormProgress>(json);
         }
 
-        public async Task<bool> SaveProgress(PartnerFormProgress progress)
+        public async Task<bool> SaveStepFlowBecomePartnerProgress(PartnerFormProgress progress)
         {
             var json = JsonConvert.SerializeObject(progress);
             return await _cache.StringSetAsync(GetKey(progress.ChatId), json, TimeSpan.FromHours(1));
         }
+
 
         public async Task<bool> ClearProgress(long chatId)
         {

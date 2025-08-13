@@ -1,7 +1,9 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
+using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
+using FloristAI.Application.Users.Models.Request;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -19,7 +21,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public string Step => "become_partner_step_final";
 
-        public async Task<List<MessageResult>> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId, string? username = null)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
@@ -62,7 +64,36 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
-            await _userService.RegisterPartner(chatId);
+            var userInfo = await _userService.GetStep(chatId); 
+
+            var request = new CreateStructureFolderAndSheetRequest
+            {
+                PartnerId = user.UserId, 
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+            };
+
+            var sheet = await _userService.CreateStructureFolderAndSheet(request);
+
+            var SheetId = sheet.FirstOrDefault(s => s.FileName == "Общая информация" || s.SheetName == "Общая информация") ?? throw new Exception("Не удалось найти таблицу");
+            var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception ("Не удалось найти публичную таблицу");
+
+            await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId);
+
+            await _userService.AddDataInRow(
+                new AddDataRequest
+                {
+                    UserId = user.UserId,
+                    SpreadsheetId = SheetId.SpreadsheetId,
+                    SheetName = SheetId.SheetName,
+                    UserData = new UserData
+                    {
+                        NameAndSurname = $"{userInfo.FirstName} {userInfo.LastName}",
+                        PhoneNumber = userInfo.Phone,
+                        TelegramId = chatId,
+                        TelegramUsername = userInfo.Username
+                    }
+                });
 
             return new List<MessageResult>
             {

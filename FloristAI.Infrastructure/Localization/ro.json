@@ -1,6 +1,6 @@
 ﻿{
   "Start": "Selectați limba interfeței",
-  "Send_Messages": "Trimiterea mesajelor",
+  "Send_Messages": "✉️ Trimiterea mesajelor",
   "Select_Room": "🚪 Selectarea cabinetului",
   "RoleSelection_Prompt": "Aveți acces la mai multe roluri.",
   "Role_Partner": "🔵 Partener",
@@ -20,14 +20,14 @@
   "Menu_Client": "🟢 Sunteți în cabinetul personal al clientului.",
   "Menu_Admin": "🔴 Sunteți în cabinetul personal al administratorului.",
   "LanguageSelection": "🌐 Selectarea limbii",
-  "Generate_ReferralLink": "Generarea linkului de invitație pentru partener",
+  "Generate_PartnerLink": "🔗 Generarea linkului de invitație pentru partener",
   "Flower": "🌷 Flori",
   "Create_Bouquet": "🤖 Crearea unui buchet",
-  "Control_Shops": "Controlul listei de buticuri",
-  "Control_Moderators": "Controlul listei de moderatori",
-  "Control_Flowers": "Controlul sortimentului de flori",
-  "Control_Bouquets": "Controlul sortimentului de buchete",
-  "Control_Baskets": "Controlul sortimentului de coșuri",
+  "Control_Shops": "🏘 Controlul listei de buticuri",
+  "Control_Moderators": "🟠 Controlul listei de moderatori",
+  "Control_Flowers": "🌷 Controlul sortimentului de flori",
+  "Control_Bouquets": "💐 Controlul sortimentului de buchete",
+  "Control_Baskets": "🧺 Controlul sortimentului de coșuri",
   "Bouquet": "💐 Buchete",
   "Become_Partner": "🤝 Devino partener",
   "Basket": "🧺 Coșuri",
@@ -45,5 +45,7 @@
   "Become_Form_Success": "✅ Formularul partenerului a fost completat cu succes.",
   "Phone_Validation_Error": "🚫 Numărul este invalid.\n Exemplu: „+37377906003”.",
   "IsPartner": "👤 Sunteți deja partener",
-  "Update_Data": "♻️ Actualizați datele"
+  "Update_Data": "♻️ Actualizați datele",
+  "Button_Go_To_Table": "📋 Mergeți la tabel",
+  "Menu_Reporting": "ℹ️ Ați câștigat {0} pentru luna curentă."
 }

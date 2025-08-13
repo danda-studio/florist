@@ -9,7 +9,7 @@ namespace FloristAI.Adapter.Models
         /// <summary>
         /// Ссылка на фото или file_id если TG
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Бинарные данные изображения (если нет URL)

@@ -33,8 +33,9 @@ namespace FloristAI.Infrastructure
                         {
                             var chatId = update.Message.Chat.Id;
                             var input = update.Message.Text;
+                            var username = string.IsNullOrWhiteSpace(update.Message.From?.Username) ? "unknown" : update.Message.From.Username;
 
-                            var results = await _router.Route(input, chatId);
+                            var results = await _router.Route(input, chatId, username);
                             await _botClient.DeleteMessage(chatId, update.Message.MessageId);
 
                             await ProcessResults(chatId, results, token);
@@ -44,8 +45,9 @@ namespace FloristAI.Infrastructure
                             var chatId = update.CallbackQuery.Message?.Chat.Id ?? update.CallbackQuery.From.Id;
                             var messageId = update.CallbackQuery.Message?.MessageId ?? 0;
                             var command = update.CallbackQuery.Data ?? "";
+                            var username = string.IsNullOrWhiteSpace(update.CallbackQuery.From.Username) ? "unknown": update.CallbackQuery.From.Username;
 
-                            var results = await _router.Route(command, chatId);
+                            var results = await _router.Route(command, chatId, username);
 
                             if (messageId != 0)
                             {
@@ -78,7 +80,6 @@ namespace FloristAI.Infrastructure
         /// </summary>
         private async Task ProcessResults(long chatId, List<MessageResult> results, CancellationToken token)
         {
-            // ✅ 1. Удаляем pinned, если нужно
             if (results.Any(r => r.RemovePinnedMessage) && _pinnedMessages.TryGetValue(chatId, out var pinnedId))
             {
                 try
@@ -93,7 +94,6 @@ namespace FloristAI.Infrastructure
                 }
             }
 
-            // ✅ 2. Удаляем старые сообщения
             if (_lastBotMessages.TryGetValue(chatId, out var oldMessages))
             {
                 foreach (var oldId in oldMessages)
@@ -104,10 +104,9 @@ namespace FloristAI.Infrastructure
                 oldMessages.Clear();
             }
 
-            // ✅ 3. Отправляем новые
             foreach (var result in results)
             {
-                Telegram.Bot.Types.Message sentMessage;
+                Message sentMessage;
 
                 if (result.Photo?.ImageBytes != null)
                 {
@@ -130,7 +129,6 @@ namespace FloristAI.Infrastructure
                     );
                 }
 
-                // ✅ Закрепляем или запоминаем сообщение
                 if (result.PinnedMessage)
                 {
                     await _botClient.PinChatMessage(chatId, sentMessage.MessageId, cancellationToken: token);

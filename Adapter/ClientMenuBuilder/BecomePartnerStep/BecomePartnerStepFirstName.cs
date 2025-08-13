@@ -25,7 +25,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public bool IsEntryPoint => true;
 
-        public async Task<List<MessageResult>> BuildMenu(long chatId)
+        public async Task<List<MessageResult>> BuildMenu(long chatId, string? username = null)
         {
             var user = await _userService.GetUser(chatId);
             if (user == null)
@@ -44,7 +44,9 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 ChatId = chatId,
                 Step = Step,
-                LastMessageId = null
+                LastMessageId = null,
+                TgUserName = username
+
             });
 
             var messages = new List<MessageResult>();
@@ -56,17 +58,17 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             messages.Add(new MessageResult
             {
-                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
-                ReplyMarkup = keyboard
-            });
-
-            messages.Add(new MessageResult
-            {
                 Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
                 ReplyMarkup = null,
                 PinnedMessage = true 
             });
-            
+
+            messages.Add(new MessageResult
+            {
+                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
+                ReplyMarkup = keyboard
+            });
+
 
             return messages;
         }
