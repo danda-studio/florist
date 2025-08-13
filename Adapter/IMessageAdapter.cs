@@ -19,6 +19,6 @@ namespace FloristAI.Adapter
         /// <param name="message">Сообщение от пользователя, включая команду и аргументы.</param>
         /// <param name="chatId">Идентификатор чата, откуда пришло сообщение.</param>
         /// <returns>Результат обработки сообщения в виде объекта <see cref="MessageResult"/>.</returns>
-        Task<List<MessageResult>> ProcessMessage(string message, long chatId);
+        Task<List<MessageResult>> ProcessMessage(MessageContext context);
     }
 }

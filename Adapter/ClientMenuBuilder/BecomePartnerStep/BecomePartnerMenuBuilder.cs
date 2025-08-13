@@ -26,11 +26,20 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
-            var isPartner = await _userService.CheckStatusPartner(chatId);
 
             var messages = new List<MessageResult>();
 
-            if (isPartner)
+            if (user == null)
+            {
+                messages.Add(new MessageResult
+                {
+                    Text = _localizationService.GetString("UserNotFound", "ru"),
+                    ReplyMarkup = null
+                });
+                return messages;
+            }
+
+            if (user.IsPartner)
             {
                 var backButton = new[]
                 {
@@ -43,16 +52,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     ReplyMarkup = backButton
                 });
 
-                return messages;
-            }
-
-            if (user == null)
-            {
-                messages.Add(new MessageResult
-                {
-                    Text = _localizationService.GetString("UserNotFound", "ru"),
-                    ReplyMarkup = null
-                });
                 return messages;
             }
 

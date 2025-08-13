@@ -41,5 +41,7 @@ namespace FloristAI.Core.Entities.ReferralsAndPartners
         /// Список рефералов, приглашённых данным партнёром.
         /// </summary>
         public List<PartnerReferal> Partners { get; set; } = new List<PartnerReferal>();
+
+        public string? SpreadsheetId { get; set; }
     }
 }

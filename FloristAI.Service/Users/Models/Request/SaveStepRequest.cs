@@ -11,5 +11,7 @@ namespace FloristAI.Application.Users.Models.Request
         public string? Phone { get; set; }
         public int? LastMessageId { get; set; }
 
+        public string? TgUserName { get; set; }
+
     }
 }

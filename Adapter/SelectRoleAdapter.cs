@@ -43,10 +43,10 @@ namespace FloristAI.Adapter
         /// <param name="parameter">Код языка, выбранный пользователем.</param>
         /// <param name="chatId">Идентификатор чата пользователя.</param>
         /// <returns>Сообщение с результатом: кнопки выбора ролей или редирект.</returns>
-        public async Task<List<MessageResult>> ProcessMessage(string parameter, long chatId)
+        public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-            var role = await _userService.GetRolesByTelegramId(chatId, parameter);
-            var langCode = await _userService.EditLanguageInterfaceUser(chatId, parameter);
+            var role = await _userService.GetRolesByTelegramId(context.ChatId, context.Message);
+            var langCode = await _userService.EditLanguageInterfaceUser(context.ChatId, context.Message);
 
             if (role.Roles.Count == 1)
             {
@@ -58,7 +58,7 @@ namespace FloristAI.Adapter
                 {
                     new MessageResult
                     {
-                        Text = parameter == "ru"
+                        Text = context.Message == "ru"
                             ? $"Вы выбрали роль: {onlyRole.RoleName}. Перенаправляю в меню..."
                             : $"Ați selectat rolul: {onlyRole.RoleName}. Redirecționez către meniu...",
                         RedirectRouteKey = redirectKey
@@ -77,7 +77,7 @@ namespace FloristAI.Adapter
             var languageButton = new[]
             {
                 InlineKeyboardButton.WithCallbackData(
-                    text: _localizationService.GetString("LanguageSelection", parameter),
+                    text: _localizationService.GetString("LanguageSelection", context.Message),
                     callbackData: "/start"
                 )
             };
@@ -89,10 +89,10 @@ namespace FloristAI.Adapter
                 new MessageResult
                 {
                     Text = role.Roles.Count > 1
-                        ? (parameter == "ru"
+                        ? (context.Message == "ru"
                             ? "Вам доступно несколько ролей:"
                             : "Selectați un rol din listă:")
-                        : (parameter == "ru"
+                        : (context.Message == "ru"
                             ? "Ваша роль:"
                             : "Rolul dvs.:"),
                     ReplyMarkup = new InlineKeyboardMarkup(keyboard)

@@ -16,6 +16,14 @@ namespace FloristAI.Core.Store
         Task<List<UserRole>> GetRoles(int Id);
 
         /// <summary>
+        /// Получает пользователя по идентификатору чата Telegram.
+        /// </summary>
+        /// <param name="chatId">Идентификатор чата Telegram.</param>
+        /// <returns>Пользователь или null, если не найден.</returns>
+        Task<User?> GetUserByChatId(long chatId);
+        Task<string?> GetSpreadsheetId(int userId);
+
+        /// <summary>
         /// Создаёт нового пользователя с данными чата Telegram и кодом языка интерфейса.
         /// </summary>
         /// <param name="chatId">Идентификатор чата Telegram.</param>
@@ -23,12 +31,8 @@ namespace FloristAI.Core.Store
         /// <returns>Созданный пользователь.</returns>
         Task<User> CreateUserWithChatData(long chatId, string languageCode);
 
-        /// <summary>
-        /// Получает пользователя по идентификатору чата Telegram.
-        /// </summary>
-        /// <param name="chatId">Идентификатор чата Telegram.</param>
-        /// <returns>Пользователь или null, если не найден.</returns>
-        Task<User?> GetUserByChatId(long chatId);
+        Task<Partner> AddPartner(Partner partner);
+        Task<Referal> AddReferal(Referal referal, int partnerId);
 
         /// <summary>
         /// Обновляет код языка интерфейса пользователя.
@@ -38,8 +42,7 @@ namespace FloristAI.Core.Store
         /// <returns>True, если обновление прошло успешно, иначе false.</returns>
         Task<bool> EditLanguageCode(int Id, string languageCode);
 
-        Task<Partner> AddPartner(Partner partner);
-
         Task<bool> IsPartner(long chatId);
+
     }
 }
