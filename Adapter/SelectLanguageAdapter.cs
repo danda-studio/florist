@@ -97,6 +97,7 @@ namespace FloristAI.Adapter
                     new[] {
                         InlineKeyboardButton.WithCallbackData(
                             text: lang.Name,
+                            callbackData: $"select_role:{lang.Code}"
                         )
                     }).ToArray()
             );

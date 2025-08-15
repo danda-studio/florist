@@ -26,7 +26,6 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
             var user = await _userService.GetUser(chatId);
-            var isPartner = await _userService.CheckStatusPartner(chatId);
 
             var messages = new List<MessageResult>();
 
