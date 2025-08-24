@@ -3,6 +3,7 @@ using System;
 using FloristAI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FloristAI.Infrastructure.Migrations
 {
     [DbContext(typeof(PostgresDbContext))]
-    partial class PostgresDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250820202315_NullableFielUserIdInTablePartner")]
+    partial class NullableFielUserIdInTablePartner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +41,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("ProductId")
                         .IsUnique();
 
-                    b.ToTable("Baskets", (string)null);
+                    b.ToTable("Baskets");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Items.Bouquet", b =>
@@ -57,7 +60,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("ProductId")
                         .IsUnique();
 
-                    b.ToTable("Bouquets", (string)null);
+                    b.ToTable("Bouquets");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Items.Flower", b =>
@@ -88,7 +91,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("ProductId")
                         .IsUnique();
 
-                    b.ToTable("Flowers", (string)null);
+                    b.ToTable("Flowers");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Items.Product", b =>
@@ -110,7 +113,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Order", b =>
@@ -136,7 +139,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.ReferralsAndPartners.Partner", b =>
@@ -178,7 +181,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Partners", (string)null);
+                    b.ToTable("Partners");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.ReferralsAndPartners.PartnerReferal", b =>
@@ -194,7 +197,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("ReferalId")
                         .IsUnique();
 
-                    b.ToTable("PartnerReferals", (string)null);
+                    b.ToTable("PartnerReferals");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.ReferralsAndPartners.Referal", b =>
@@ -213,7 +216,7 @@ namespace FloristAI.Infrastructure.Migrations
                     b.HasIndex("ReferalId")
                         .IsUnique();
 
-                    b.ToTable("Referals", (string)null);
+                    b.ToTable("Referals");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Shop", b =>
@@ -235,7 +238,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shops", (string)null);
+                    b.ToTable("Shops");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Transaction", b =>
@@ -254,7 +257,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Transaction", (string)null);
+                    b.ToTable("Transaction");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.UserInfo.User", b =>
@@ -271,7 +274,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.UserInfo.UserRole", b =>
@@ -284,7 +287,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasKey("UserId", "Role");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.UserInfo.UserTgData", b =>
@@ -303,7 +306,7 @@ namespace FloristAI.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("UserTgDatas", (string)null);
+                    b.ToTable("UserTgDatas");
                 });
 
             modelBuilder.Entity("FloristAI.Core.Entities.Items.Basket", b =>

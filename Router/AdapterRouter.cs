@@ -1,6 +1,5 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.Models;
-using Telegram.Bot.Types;
 
 
 namespace FloristAI.Router
@@ -69,10 +68,8 @@ namespace FloristAI.Router
         /// <returns>Результат обработки команды.</returns>
         private async Task<List<MessageResult>> RouteCommand(string message, long chatId)
         {
-            var (command, param) = ExtractCommand(message); // вернет (start, "123" или null)
+            var (command, param) = ExtractCommand(message); 
 
-
-            // Остальные команды
             if (_adapters.TryGetValue(command, out var adapter))
             {
                 var result = await adapter.ProcessMessage(new MessageContext
@@ -82,7 +79,6 @@ namespace FloristAI.Router
                     Parameter = param
                 });
 
-                // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
 
                 if (firstMessage != null && !string.IsNullOrWhiteSpace(firstMessage.RedirectRouteKey))
@@ -114,29 +110,36 @@ namespace FloristAI.Router
                 if (_adapters.TryGetValue("step_message", out var stepAdapter))
                 {
                     return await stepAdapter.ProcessMessage(new MessageContext
-                    { 
-                        Message =  step, 
-                        ChatId =  chatId,
+                    {
+                        Message = step,
+                        ChatId = chatId,
                         Username = username
-
                     });
-
                 }
             }
+
             var parts = callbackData.Split(':', 2);
             var route = parts[0];
             var parameter = parts.Length > 1 ? parts[1] : "";
 
+            if (parameter.Contains("_"))
+            {
+                var partsParam = parameter.Split('_', 2);
+
+                // если это реально ID-шка (цифры) - тогда берём её
+                if (int.TryParse(partsParam[1], out _))
+                    parameter = partsParam[1];
+            }
+
             if (_adapters.TryGetValue(route, out var adapter))
             {
                 var result = await adapter.ProcessMessage(new MessageContext
-                { 
-                    Message = parameter, 
+                {
+                    Message = parameter,
                     ChatId = chatId,
                     Username = username
                 });
 
-                // Так как result — список, проверяем RedirectRouteKey у первого сообщения
                 var firstMessage = result.FirstOrDefault();
 
                 if (firstMessage != null && !string.IsNullOrWhiteSpace(firstMessage.RedirectRouteKey))
@@ -146,14 +149,16 @@ namespace FloristAI.Router
 
                 return result;
             }
+
             return new List<MessageResult> { new MessageResult { Text = $"Неизвестный callback: {callbackData}" } };
         }
+
 
         /// <summary>
         /// Извлекает команду из сообщения (убирает "/" и приводит к нижнему регистру).
         /// </summary>
         /// <param name="message">Входящее сообщение.</param>
-        /// <returns>Чистая команда без символа "/".</returns>
+        /// <returns>Чистая команда и параметр (если есть).</returns>
         private static (string command, string? param) ExtractCommand(string message)
         {
             var trimmed = message.TrimStart('/').Trim();
@@ -162,8 +167,13 @@ namespace FloristAI.Router
             var command = parts[0].ToLowerInvariant();
             string? param = parts.Length > 1 ? parts[1] : null;
 
+            // 🔹 если параметр вида "partner_xxx", то берём только часть после "_"
+            if (!string.IsNullOrEmpty(param) && param.Contains("_"))
+                param = param.Split('_', 2)[1];
+
             return (command, param);
         }
+
 
         private bool TryExtractPartnerId(string message, out int partnerId)
         {

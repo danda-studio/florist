@@ -15,7 +15,7 @@ namespace FloristAI.Core.Entities.ReferralsAndPartners
         /// <summary>
         /// Идентификатор пользователя, связанного с партнёром.
         /// </summary>
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         /// <summary>
         /// Имя партнёра.
@@ -35,13 +35,16 @@ namespace FloristAI.Core.Entities.ReferralsAndPartners
         /// <summary>
         /// Пользователь, которому принадлежит статус партнёра.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Список рефералов, приглашённых данным партнёром.
         /// </summary>
         public List<PartnerReferal> Partners { get; set; } = new List<PartnerReferal>();
 
-        public string? SpreadsheetId { get; set; }
+        public string SpreadsheetId { get; set; } = string.Empty;
+
+        public string InviteCode{ get; set; } = string.Empty;
+        public bool IsActive { get; set; } 
     }
 }

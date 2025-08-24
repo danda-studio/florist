@@ -4,13 +4,12 @@ using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
-using FloristAI.Application.Store.Models.Response;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
-using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
+using Newtonsoft.Json;
 using QRCoder;
 
 namespace FloristAI.Application.Users
@@ -119,6 +118,24 @@ namespace FloristAI.Application.Users
             return $"https://t.me/{botName}?start={Id}";
         }
 
+        public async Task<string> GetPartnerLink(GetPartnerLinkRequest request)
+        {
+            string botName = "FlowerKisaBot";
+
+            string code = Guid.NewGuid().ToString("N")[..8];
+
+
+            await AddPartnerFromInviteCode(new AddPartnerFromInviteCodeRequest
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumber = request.Phone,
+                InviteCode = code
+            });
+
+            return $"https://t.me/{botName}?start=partner_{code}";
+        }
+
         public byte[] GetReferralQrCode(int id)
         {
             string link = GetReferralLink(id);
@@ -129,6 +146,16 @@ namespace FloristAI.Application.Users
             var renderer = new PngByteQRCode(data);
             return renderer.GetGraphic(20);
         }
+
+        public byte[] GetPartnerLinkQrCode(string link)
+        {
+            var generator = new QRCodeGenerator();
+            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
+
+            var renderer = new PngByteQRCode(data);
+            return renderer.GetGraphic(20);
+        }
+
 
         public async Task<GetStepResponse> GetStep(long chatId)
         {
@@ -282,20 +309,71 @@ namespace FloristAI.Application.Users
             return await _cacheRepository.ClearProgress(chatId);
         }
 
-        private async Task<Partner> AddPartner(AddPartnerRequest request)
+        public async Task<Partner> AddPartner(AddPartnerRequest request)
         {
 
             var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
             var partner = new Partner
             {
-                UserId = user.Id,
+                UserId = user?.Id,
                 FirstName = request.FirstName ?? string.Empty,
                 LastName = request.LastName ?? string.Empty,
                 PhoneNumber = request.PhoneNumber ?? string.Empty,
-                SpreadsheetId = request.SpreadSheetId
+                SpreadsheetId = request.SpreadSheetId ?? string.Empty,
             };
 
             return await _userRepository.AddPartner(partner);
+        }
+
+
+
+        public async Task UpdatePartnerOnActivation(long chatId, string spreadSheetId, string inviteCode)
+        {
+
+            var user = await _userRepository.GetUserByChatId(chatId) ?? throw new Exception("User not found");
+            var partner = new Partner
+            {
+                UserId = user.Id,
+                SpreadsheetId = spreadSheetId,
+                IsActive = true,
+                InviteCode = inviteCode
+            };
+
+            await _userRepository.UpdatePartner(partner);
+        }
+
+        public async Task AddPartnerFromInviteCode(AddPartnerFromInviteCodeRequest request)
+        {
+            var partner = new Partner
+            {
+                UserId = null,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                PhoneNumber = request.PhoneNumber,
+                InviteCode = request.InviteCode,
+                IsActive = request.IsActive
+            };
+
+            await _userRepository.AddPartner(partner);
+        }
+
+        public async Task<ResolvePartnerInviteResponse> ResolvePartnerInvite(string code)
+        {
+            var resolveInfo = await _userRepository.ResolvePartnerInvite(code);
+
+            if (resolveInfo == null)
+            {
+                Console.WriteLine($"Не удалось разрешить приглашение партнёра по коду {code}");
+                return new ResolvePartnerInviteResponse();
+            }
+
+            return new ResolvePartnerInviteResponse
+            {
+                PartnerId = resolveInfo.Id,
+                FirstName = resolveInfo.FirstName,
+                LastName = resolveInfo.LastName,
+                Phone = resolveInfo.PhoneNumber
+            };
         }
 
         /// <summary>

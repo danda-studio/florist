@@ -5,23 +5,23 @@ using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
+namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
 {
-    public class BecomePartnerStepFirstName : IStepFlowBuilder
+    public class GenerateInviteLinkPartnerStepFirstNamePartner : IStepFlowBuilder
     {
         private readonly IUserService _userService;
-        
+
         private readonly ILocalizationService _localizationService;
 
         private readonly Lazy<IStepFlowProvider> _menuProvider;
-        public BecomePartnerStepFirstName(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
+        public GenerateInviteLinkPartnerStepFirstNamePartner(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
             _localizationService = localizationService;
             _menuProvider = menuProvider;
         }
 
-        public string Step => "become_partner_step_firstName";
+        public string Step => "generate_partnerlink_firstname";
 
         public bool IsEntryPoint => true;
 
@@ -53,21 +53,22 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Client") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Admin") },
             };
 
             messages.Add(new MessageResult
             {
-                Text = _localizationService.GetString("Become_Partner_Title", user.LanguageCode),
+                Text = _localizationService.GetString("Generator_Url_Title", user.LanguageCode),
                 ReplyMarkup = null,
                 PinnedMessage = true
             });
 
             messages.Add(new MessageResult
             {
-                Text = _localizationService.GetString("Become_Input_FirstName", user.LanguageCode),
-                ReplyMarkup = keyboard,
+                Text = _localizationService.GetString("Generate_PartnerLink_FirstName", user.LanguageCode),
+                ReplyMarkup = keyboard
             });
+
 
             return messages;
         }
@@ -78,13 +79,14 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 ChatId = chatId,
                 FirstName = input,
-                Step = "become_partner_step_lastName",
+                Step = "generate_partnerLink_lastName",
             });
 
-            var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_lastName");
-            
+            var nextBuilder = _menuProvider.Value.GetBuilder("generate_partnerLink_lastName");
+
             return await nextBuilder.BuildMenu(chatId);
         }
 
     }
 }
+

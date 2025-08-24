@@ -149,5 +149,6 @@ namespace FloristAI.Infrastructure
             Console.WriteLine($"Ошибка Telegram: {exception.Message}");
             return Task.CompletedTask;
         }
+
     }
 }

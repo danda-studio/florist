@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.AdminMenuBuilder;
+using FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep;
 using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.PartnerMenuBuilder;
@@ -152,6 +153,10 @@ namespace FloristAIBot
             services.AddScoped<IStepMenuBuilder, BecomePartnerMenuBuilder>();
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReferralUrl>();
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReporting>();
+            services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFirstNamePartner>();
+            services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepLastNamePartner>();
+            services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepPhonePartner>();
+            services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFinalPartner>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepFirstName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepLastName>();
             services.AddScoped<IStepFlowBuilder, BecomePartnerStepPhone>();

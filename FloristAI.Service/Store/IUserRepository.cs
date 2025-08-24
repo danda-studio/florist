@@ -21,7 +21,10 @@ namespace FloristAI.Core.Store
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <returns>Пользователь или null, если не найден.</returns>
         Task<User?> GetUserByChatId(long chatId);
+        Task<Partner?> GetPartnerByInviteCode(string inviteCode);
         Task<string?> GetSpreadsheetId(int userId);
+
+        Task<Partner?> ResolvePartnerInvite(string code);
 
         /// <summary>
         /// Создаёт нового пользователя с данными чата Telegram и кодом языка интерфейса.
@@ -32,6 +35,7 @@ namespace FloristAI.Core.Store
         Task<User> CreateUserWithChatData(long chatId, string languageCode);
 
         Task<Partner> AddPartner(Partner partner);
+        Task UpdatePartner(Partner partner);
         Task<Referal> AddReferal(Referal referal, int partnerId);
 
         /// <summary>
@@ -43,6 +47,7 @@ namespace FloristAI.Core.Store
         Task<bool> EditLanguageCode(int Id, string languageCode);
 
         Task<bool> IsPartner(long chatId);
+
 
     }
 }

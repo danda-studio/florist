@@ -1,12 +1,11 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Application.GoogleSheets;
+using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using FloristAI.Application.Language;
-using FloristAI.Adapter.Models;
 
 namespace FloristAI.Adapter
 {
@@ -53,16 +52,50 @@ namespace FloristAI.Adapter
             var user = await _userService.GetOrCreateUser(context.ChatId, "ru");
 
             int partnerId = 0;
-            if (!string.IsNullOrEmpty(context.Parameter) && int.TryParse(context.Parameter, out partnerId))
+            if (!string.IsNullOrEmpty(context.Parameter) && !int.TryParse(context.Parameter, out _))
+            {
+                var partnerInfo = await _userService.ResolvePartnerInvite(context.Parameter);
+
+                var request = new CreateStructureFolderAndSheetRequest
+                {
+                    PartnerId = partnerInfo.PartnerId,
+                    FirstName = partnerInfo.FirstName,
+                    LastName = partnerInfo.LastName,
+                };
+
+                var sheet = await _userService.CreateStructureFolderAndSheet(request);
+
+                var SheetId = sheet.FirstOrDefault(s => s.FileName == "Общая информация" || s.SheetName == "Общая информация") ?? throw new Exception("Не удалось найти таблицу");
+                var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
+
+                await _userService.UpdatePartnerOnActivation(context.ChatId, publicSheet.SpreadsheetId, context.Parameter);
+
+                await _userService.AddDataInRow(
+                    new AddDataRequest
+                    {
+                        UserId = user.UserId,
+                        SpreadsheetId = SheetId.SpreadsheetId,
+                        SheetName = SheetId.SheetName,
+                        UserData = new UserData
+                        {
+                            NameAndSurname = $"{partnerInfo.FirstName} {partnerInfo.LastName}",
+                            PhoneNumber = partnerInfo.Phone,
+                            TelegramId = context.ChatId,
+                            TelegramUsername = context.Username ?? string.Empty
+                        }
+                    });
+            }
+
+            if (int.TryParse(context.Parameter, out partnerId))
             {
                 await _userService.ProcessReferral(new ProcessReferralRequest
                 {
                     UserId = user.UserId,
                     PartnerId = partnerId
-
                 });
-
             }
+        
+            
 
             var spreadsheetId = await _googleSheetsService.FindSpreadsheet("Общая информация");
             if (!string.IsNullOrEmpty(spreadsheetId))

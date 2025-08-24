@@ -46,6 +46,12 @@ namespace FloristAI.Infrastructure.Persistence
                 .FirstOrDefaultAsync(u => u.TgData != null && u.TgData.TelegramId == chatId);
         }
 
+        public async Task<Partner?> GetPartnerByInviteCode(string inviteCode)
+        {
+            return await _dbContext.Partners
+                .FirstOrDefaultAsync(p => p.InviteCode == inviteCode);
+        }
+
         /// <summary>
         /// Создаёт пользователя с данными Telegram и языком интерфейса.
         /// </summary>
@@ -95,22 +101,50 @@ namespace FloristAI.Infrastructure.Persistence
         {
             await _dbContext.Partners.AddAsync(partner);
 
-            // Проверка наличия роли
-            bool hasPartnerRole = await _dbContext.UserRoles
-                .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
-
-            if (!hasPartnerRole)
+            if(partner.UserId.HasValue)
             {
-                _dbContext.UserRoles.Add(new UserRole
+                bool hasPartnerRole = await _dbContext.UserRoles
+                    .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
+
+                if (!hasPartnerRole)
                 {
-                    UserId = partner.UserId,
-                    Role = RoleType.Partner
-                });
+                    _dbContext.UserRoles.Add(new UserRole
+                    {
+                        UserId = (int)partner.UserId,
+                        Role = RoleType.Partner
+                    });
+                }
             }
 
             await _dbContext.SaveChangesAsync();
 
             return partner;
+        }
+        public async Task UpdatePartner(Partner partner)
+        {
+            var partnerInfo  = await ResolvePartnerInvite(partner.InviteCode) 
+                ?? throw new InvalidOperationException($"Партнёр с InviteCode {partner.InviteCode} не найден");
+
+            partnerInfo.UserId = partner.UserId;
+            partnerInfo.SpreadsheetId = partner.SpreadsheetId ?? partnerInfo.SpreadsheetId;
+            partnerInfo.IsActive = partner.IsActive;
+
+
+            if (partner.UserId.HasValue)
+            {
+                bool hasPartnerRole = await _dbContext.UserRoles
+                    .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
+
+                if (!hasPartnerRole)
+                {
+                    _dbContext.UserRoles.Add(new UserRole
+                    {
+                        UserId = (int)partner.UserId,
+                        Role = RoleType.Partner
+                    });
+                }
+            }
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<bool> IsPartner(long chatId)
@@ -157,6 +191,12 @@ namespace FloristAI.Infrastructure.Persistence
             await _dbContext.SaveChangesAsync();
 
             return referal;
+        }
+
+        public async Task<Partner?> ResolvePartnerInvite(string code)
+        {
+            return await _dbContext.Partners
+                .FirstOrDefaultAsync(x => x.InviteCode == code);
         }
 
 

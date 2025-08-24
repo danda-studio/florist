@@ -14,5 +14,7 @@ namespace FloristAI.Adapter.Models
 
         public string? Username { get; set; } = string.Empty;
 
+        public PartnerPayload PartnerPayload { get; set; } = new PartnerPayload();
+
     }
 }

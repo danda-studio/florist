@@ -3,26 +3,25 @@ using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
-using FloristAI.Application.Validation;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
+namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
 {
-    public class BecomePartnerStepPhone : IStepFlowBuilder
+    public class GenerateInviteLinkPartnerStepLastNamePartner : IStepFlowBuilder
     {
         private readonly IUserService _userService;
 
         private readonly ILocalizationService _localizationService;
 
         private readonly Lazy<IStepFlowProvider> _menuProvider;
-        public BecomePartnerStepPhone(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
+        public GenerateInviteLinkPartnerStepLastNamePartner(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
             _localizationService = localizationService;
             _menuProvider = menuProvider;
         }
 
-        public string Step => "become_partner_step_phone";
+        public string Step => "generate_partnerLink_lastName";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId, string? username = null)
         {
@@ -38,9 +37,10 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     }
                 };
             }
+
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:become_partner_step_lastName") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:generate_partnerlink_firstname") },
             };
             await _userService.SaveStep(new SaveStepRequest
             {
@@ -51,7 +51,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
             {
                 new MessageResult
                 {
-                    Text = _localizationService.GetString("Become_Input_Phone", user.LanguageCode),
+                    Text = _localizationService.GetString("Generate_PartnerLink_LastName", user.LanguageCode),
                     ReplyMarkup = keyboard
                 }
             };
@@ -59,39 +59,14 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
-            var user = await _userService.GetUser(chatId);
-            if (user == null)
-            {
-                return new List<MessageResult>
-                {
-                    new MessageResult
-                    {
-                        Text = _localizationService.GetString("UserNotFound", "ru"),
-                        ReplyMarkup = null
-                    }
-                };
-            }
-
-            if (!Validator.IsValidPhone(input))
-            {
-                return new List<MessageResult>
-                {
-                    new MessageResult
-                    {
-                        Text = _localizationService.GetString("Phone_Validation_Error", user.LanguageCode),
-                        ReplyMarkup = null
-                    }
-                };  
-            }
-
             await _userService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
-                Phone = input,
-                Step = "become_partner_step_final"
+                LastName = input,
+                Step = "generate_partnerLink_phone"
             });
 
-            var nextBuilder = _menuProvider.Value.GetBuilder("become_partner_step_final");
+            var nextBuilder = _menuProvider.Value.GetBuilder("generate_partnerLink_phone");
             return await nextBuilder.BuildMenu(chatId);
         }
     }
