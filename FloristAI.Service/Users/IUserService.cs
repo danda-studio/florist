@@ -21,7 +21,10 @@ namespace FloristAI.Application.Users
         Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
         Task<GetStepResponse> GetStep(long chatId);
         string GetReferralLink(int Id);
+        Task<string> GetPartnerLink(GetPartnerLinkRequest request);
         byte[] GetReferralQrCode(int Id);
+        byte[] GetPartnerLinkQrCode(string link);
+
 
         /// <summary>
         /// Получает список ролей пользователя по его Telegram chatId.
@@ -38,6 +41,8 @@ namespace FloristAI.Application.Users
         /// <param name="languageCode">Код языка интерфейса.</param>
         /// <returns>Ответ с информацией о созданном пользователе.</returns>
         Task<AddUserResponse> AddUser(long chatId, string languageCode);
+        Task<Partner> AddPartner(AddPartnerRequest request);
+        Task UpdatePartnerOnActivation(long chatId, string spreadSheetId, string inviteCode);
         Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
 
         /// <summary>
@@ -52,6 +57,7 @@ namespace FloristAI.Application.Users
         Task<bool> ClearStep(long chatId);
         Task RegisterPartner(long chatId, string spreadSheetId);
         Task ProcessReferral(ProcessReferralRequest request);
+        Task<ResolvePartnerInviteResponse> ResolvePartnerInvite(string code);
 
     }
 }

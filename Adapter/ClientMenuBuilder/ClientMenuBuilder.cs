@@ -68,7 +68,8 @@ namespace FloristAI.Adapter.ClientMenuBuilder
             return new MessageResult
             {
                 Text = _localizationService.GetString("Menu_Client", user.LanguageCode),
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard)
+                ReplyMarkup = new InlineKeyboardMarkup(keyboard),
+                RemovePinnedMessage = true
             };
 
             

@@ -13,10 +13,10 @@ namespace FloristAI.Application.Language.Models
         /// <summary>
         /// Название
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         /// <summary>
         /// Код языка ("ru")
         /// </summary>
-        public string Code { get; set; }
+        public string Code { get; set; } = string.Empty;
     }
 }

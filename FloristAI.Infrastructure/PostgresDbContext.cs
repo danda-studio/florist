@@ -79,7 +79,8 @@ namespace FloristAI.Infrastructure
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Partner)
                 .WithOne(p => p.User)
-                .HasForeignKey<Partner>(p => p.UserId);
+                .HasForeignKey<Partner>(p => p.UserId)
+                .IsRequired(false);
 
             // Отношение 1:1 между User и Referal
             modelBuilder.Entity<User>()
