@@ -75,7 +75,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             var sheet = await _userService.CreateStructureFolderAndSheet(request);
 
-            var SheetId = sheet.FirstOrDefault(s => s.FileName == "Общая информация" || s.SheetName == "Общая информация") ?? throw new Exception("Не удалось найти таблицу");
+            var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetString("Total_Info", "sheetName") || s.SheetName == _localizationService.GetString("Total_Info", "sheetName")) ?? throw new Exception("Не удалось найти таблицу");
             var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception ("Не удалось найти публичную таблицу");
 
             await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId);

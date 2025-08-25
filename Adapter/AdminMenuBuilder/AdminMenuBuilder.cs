@@ -33,7 +33,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder
                     ReplyMarkup = null
                 };
             }
-            var keyboard = new List<InlineKeyboardButton[]>
+            var keyboard = new []
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Flowers", user.LanguageCode), "step:control_flowers") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Bouquets", user.LanguageCode), "step:control_bouquets") },
@@ -48,7 +48,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder
             return new MessageResult
             {
                 Text = _localizationService.GetString("Menu_Admin", user.LanguageCode),
-                ReplyMarkup = new InlineKeyboardMarkup(keyboard),
+                ReplyMarkup = keyboard,
                 RemovePinnedMessage = true,
             };
         }
