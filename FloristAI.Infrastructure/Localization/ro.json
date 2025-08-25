@@ -40,6 +40,7 @@
   "Become_Fill_Button": "✍️ Completați formularul",
   "Button_Menu": "☰ Meniu",
   "Button_Back": "⬅️ Înapoi",
+  "Button_Turnover": "💰 Cifra de afaceri",
   "Partner_Input_FirstName": "Introduceți prenumele dvs.",
   "Partner_Input_LastName": "Introduceți numele de familie.",
   "GoToPartner_Menu": "🔵 Mergeți la dulapul personal al partenerului dvs.",
@@ -51,5 +52,6 @@
   "IsPartner": "👤 Sunteți deja partener",
   "Update_Data": "♻️ Actualizați datele",
   "Button_Go_To_Table": "📋 Mergeți la tabel",
-  "Menu_Reporting": "ℹ️ Ați câștigat {0} pentru luna curentă."
+  "Menu_Reporting_Partner": "ℹ️ Ați câștigat {0} pentru luna curentă.",
+  "Menu_Reporting_Admin": "ℹ️ Mai jos sunt prezentate linkurile către documentele cu raportările."
 }

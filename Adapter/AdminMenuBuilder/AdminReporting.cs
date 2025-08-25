@@ -2,32 +2,24 @@
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
-using FloristAI.Application.Store;
 using FloristAI.Application.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.PartnerMenuBuilder
+namespace FloristAI.Adapter.AdminMenuBuilder
 {
-    public class PartnerMenuStepReporting : IStepMenuBuilder
+    public class AdminReporting : IStepMenuBuilder
     {
-
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
         private readonly IGoogleSheetsService _googleSheetsService;
-
-        public PartnerMenuStepReporting(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
+        public AdminReporting(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
             _localizationService = localizationService;
             _googleSheetsService = googleSheetsService;
         }
-        public string Step => "reporting";
 
+        public string Step => "reporting_bussines";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
@@ -44,28 +36,22 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                 };
             }
 
-            var income = await _googleSheetsService.GetMonthlyIncome(user.UserId);
-            var template = _localizationService.GetString("Menu_Reporting_Partner", user.LanguageCode);
-            var messageText = string.Format(template, income);
-
-            var googleSheetsUrl = await _googleSheetsService.GetGoogleSheetsUrl(user.UserId);
-
+            var googleSheetsUrl = await _googleSheetsService.GetAdminGoogleSheetsUrl();
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Partners", user.LanguageCode), googleSheetsUrl)},
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Update_Data", user.LanguageCode), "step:reporting") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Partner") },
+                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl)},
+                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Turnover", user.LanguageCode), googleSheetsUrl) },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Admin") },
 
             };
             return new List<MessageResult>
             {
                 new MessageResult
                 {
-                    Text = messageText,
+                    Text = _localizationService.GetString("Menu_Reporting_Admin", user.LanguageCode),
                     ReplyMarkup = keyboard
                 }
             };
-
         }
     }
 }

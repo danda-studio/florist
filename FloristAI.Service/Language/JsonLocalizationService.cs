@@ -27,6 +27,7 @@ namespace FloristAI.Application.Language
             // Загружаем доступные языки
             TryLoadLocale(logger, "ru");
             TryLoadLocale(logger, "ro");
+            TryLoadLocale(logger, "sheetName");
         }
 
         /// <summary>

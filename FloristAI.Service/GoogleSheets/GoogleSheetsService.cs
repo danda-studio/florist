@@ -1,5 +1,6 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.GoogleSheets.Models.Response;
+using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
 using FloristAI.Core.Store;
@@ -18,11 +19,13 @@ namespace FloristAI.Application.GoogleSheets
     {
         private readonly IGoogleSheets _googleSheets;
         private readonly IUserRepository _userRepository;
+        private readonly ILocalizationService _localizationService;
 
-        public GoogleSheetsService(IGoogleSheets googleSheets, IUserRepository userRepository)
+        public GoogleSheetsService(IGoogleSheets googleSheets, IUserRepository userRepository, ILocalizationService localizationService)
         {
             _googleSheets = googleSheets;
             _userRepository = userRepository;
+            _localizationService = localizationService;
         }
 
         public async Task<decimal> GetMonthlyIncome(int userId)
@@ -49,6 +52,15 @@ namespace FloristAI.Application.GoogleSheets
                 spreadsheetId = "0";
 
             return $"https://docs.google.com/spreadsheets/d/{spreadsheetId}";
+        }
+
+        public async Task<string> GetAdminGoogleSheetsUrl()
+        {
+            var (success, file) = await _googleSheets.FindSpreadsheet(_localizationService.GetString("Total_Info", "sheetName"));
+            if (!success || file == null)
+                throw new InvalidOperationException("Admin spreadsheet not found");
+
+            return $"https://docs.google.com/spreadsheets/d/{file.Id}";
         }
 
         public async Task<string> GetSheetIdByMonth(string spreadsheetId, DateTime date)
@@ -83,7 +95,7 @@ namespace FloristAI.Application.GoogleSheets
                  folderId: parameters.PrivateFolderId,
                  IsPublic: false,
                  FlagName: "PrivatePartnerInfo"),
-                (name: "Общая информация",
+                (name: _localizationService.GetString("Total_Info", "sheetName"),
                  folderId: parameters.PrivateFolderId,
                  IsPublic: false,
                  FlagName: "TotalInfo")
@@ -233,7 +245,7 @@ namespace FloristAI.Application.GoogleSheets
             }
         }
 
-        public async Task<string?> FindSpreadsheet(string name, string? parentFolderId = null)
+        public async Task<string?> FindSpreadsheet(string name)
         {
             var (success, file) = await _googleSheets.FindSpreadsheet(name);
             return success ? file?.Id : null;

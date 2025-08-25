@@ -18,6 +18,7 @@ namespace FloristAI.Adapter
         /// Сервис для получения списка доступных языков.
         /// </summary>
         private readonly ILanguageService _languageService;
+        private readonly ILocalizationService _localizationService;
 
         private readonly IUserService _userService;
         
@@ -32,11 +33,12 @@ namespace FloristAI.Adapter
         /// Инициализирует новый экземпляр <see cref="SelectLanguageAdapter"/>.
         /// </summary>
         /// <param name="languageService">Сервис для получения списка поддерживаемых языков.</param>
-        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService, IGoogleSheetsService googleSheetsService)
+        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService, IGoogleSheetsService googleSheetsService, ILocalizationService localizationService)
         {
             _languageService = languageService;
             _userService = userService;
             _googleSheetsService = googleSheetsService;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -65,7 +67,7 @@ namespace FloristAI.Adapter
 
                 var sheet = await _userService.CreateStructureFolderAndSheet(request);
 
-                var SheetId = sheet.FirstOrDefault(s => s.FileName == "Общая информация" || s.SheetName == "Общая информация") ?? throw new Exception("Не удалось найти таблицу");
+                var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetString("Total_Info", "sheetName") || s.SheetName == _localizationService.GetString("Total_Info", "sheetName")) ?? throw new Exception("Не удалось найти таблицу");
                 var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
 
                 await _userService.UpdatePartnerOnActivation(context.ChatId, publicSheet.SpreadsheetId, context.Parameter);
@@ -97,7 +99,7 @@ namespace FloristAI.Adapter
         
             
 
-            var spreadsheetId = await _googleSheetsService.FindSpreadsheet("Общая информация");
+            var spreadsheetId = await _googleSheetsService.FindSpreadsheet(_localizationService.GetString("Total_Info", "sheetName"));
             if (!string.IsNullOrEmpty(spreadsheetId))
             {
                 var sheetName = await _googleSheetsService.GetSheetIdByMonth(spreadsheetId, DateTime.Now);
