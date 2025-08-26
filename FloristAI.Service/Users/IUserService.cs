@@ -42,7 +42,7 @@ namespace FloristAI.Application.Users
         /// <returns>Ответ с информацией о созданном пользователе.</returns>
         Task<AddUserResponse> AddUser(long chatId, string languageCode);
         Task<Partner> AddPartner(AddPartnerRequest request);
-        Task UpdatePartnerOnActivation(long chatId, string spreadSheetId, string inviteCode);
+        Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request);
         Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace FloristAI.Application.Users
         Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request);
         Task<bool> SaveStep(SaveStepRequest request);
         Task<bool> ClearStep(long chatId);
-        Task RegisterPartner(long chatId, string spreadSheetId);
+        Task RegisterPartner(long chatId, string spreadSheetId, string privateSpreadSheetId);
         Task ProcessReferral(ProcessReferralRequest request);
         Task<ResolvePartnerInviteResponse> ResolvePartnerInvite(string code);
 

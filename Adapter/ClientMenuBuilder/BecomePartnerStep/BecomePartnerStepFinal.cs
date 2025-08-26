@@ -64,27 +64,29 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
-            var userInfo = await _userService.GetStep(chatId); 
+            var userInfo = await _userService.GetStep(chatId);
 
             var request = new CreateStructureFolderAndSheetRequest
             {
-                PartnerId = user.UserId, 
+                PartnerId = user.UserId,
                 FirstName = userInfo.FirstName,
                 LastName = userInfo.LastName,
             };
 
             var sheet = await _userService.CreateStructureFolderAndSheet(request);
 
-            var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetString("Total_Info", "sheetName") || s.SheetName == _localizationService.GetString("Total_Info", "sheetName")) ?? throw new Exception("Не удалось найти таблицу");
-            var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception ("Не удалось найти публичную таблицу");
+            var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetSheetName("General_Info") || s.SheetName == _localizationService.GetSheetName("General_Info")) ?? throw new Exception("Не удалось найти таблицу");
+            var privateSheet = sheet.FirstOrDefault(s => s.FileName != _localizationService.GetSheetName("General_Info") && s.IsPublic == false) ?? throw new Exception("Не удалось найти приватную таблицу");
+            var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
 
-            await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId);
+            await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId, privateSheet.SpreadsheetId);
 
             await _userService.AddDataInRow(
                 new AddDataRequest
                 {
                     UserId = user.UserId,
                     SpreadsheetId = SheetId.SpreadsheetId,
+                    PrivateSpreadsheetId = privateSheet.SpreadsheetId,
                     SheetName = SheetId.SheetName,
                     UserData = new UserData
                     {

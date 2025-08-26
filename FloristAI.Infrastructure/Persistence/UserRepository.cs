@@ -99,6 +99,7 @@ namespace FloristAI.Infrastructure.Persistence
 
         public async Task<Partner> AddPartner(Partner partner)
         {
+            partner.IsActive = true;
             await _dbContext.Partners.AddAsync(partner);
 
             if(partner.UserId.HasValue)
@@ -128,6 +129,7 @@ namespace FloristAI.Infrastructure.Persistence
             partnerInfo.UserId = partner.UserId;
             partnerInfo.SpreadsheetId = partner.SpreadsheetId ?? partnerInfo.SpreadsheetId;
             partnerInfo.IsActive = partner.IsActive;
+            partnerInfo.PrivateSpreadsheetId = partner.PrivateSpreadsheetId;
 
 
             if (partner.UserId.HasValue)

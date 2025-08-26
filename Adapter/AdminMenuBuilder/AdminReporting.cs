@@ -39,7 +39,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder
             var googleSheetsUrl = await _googleSheetsService.GetAdminGoogleSheetsUrl();
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl)},
+                new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Partners", user.LanguageCode), googleSheetsUrl)},
                 new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Turnover", user.LanguageCode), googleSheetsUrl) },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Admin") },
 

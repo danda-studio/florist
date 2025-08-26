@@ -83,12 +83,15 @@ namespace FloristAI.Infrastructure
 
         public async Task AddData(AddDataRequest request)
         {
+            // Формируем ссылку для userId
+            var privateSpreadsheetId = request.PrivateSpreadsheetId; 
+            var hyperlinkFormula = $"=ГИПЕРССЫЛКА(\"https://docs.google.com/spreadsheets/d/{privateSpreadsheetId}\";\"{request.UserId}\")";
 
             var rowValues = new List<object>
             {
-                request.UserId,
+                hyperlinkFormula,
                 request.UserData.NameAndSurname,
-                request.UserData.PhoneNumber,
+                $"'{request.UserData.PhoneNumber}",
                 request.UserData.TelegramId,
                 request.UserData.TelegramUsername,
                 request.UserData.CountReferals,
@@ -103,7 +106,7 @@ namespace FloristAI.Infrastructure
             };
 
             var appendRequest = _sheetsService.Spreadsheets.Values.Append(valueRange, request.SpreadsheetId, $"{request.SheetName}!A2");
-            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
+            appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
             appendRequest.InsertDataOption = SpreadsheetsResource.ValuesResource.AppendRequest.InsertDataOptionEnum.INSERTROWS;
 
             await appendRequest.ExecuteAsync();

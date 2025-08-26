@@ -1,12 +1,7 @@
 ﻿using FloristAI.Adapter.Models;
-using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
-using FloristAI.Application.Users.Models.Request;
-using FloristAI.Core.Entities.Enums;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
