@@ -21,7 +21,7 @@ namespace FloristAI.Adapter
         private readonly ILocalizationService _localizationService;
 
         private readonly IUserService _userService;
-        
+
         private readonly IGoogleSheetsService _googleSheetsService;
 
         /// <summary>
@@ -57,35 +57,45 @@ namespace FloristAI.Adapter
             if (!string.IsNullOrEmpty(context.Parameter) && !int.TryParse(context.Parameter, out _))
             {
                 var partnerInfo = await _userService.ResolvePartnerInvite(context.Parameter);
-
-                var request = new CreateStructureFolderAndSheetRequest
+                if (partnerInfo.IsActive == false)
                 {
-                    PartnerId = partnerInfo.PartnerId,
-                    FirstName = partnerInfo.FirstName,
-                    LastName = partnerInfo.LastName,
-                };
-
-                var sheet = await _userService.CreateStructureFolderAndSheet(request);
-
-                var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetString("Total_Info", "sheetName") || s.SheetName == _localizationService.GetString("Total_Info", "sheetName")) ?? throw new Exception("Не удалось найти таблицу");
-                var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
-
-                await _userService.UpdatePartnerOnActivation(context.ChatId, publicSheet.SpreadsheetId, context.Parameter);
-
-                await _userService.AddDataInRow(
-                    new AddDataRequest
+                    var request = new CreateStructureFolderAndSheetRequest
                     {
-                        UserId = user.UserId,
-                        SpreadsheetId = SheetId.SpreadsheetId,
-                        SheetName = SheetId.SheetName,
-                        UserData = new UserData
-                        {
-                            NameAndSurname = $"{partnerInfo.FirstName} {partnerInfo.LastName}",
-                            PhoneNumber = partnerInfo.Phone,
-                            TelegramId = context.ChatId,
-                            TelegramUsername = context.Username ?? string.Empty
-                        }
+                        PartnerId = partnerInfo.PartnerId,
+                        FirstName = partnerInfo.FirstName,
+                        LastName = partnerInfo.LastName,
+                    };
+
+                    var sheet = await _userService.CreateStructureFolderAndSheet(request);
+
+                    var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetSheetName("General_Info") || s.SheetName == _localizationService.GetSheetName("General_Info")) ?? throw new Exception("Не удалось найти таблицу");
+                    var privateSheet = sheet.FirstOrDefault(s => s.FileName != _localizationService.GetSheetName("General_Info") && s.IsPublic == false) ?? throw new Exception("Не удалось найти приватную таблицу");
+                    var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
+
+                    await _userService.UpdatePartnerOnActivation(new UpdatePartnerOnActivationRequest
+                    {
+                        ChatId = context.ChatId,
+                        SpreadSheetId = publicSheet.SpreadsheetId,
+                        PrivateSpreadSheetId = privateSheet.SpreadsheetId,
+                        InviteCode = context.Parameter
                     });
+
+                    await _userService.AddDataInRow(
+                        new AddDataRequest
+                        {
+                            UserId = user.UserId,
+                            SpreadsheetId = SheetId.SpreadsheetId,
+                            PrivateSpreadsheetId = privateSheet.SpreadsheetId,
+                            SheetName = SheetId.SheetName,
+                            UserData = new UserData
+                            {
+                                NameAndSurname = $"{partnerInfo.FirstName} {partnerInfo.LastName}",
+                                PhoneNumber = partnerInfo.Phone,
+                                TelegramId = context.ChatId,
+                                TelegramUsername = context.Username ?? string.Empty
+                            }
+                        });
+                }
             }
 
             if (int.TryParse(context.Parameter, out partnerId))
@@ -96,10 +106,8 @@ namespace FloristAI.Adapter
                     PartnerId = partnerId
                 });
             }
-        
-            
 
-            var spreadsheetId = await _googleSheetsService.FindSpreadsheet(_localizationService.GetString("Total_Info", "sheetName"));
+            var spreadsheetId = await _googleSheetsService.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
             if (!string.IsNullOrEmpty(spreadsheetId))
             {
                 var sheetName = await _googleSheetsService.GetSheetIdByMonth(spreadsheetId, DateTime.Now);
@@ -117,12 +125,12 @@ namespace FloristAI.Adapter
 
                         await _googleSheetsService.UpdateValue(
                             spreadsheetId,
-                            $"{sheetName}!F{i + 2}", 
+                            $"{sheetName}!F{i + 2}",
                             currentCount.ToString()
                         );
                     }
                 }
-                
+
             }
 
             var language = await _languageService.GetLanguageList(context.ChatId);
@@ -145,7 +153,7 @@ namespace FloristAI.Adapter
                     ReplyMarkup = keyboard
                 }
             };
-            
+
         }
     }
 }

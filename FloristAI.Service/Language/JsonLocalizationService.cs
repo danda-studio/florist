@@ -58,6 +58,26 @@ namespace FloristAI.Application.Language
         }
 
         /// <summary>
+        /// Получить строку из sheetName.json
+        /// </summary>
+        public string GetSheetName(string key)
+        {
+            if (_locales.TryGetValue("sheetName", out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                    return value;
+
+                Console.WriteLine($"[i18n] Ключ не найден в sheetName: {key}");
+            }
+            else
+            {
+                Console.WriteLine("[i18n] sheetName.json не загружен");
+            }
+
+            return key;
+        }
+
+        /// <summary>
         /// Пытается загрузить локализационный файл для указанного языка.
         /// </summary>
         /// <param name="logger">Логгер для записи информации и ошибок.</param>

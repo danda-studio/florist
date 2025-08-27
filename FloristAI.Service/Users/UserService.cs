@@ -226,7 +226,7 @@ namespace FloristAI.Application.Users
 
         }
 
-        public async Task RegisterPartner(long chatId, string spreadSheetId)
+        public async Task RegisterPartner(long chatId, string spreadSheetId, string privateSpreadSheetId)
         {
             var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
             var request = new AddPartnerRequest
@@ -235,7 +235,8 @@ namespace FloristAI.Application.Users
                 FirstName = stepData.FirstName ?? string.Empty,
                 LastName = stepData.LastName ?? string.Empty,
                 PhoneNumber = stepData.Phone ?? string.Empty,
-                SpreadSheetId = spreadSheetId
+                SpreadSheetId = spreadSheetId,
+                PrivateSpreadSheetId = privateSpreadSheetId
             };
 
             await AddPartner(request);
@@ -320,6 +321,7 @@ namespace FloristAI.Application.Users
                 LastName = request.LastName ?? string.Empty,
                 PhoneNumber = request.PhoneNumber ?? string.Empty,
                 SpreadsheetId = request.SpreadSheetId ?? string.Empty,
+                PrivateSpreadsheetId = request.PrivateSpreadSheetId ?? string.Empty,
             };
 
             return await _userRepository.AddPartner(partner);
@@ -327,16 +329,17 @@ namespace FloristAI.Application.Users
 
 
 
-        public async Task UpdatePartnerOnActivation(long chatId, string spreadSheetId, string inviteCode)
+        public async Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request)
         {
 
-            var user = await _userRepository.GetUserByChatId(chatId) ?? throw new Exception("User not found");
+            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
             var partner = new Partner
             {
                 UserId = user.Id,
-                SpreadsheetId = spreadSheetId,
+                SpreadsheetId = request.SpreadSheetId,
+                PrivateSpreadsheetId = request.PrivateSpreadSheetId,
                 IsActive = true,
-                InviteCode = inviteCode
+                InviteCode = request.InviteCode
             };
 
             await _userRepository.UpdatePartner(partner);
@@ -372,7 +375,8 @@ namespace FloristAI.Application.Users
                 PartnerId = resolveInfo.Id,
                 FirstName = resolveInfo.FirstName,
                 LastName = resolveInfo.LastName,
-                Phone = resolveInfo.PhoneNumber
+                Phone = resolveInfo.PhoneNumber,
+                IsActive = resolveInfo.IsActive
             };
         }
 

@@ -4,14 +4,8 @@ using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
 using FloristAI.Core.Store;
-using Google.Apis.Sheets.v4;
-using Google.Apis.Sheets.v4.Data;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FloristAI.Application.GoogleSheets
 {
@@ -56,7 +50,7 @@ namespace FloristAI.Application.GoogleSheets
 
         public async Task<string> GetAdminGoogleSheetsUrl()
         {
-            var (success, file) = await _googleSheets.FindSpreadsheet(_localizationService.GetString("Total_Info", "sheetName"));
+            var (success, file) = await _googleSheets.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
             if (!success || file == null)
                 throw new InvalidOperationException("Admin spreadsheet not found");
 
@@ -81,7 +75,7 @@ namespace FloristAI.Application.GoogleSheets
         {
             return await _googleSheets.GetValues(spreadsheetId, range);
         }
-        
+
         public async Task<List<CreateStructureSheetResponse>> CreateStructureSheet(SheetsCreationParams parameters)
         {
             // Создаём все таблицы, но сохраняем ID публичной
@@ -95,7 +89,7 @@ namespace FloristAI.Application.GoogleSheets
                  folderId: parameters.PrivateFolderId,
                  IsPublic: false,
                  FlagName: "PrivatePartnerInfo"),
-                (name: _localizationService.GetString("Total_Info", "sheetName"),
+                (name: _localizationService.GetSheetName("General_Info"),
                  folderId: parameters.PrivateFolderId,
                  IsPublic: false,
                  FlagName: "TotalInfo")
@@ -106,26 +100,47 @@ namespace FloristAI.Application.GoogleSheets
                 {
                     "PublicPartnerInfo", new List<string[]>
                     {
-                        new[] {"Итого"},
-                        new[] {"Дата", "Доход" }
+                        new[] { _localizationService.GetSheetName("Total") },
+                        new[]
+                        {
+                            _localizationService.GetSheetName("Date"),
+                            _localizationService.GetSheetName("Income")
+                        }
                     }
                 },
                 {
                     "PrivatePartnerInfo", new List<string[]>
                     {
-                        new[] {"Итого"},
-                        new[] {"Дата", "Доход партнера(5%)", "Доход без комисси партнера(95%)", "Общий доход(100%)" }
+                        new[] { _localizationService.GetSheetName("Total") },
+                        new[]
+                        {
+                            _localizationService.GetSheetName("Date"),
+                            _localizationService.GetSheetName("PartnerIncome"),
+                            _localizationService.GetSheetName("NetIncome"),
+                            _localizationService.GetSheetName("TotalIncome")
+                        }
                     }
                 },
                 {
                     "TotalInfo", new List<string[]>
                     {
-
-                        new[] {"Итого"},
-                        new[] {"ID", "Фамилия,Имя", "Номер телефона", "Telegram ID", "Telegran USERNAME", "Кол-во рефералов", "Общий доход(5%)", "Общий доход,без комисии партнера (95%)", "Общий доход(100%)" }
+                        new[] { _localizationService.GetSheetName("Total") },
+                        new[]
+                        {
+                            _localizationService.GetSheetName("Id"),
+                            _localizationService.GetSheetName("FullName"),
+                            _localizationService.GetSheetName("PhoneNumber"),
+                            _localizationService.GetSheetName("TelegramId"),
+                            _localizationService.GetSheetName("TelegramUsername"),
+                            _localizationService.GetSheetName("ReferralCount"),
+                            _localizationService.GetSheetName("PartnerTotalIncome"),
+                            _localizationService.GetSheetName("NetTotalIncome"),
+                            _localizationService.GetSheetName("GrandTotalIncome")
+                        }
                     }
                 }
             };
+
 
             var result = new List<CreateStructureSheetResponse>();
             var monthSheetName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DateTime.Now.ToString("MMMM"));
@@ -145,7 +160,7 @@ namespace FloristAI.Application.GoogleSheets
                     });
                     continue;
                 }
-                    
+
 
                 await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, monthSheetName);
 
@@ -162,8 +177,8 @@ namespace FloristAI.Application.GoogleSheets
 
                     if (sheetInfo.IsNew)
                     {
-                        await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, "Итог");
-                        range = $"Итог!A1:{lastColumn}{rows}";
+                        await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, _localizationService.GetSheetName("Total"));
+                        range = $"{_localizationService.GetSheetName("Total")}!A1:{lastColumn}{rows}";
                         await _googleSheets.AddHeaders(sheetInfo.SpreadsheetId, range, headers);
                     }
                 }
@@ -218,11 +233,11 @@ namespace FloristAI.Application.GoogleSheets
 
             //await _googleSheets.AddData(summaryRequest);
 
-            return new AddDataInRowResponse 
+            return new AddDataInRowResponse
             {
                 UserId = request.UserId,
                 SpreadsheetId = request.SpreadsheetId,
-                Success = true 
+                Success = true
             };
         }
 

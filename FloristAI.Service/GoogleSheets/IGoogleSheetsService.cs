@@ -7,7 +7,6 @@ namespace FloristAI.Application.GoogleSheets
 {
     public interface IGoogleSheetsService
     {
-
         Task<string> GetSheetIdByMonth(string spreadsheetId, DateTime date);
         Task<IList<IList<object>>> GetValues(string spreadsheetId, string range);
         Task<decimal> GetMonthlyIncome(int userId);

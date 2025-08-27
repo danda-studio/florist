@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace FloristAI.Application.Users.Models.Request
 {
-    public class AddPartnerRequest
+    public class UpdatePartnerOnActivationRequest
     {
         public long ChatId { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
         public string SpreadSheetId { get; set; } = string.Empty;
+        public string InviteCode { get; set; } = string.Empty;
         public string PrivateSpreadSheetId { get; set; } = string.Empty;
     }
-
 }
