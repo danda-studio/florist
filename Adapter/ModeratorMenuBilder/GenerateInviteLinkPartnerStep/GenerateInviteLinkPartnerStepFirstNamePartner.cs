@@ -5,7 +5,7 @@ using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
+namespace FloristAI.Adapter.ModeratorMenuBilder.GenerateInviteLinkPartnerStep
 {
     public class GenerateInviteLinkPartnerStepFirstNamePartner : IStepFlowBuilder
     {
@@ -21,7 +21,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
             _menuProvider = menuProvider;
         }
 
-        public string Step => "generate_partnerlink_firstname";
+        public string Step => "generate_partnerlink_firstname_moderator";
 
         public bool IsEntryPoint => true;
 
@@ -53,7 +53,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
 
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Admin") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "role_menu:Moderator") },
             };
 
             messages.Add(new MessageResult
@@ -62,8 +62,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
                 ReplyMarkup = null,
                 PinnedMessage = true
             });
-            AdminMenuBuilder._hasTempPin.Add(chatId);
-
+            ModeratorMenuBuilder._hasTempPin.Add(chatId);
             messages.Add(new MessageResult
             {
                 Text = _localizationService.GetString("Generate_PartnerLink_FirstName", user.LanguageCode),
@@ -80,10 +79,10 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
             {
                 ChatId = chatId,
                 FirstName = input,
-                Step = "generate_partnerLink_lastName",
+                Step = "generate_partnerLink_lastName_moderator",
             });
 
-            var nextBuilder = _menuProvider.Value.GetBuilder("generate_partnerLink_lastName");
+            var nextBuilder = _menuProvider.Value.GetBuilder("generate_partnerLink_lastName_moderator");
 
             return await nextBuilder.BuildMenu(chatId);
         }

@@ -1,4 +1,5 @@
 ﻿using FloristAI.Adapter.Models;
+using FloristAI.Application;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
@@ -24,6 +25,11 @@ namespace FloristAI.Adapter
 
         private readonly IGoogleSheetsService _googleSheetsService;
 
+        private readonly IPinnedMessageService _pinnedMessageService;
+
+        private static readonly HashSet<long> _permanentPinnedChats = new();
+
+
         /// <summary>
         /// Ключ маршрута, соответствующий команде.
         /// </summary>
@@ -33,12 +39,13 @@ namespace FloristAI.Adapter
         /// Инициализирует новый экземпляр <see cref="SelectLanguageAdapter"/>.
         /// </summary>
         /// <param name="languageService">Сервис для получения списка поддерживаемых языков.</param>
-        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService, IGoogleSheetsService googleSheetsService, ILocalizationService localizationService)
+        public SelectLanguageAdapter(ILanguageService languageService, IUserService userService, IGoogleSheetsService googleSheetsService, ILocalizationService localizationService, IPinnedMessageService pinnedMessageService)
         {
             _languageService = languageService;
             _userService = userService;
             _googleSheetsService = googleSheetsService;
             _localizationService = localizationService;
+            _pinnedMessageService = pinnedMessageService;
         }
 
         /// <summary>
@@ -144,16 +151,43 @@ namespace FloristAI.Adapter
                         )
                     }).ToArray()
             );
+            
+            //При деплое удалить из проекта
+            var bytes = await File.ReadAllBytesAsync("images/коть.jpg");
 
-            return new List<MessageResult>
+            if (!_permanentPinnedChats.Contains(context.ChatId))
             {
-                new MessageResult
-                {
-                    Text = "🌐 Выберите язык / Selectați o limbă",
-                    ReplyMarkup = keyboard
-                }
-            };
+                _permanentPinnedChats.Add(context.ChatId); 
 
+                return new List<MessageResult>
+                {
+                    new MessageResult
+                    {
+                        Photo = new PhotoContent
+                        {
+                            ImageBytes = bytes
+                        },
+                        Text = "Купи ей цветы 💐 — маленький жест, который скажет больше, чем тысяча слов. Не откладывай, сделай это сегодня!",
+                        PinnedMessage = true
+                    },
+                    new MessageResult
+                    {
+                        Text = "🌐 Выберите язык / Selectați o limbă",
+                        ReplyMarkup = keyboard
+                    }
+                };
+            }
+            else
+            {
+                return new List<MessageResult>
+                {
+                    new MessageResult
+                    {
+                        Text = "🌐 Выберите язык / Selectați o limbă",
+                        ReplyMarkup = keyboard
+                    }
+                };
+            }
         }
     }
 }
