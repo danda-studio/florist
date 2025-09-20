@@ -65,9 +65,22 @@ namespace FloristAI.Application.GoogleSheets
             var sheet = sheets.FirstOrDefault(s =>
                 string.Equals(s.Properties.Title, monthName, StringComparison.OrdinalIgnoreCase));
 
-            return sheet == null
-                ? throw new Exception($"Лист для месяца '{monthName}' не найден")
-                : sheet.Properties.Title;
+            if (sheet == null)
+            {
+                // создаём новый лист
+                await _googleSheets.AddSheet(spreadsheetId, monthName);
+
+                // перечитываем список листов
+                sheets = await _googleSheets.GetSheets(spreadsheetId);
+
+                sheet = sheets.FirstOrDefault(s =>
+                    string.Equals(s.Properties.Title, monthName, StringComparison.OrdinalIgnoreCase));
+
+                if (sheet == null)
+                    throw new Exception($"Не удалось создать лист для месяца '{monthName}'");
+            }
+
+            return sheet.Properties.Title;
         }
 
 
