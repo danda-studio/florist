@@ -39,7 +39,6 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
 
             byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
             var referralText = $"""
-            {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
             {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_userService.GetReferralLink(user.UserId)}
 

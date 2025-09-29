@@ -27,8 +27,6 @@ namespace FloristAI.Adapter
 
         private readonly IPinnedMessageService _pinnedMessageService;
 
-        private static readonly HashSet<long> _permanentPinnedChats = new();
-
 
         /// <summary>
         /// Ключ маршрута, соответствующий команде.
@@ -64,7 +62,7 @@ namespace FloristAI.Adapter
             if (!string.IsNullOrEmpty(context.Parameter) && !int.TryParse(context.Parameter, out _))
             {
                 var partnerInfo = await _userService.ResolvePartnerInvite(context.Parameter);
-                if (partnerInfo.IsActive == false)
+                if (partnerInfo.IsActive != true)
                 {
                     var request = new CreateStructureFolderAndSheetRequest
                     {
@@ -155,9 +153,9 @@ namespace FloristAI.Adapter
             //При деплое удалить из проекта
             var bytes = await File.ReadAllBytesAsync("images/коть.jpg");
 
-            if (!_permanentPinnedChats.Contains(context.ChatId))
+            if (!_pinnedMessageService.HasPermanentMessage(context.ChatId))
             {
-                _permanentPinnedChats.Add(context.ChatId); 
+                _pinnedMessageService.SetPermanentMessage(context.ChatId); 
 
                 return new List<MessageResult>
                 {
