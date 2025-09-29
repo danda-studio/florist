@@ -1,4 +1,5 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
 using Google;
@@ -12,11 +13,13 @@ namespace FloristAI.Infrastructure
     {
         private readonly SheetsService _sheetsService;
         private readonly DriveService _driveService;
+        private readonly ILocalizationService _localizationService;
 
-        public GoogleSheets(SheetsService sheetsService, DriveService driveService)
+        public GoogleSheets(SheetsService sheetsService, DriveService driveService, ILocalizationService localizationService)
         {
             _sheetsService = sheetsService;
             _driveService = driveService;
+            _localizationService = localizationService;
         }
 
         public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
@@ -38,13 +41,31 @@ namespace FloristAI.Infrastructure
         /// </summary>
         public async Task<string> AddSheet(string spreadsheetId, string sheetName)
         {
+            var spreadsheet = await _sheetsService.Spreadsheets.Get(spreadsheetId).ExecuteAsync();
+            var sheets = spreadsheet.Sheets;
+
+            var totalSheet = sheets.FirstOrDefault(s => s.Properties.Title.Equals(_localizationService.GetSheetName("Total"), StringComparison.OrdinalIgnoreCase));
+
+            int insertIndex;
+            if (totalSheet != null)
+            {
+                // Вставляем новый лист перед "ИТОГО"
+                insertIndex = totalSheet.Properties.Index ?? sheets.Count;
+            }
+            else
+            {
+                // Если "ИТОГО" нет — добавляем в конец
+                insertIndex = sheets.Count;
+            }
+
             var addSheetRequest = new Request
             {
                 AddSheet = new AddSheetRequest
                 {
                     Properties = new SheetProperties
                     {
-                        Title = sheetName
+                        Title = sheetName,
+                        Index = insertIndex
                     }
                 }
             };

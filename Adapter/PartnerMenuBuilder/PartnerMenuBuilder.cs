@@ -42,7 +42,6 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                 ReplyMarkup = keyboard
             };
 
-
         }
     }
 }

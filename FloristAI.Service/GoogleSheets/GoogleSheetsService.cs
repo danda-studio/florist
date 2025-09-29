@@ -164,6 +164,28 @@ namespace FloristAI.Application.GoogleSheets
                 var sheetInfo = await CreateSpreadsheet(spreadsheet.name, spreadsheet.folderId);
                 if (sheetInfo.IsNew == false)
                 {
+                    // Получаем текущую информацию о листах таблицы
+                    var spreadsheetData = await _googleSheets.GetSheets(sheetInfo.SpreadsheetId);
+
+                    // Проверяем, есть ли лист месяца
+                    bool monthSheetExists = spreadsheetData.Any(s => s.Properties.Title == monthSheetName);
+
+                    if (!monthSheetExists)
+                    {
+                        await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, monthSheetName);
+                    }
+
+                    if (headersConfig.TryGetValue(spreadsheet.FlagName, out var existingTableSheetHeaders))
+                    {
+                        int maxColumns = existingTableSheetHeaders.Max(h => h.Length);
+                        int rows = existingTableSheetHeaders.Count;
+
+                        var lastColumn = GetColumnLetter(maxColumns);
+                        var range = $"{monthSheetName}!A1:{lastColumn}{rows}";
+
+                        await _googleSheets.AddHeaders(sheetInfo.SpreadsheetId, range, existingTableSheetHeaders);
+                    }
+
                     result.Add(new CreateStructureSheetResponse
                     {
                         SpreadsheetId = sheetInfo.SpreadsheetId,
@@ -171,6 +193,7 @@ namespace FloristAI.Application.GoogleSheets
                         FileName = spreadsheet.name,
                         SheetName = monthSheetName
                     });
+
                     continue;
                 }
 
@@ -234,17 +257,6 @@ namespace FloristAI.Application.GoogleSheets
         public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
         {
             await _googleSheets.AddData(request);
-
-            //// Аналогично для листа "Итог"
-            //var summaryRequest = new AddDataRequest
-            //{
-            //    SpreadsheetId = request.SpreadsheetId,
-            //    SheetName = "Итог",
-            //    UserId = request.UserId,
-            //    UserData = request.UserData 
-            //};
-
-            //await _googleSheets.AddData(summaryRequest);
 
             return new AddDataInRowResponse
             {

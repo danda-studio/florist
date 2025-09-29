@@ -10,6 +10,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
+        public static readonly HashSet<long> _hasTempPin = new();
         public ClientMenuBuilder(IUserService userService, ILocalizationService localizationService)
         {
             _userService = userService;
@@ -65,11 +66,16 @@ namespace FloristAI.Adapter.ClientMenuBuilder
                         "/start")
                 });
             }
+            
+            bool removePin = _hasTempPin.Contains(chatId);
+            if (removePin)
+                _hasTempPin.Remove(chatId);
+
             return new MessageResult
             {
                 Text = _localizationService.GetString("Menu_Client", user.LanguageCode),
                 ReplyMarkup = new InlineKeyboardMarkup(keyboard),
-                RemovePinnedMessage = true
+                RemovePinnedMessage = removePin
             };
 
             

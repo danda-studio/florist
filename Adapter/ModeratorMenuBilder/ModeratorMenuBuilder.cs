@@ -50,7 +50,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder
             {
                 Text = _localizationService.GetString("Menu_Moderator", user.LanguageCode),
                 ReplyMarkup = keyboard,
-                RemovePinnedMessage = true,
+                RemovePinnedMessage = removePin,
             };
         }
     }
