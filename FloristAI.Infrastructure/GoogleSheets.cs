@@ -1,4 +1,5 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
@@ -140,13 +141,13 @@ namespace FloristAI.Infrastructure
         {
             try
             {
-                var (success, existingFile) = await FindSpreadsheet(name, parentFolderId);
+                var spreadsheet = await FindSpreadsheet(name, parentFolderId);
 
-                if (success && existingFile != null)
+                if (spreadsheet.Success && spreadsheet.File != null)
                 {
                     return new CreateSpreadsheetResponse
                     {
-                        SpreadsheetId = existingFile.Id,
+                        SpreadsheetId = spreadsheet.File.Id,
                         IsNew = false,
                     };
 
@@ -236,7 +237,7 @@ namespace FloristAI.Infrastructure
         /// <summary>
         /// Поиск таблицы по имени и родительской папке
         /// </summary>
-        public async Task<(bool Success, Google.Apis.Drive.v3.Data.File? File)> FindSpreadsheet(string name, string? parentFolderId = null)
+        public async Task<FindSpreadsheetResponse>FindSpreadsheet(string name, string? parentFolderId = null)
         {
             try
             {
@@ -259,12 +260,20 @@ namespace FloristAI.Infrastructure
                 var result = await listRequest.ExecuteAsync();
                 var file = result.Files?.FirstOrDefault();
 
-                return file != null ? (true, file) : (false, null);
+                return new FindSpreadsheetResponse
+                {
+                    Success = file != null,
+                    File = file,
+                }; 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"{ex}, Ошибка при поиске таблицы '{name}'{(string.IsNullOrEmpty(parentFolderId) ? "" : $" в папке {parentFolderId}")}");
-                return (false, null);
+                return new FindSpreadsheetResponse
+                {
+                    Success = false,
+                    File = null,
+                };
             }
         }
 

@@ -39,6 +39,14 @@ namespace FloristAI.Application.GoogleSheets
             return 0m;
         }
 
+        public async Task<bool> GetModeratorSpreadsheet(string spreadSheetName)
+        {
+            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName);
+            return spreadsheet.Success && spreadsheet.File != null;
+
+
+        }
+
         public async Task<string> GetGoogleSheetsUrl(int userId)
         {
             var spreadsheetId = await _userRepository.GetSpreadsheetId(userId);
@@ -50,11 +58,11 @@ namespace FloristAI.Application.GoogleSheets
 
         public async Task<string> GetAdminGoogleSheetsUrl()
         {
-            var (success, file) = await _googleSheets.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
-            if (!success || file == null)
+            var spreadsheet = await _googleSheets.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
+            if (!spreadsheet.Success || spreadsheet.File == null)
                 throw new InvalidOperationException("Admin spreadsheet not found");
 
-            return $"https://docs.google.com/spreadsheets/d/{file.Id}";
+            return $"https://docs.google.com/spreadsheets/d/{spreadsheet.File.Id}";
         }
 
         public async Task<string> GetSheetIdByMonth(string spreadsheetId, DateTime date)
@@ -285,10 +293,14 @@ namespace FloristAI.Application.GoogleSheets
             }
         }
 
-        public async Task<string?> FindSpreadsheet(string name)
+        public async Task<FindSpreadsheetResponse> FindSpreadsheet(string name)
         {
-            var (success, file) = await _googleSheets.FindSpreadsheet(name);
-            return success ? file?.Id : null;
+            var spreadsheet = await _googleSheets.FindSpreadsheet(name);
+            return new FindSpreadsheetResponse 
+            {
+                Success = spreadsheet.Success,
+                File = spreadsheet.File
+            };
         }
 
         private static string GetColumnLetter(int columnIndex)

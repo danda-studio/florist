@@ -18,6 +18,6 @@ namespace FloristAI.Application.GoogleSheets
         Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
         Task UpdateValue(string spreadsheetId, string range, string value);
         Task DeleteDefaultSheet(string spreadsheetId);
-        Task<string?> FindSpreadsheet(string name);
+        Task<FindSpreadsheetResponse> FindSpreadsheet(string name);
     }
 }

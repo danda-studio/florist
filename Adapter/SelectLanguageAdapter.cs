@@ -112,12 +112,12 @@ namespace FloristAI.Adapter
                 });
             }
 
-            var spreadsheetId = await _googleSheetsService.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
-            if (!string.IsNullOrEmpty(spreadsheetId))
+            var spreadsheet = await _googleSheetsService.FindSpreadsheet(_localizationService.GetSheetName("General_Info"));
+            if (!string.IsNullOrEmpty(spreadsheet.File.Id))
             {
-                var sheetName = await _googleSheetsService.GetSheetIdByMonth(spreadsheetId, DateTime.Now);
+                var sheetName = await _googleSheetsService.GetSheetIdByMonth(spreadsheet.File.Id, DateTime.Now);
 
-                var rows = await _googleSheetsService.GetValues(spreadsheetId, $"{sheetName}!A2:I");
+                var rows = await _googleSheetsService.GetValues(spreadsheet.File.Id, $"{sheetName}!A2:I");
                 for (int i = 0; i < rows.Count; i++)
                 {
                     if (rows[i][0]?.ToString() == partnerId.ToString())
@@ -129,7 +129,7 @@ namespace FloristAI.Adapter
                         currentCount++;
 
                         await _googleSheetsService.UpdateValue(
-                            spreadsheetId,
+                            spreadsheet.File.Id,
                             $"{sheetName}!F{i + 2}",
                             currentCount.ToString()
                         );
