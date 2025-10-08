@@ -4,6 +4,7 @@ using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
 using FloristAI.Core.Store;
+using Google.Apis.Sheets.v4.Data;
 using System.Globalization;
 
 
@@ -39,11 +40,29 @@ namespace FloristAI.Application.GoogleSheets
             return 0m;
         }
 
-        public async Task<bool> GetModeratorSpreadsheet(string spreadSheetName)
+        public async Task<GetModeratorSpreadsheetResponse> GetModeratorSpreadsheet(string spreadSheetName)
         {
-            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName);
-            return spreadsheet.Success && spreadsheet.File != null;
 
+            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName, _localizationService.GetSheetName("RootFolderId"));
+            if(spreadsheet.Success == false || spreadsheet.File == null)
+            {
+                var newSpreadsheet = await CreateSpreadsheetModerator(new CreateSpreadsheetModeratorRequest 
+                { 
+                    SheetName = spreadSheetName, 
+                    FolderId = _localizationService.GetSheetName("RootFolderId")
+                });
+
+                return new GetModeratorSpreadsheetResponse
+                {
+                    Success = true,
+                    SpreadSheetId = newSpreadsheet.SpreadsheetId,
+                };
+            }
+            return new GetModeratorSpreadsheetResponse
+            {
+                Success = spreadsheet.Success,
+                SpreadSheetId = spreadsheet.File.Id,
+            };
 
         }
 
@@ -162,7 +181,6 @@ namespace FloristAI.Application.GoogleSheets
                 }
             };
 
-
             var result = new List<CreateStructureSheetResponse>();
             var monthSheetName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(DateTime.Now.ToString("MMMM"));
 
@@ -246,9 +264,40 @@ namespace FloristAI.Application.GoogleSheets
             return result;
         }
 
+
+        public async Task<CreateSpreadsheetModeratorResponse> CreateSpreadsheetModerator(CreateSpreadsheetModeratorRequest request)
+        {
+            var headers = new List<string[]>
+            {
+                new[] 
+                { 
+                    _localizationService.GetSheetName("TelegramId"), 
+                    _localizationService.GetSheetName("FullName") 
+                }
+            };
+
+            // Создаём таблицу
+            var sheetInfo = await CreateSpreadsheet(request.SheetName, request.FolderId);
+
+            if (sheetInfo.IsNew != false)
+            {
+                int maxColumns = headers.Max(h => h.Length);
+                int rows = headers.Count;
+                var lastColumn = GetColumnLetter(maxColumns);
+                var range = $"Лист1!A1:{lastColumn}{rows}";
+
+                await _googleSheets.AddHeaders(sheetInfo.SpreadsheetId, range, headers);
+            }
+
+            return new CreateSpreadsheetModeratorResponse
+            {
+                SheetName = request.SheetName,
+                SpreadsheetId = sheetInfo.SpreadsheetId
+            };
+        }
+
         public async Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId)
         {
-
             var sheet = await _googleSheets.CreateSpreadsheet(name, parentFolderId);
             return new CreateSpreadsheetResponse
             {

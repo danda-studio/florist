@@ -56,7 +56,7 @@ namespace FloristAI.Adapter
         /// </returns>
         public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-            var user = await _userService.GetOrCreateUser(context.ChatId, "ru");
+            var user = await _userService.GetOrCreateUser(context.ChatId, "ru", false);
 
             int partnerId = 0;
             if (!string.IsNullOrEmpty(context.Parameter) && !int.TryParse(context.Parameter, out _))

@@ -40,21 +40,47 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
                     }
                 };
             }
-            //try
-            //{
-            //    await _googleSheetsService.ImportModeratorsFromGoogleSheets(user.UserId);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return new List<MessageResult>
-            //    {
-            //        new MessageResult
-            //        {
-            //            Text = _localizationService.GetString("Control_Error_Importing", user.LanguageCode) + $"\n{ex.Message}",
-            //            ReplyMarkup = null
-            //        }
-            //    };
-            //}
+            try
+            {
+                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet("Модераторы");
+
+                var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "A:A");
+
+                var userIds = dataTable
+                    .Select(row => row.FirstOrDefault()?.ToString())
+                    .Where(val => !string.IsNullOrEmpty(val) && long.TryParse(val, out _))
+                    .Select(val => long.Parse(val!))
+                    .ToList();
+
+                // Запускаем задачи параллельно
+                var tasks = userIds.Select(async userId =>
+                {
+                    var user = await _userService.GetUser(userId);
+                    return new { userId, Exists = user.UserId != 0 && user != null };
+                }).ToList();
+
+                var results = await Task.WhenAll(tasks);
+
+                // Теперь results содержит информацию о каждом userId
+                foreach (var result in results)
+                {
+                    if (result.Exists == false)
+                    {
+                        await _userService.GetOrCreateUser(result.userId, "ru", true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<MessageResult>
+                {
+                    new MessageResult
+                    {
+                        Text = _localizationService.GetString("Control_Error_Importing", user.LanguageCode) + $"\n{ex.Message}",
+                        ReplyMarkup = null
+                    }
+                };
+            }
 
             var keyboard = new[]
             {

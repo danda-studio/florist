@@ -2,6 +2,7 @@
 using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 using FloristAI.Core.Store;
+using FloristAI.Infrastructure.Models.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace FloristAI.Infrastructure.Persistence
@@ -58,7 +59,7 @@ namespace FloristAI.Infrastructure.Persistence
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <param name="languageCode">Код языка интерфейса.</param>
         /// <returns>Созданный пользователь.</returns>
-        public async Task<User> CreateUserWithChatData(long chatId, string languageCode)
+        public async Task<User> CreateUserWithChatData(long chatId, string languageCode, bool IsModerator)
         {
             var user = new User
             {
@@ -75,6 +76,14 @@ namespace FloristAI.Infrastructure.Persistence
                     }
                 }
             };
+
+            if(IsModerator != false)
+            {
+                user.Roles.Add(new UserRole
+                {
+                    Role = RoleType.Moderator
+                });
+            }
 
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();

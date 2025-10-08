@@ -18,7 +18,7 @@ namespace FloristAI.Application.Users
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <returns>Модель с данными пользователя.</returns>
         Task<GetUserResponse> GetUser(long chatId);
-        Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode);
+        Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode, bool IsModerator);
         Task<GetStepResponse> GetStep(long chatId);
         string GetReferralLink(int Id);
         Task<string> GetPartnerLink(GetPartnerLinkRequest request);
@@ -40,7 +40,7 @@ namespace FloristAI.Application.Users
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <param name="languageCode">Код языка интерфейса.</param>
         /// <returns>Ответ с информацией о созданном пользователе.</returns>
-        Task<AddUserResponse> AddUser(long chatId, string languageCode);
+        Task<AddUserResponse> AddUser(long chatId, string languageCode, bool IsModerator);
         Task<Partner> AddPartner(AddPartnerRequest request);
         Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request);
         Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);

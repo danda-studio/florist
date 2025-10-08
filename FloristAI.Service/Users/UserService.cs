@@ -48,11 +48,11 @@ namespace FloristAI.Application.Users
             _googleDriveService = googleDriveService;
         }
 
-        public async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode)
+        public async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode, bool IsModerator)
         {
             if (!await CheckUserInSystem(chatId))
             {
-                var createdUser = await AddUser(chatId, languageCode);
+                var createdUser = await AddUser(chatId, languageCode, IsModerator);
                 return new GetUserResponse
                 {
                     UserId = createdUser.Id,
@@ -72,8 +72,11 @@ namespace FloristAI.Application.Users
         /// <exception cref="InvalidOperationException">Если пользователь не найден.</exception>
         public async Task<GetUserResponse> GetUser(long chatId)
         {
-            var user = await _userRepository.GetUserByChatId(chatId)
-                ?? throw new InvalidOperationException($"Пользователь с chatId {chatId} не найден");
+            var user = await _userRepository.GetUserByChatId(chatId);
+            if(user == null)
+            {
+                return new GetUserResponse();
+            }
 
             var isPartner = await _userRepository.IsPartner(chatId);
 
@@ -94,7 +97,7 @@ namespace FloristAI.Application.Users
         /// <returns>Роли пользователя с локализованными названиями.</returns>
         public async Task<GetRolesResponse> GetRolesByTelegramId(long chatId, string languageCode)
         {
-            var user = await GetOrCreateUser(chatId, languageCode);
+            var user = await GetOrCreateUser(chatId, languageCode, false);
 
             var roles = await _userRepository.GetRoles(user.UserId);
             var response = roles
@@ -179,9 +182,9 @@ namespace FloristAI.Application.Users
         /// <param name="chatId">Идентификатор Telegram-чата пользователя.</param>
         /// <param name="languageCode">Код языка интерфейса пользователя.</param>
         /// <returns>Информация о созданном или существующем пользователе.</returns>
-        public async Task<AddUserResponse> AddUser(long chatId, string languageCode)
+        public async Task<AddUserResponse> AddUser(long chatId, string languageCode, bool IsModerator)
         {
-            var user = await _userRepository.CreateUserWithChatData(chatId, languageCode);
+            var user = await _userRepository.CreateUserWithChatData(chatId, languageCode, IsModerator);
 
             return new AddUserResponse
             {
@@ -326,8 +329,6 @@ namespace FloristAI.Application.Users
 
             return await _userRepository.AddPartner(partner);
         }
-
-
 
         public async Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request)
         {
