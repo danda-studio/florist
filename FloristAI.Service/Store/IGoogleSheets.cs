@@ -1,4 +1,5 @@
 ﻿using FloristAI.Application.GoogleSheets.Models.Request;
+using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Store.Models.Response;
 using Google.Apis.Sheets.v4.Data;
 
@@ -15,7 +16,7 @@ namespace FloristAI.Application.Store
         Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId);
         Task UpdateValue(string spreadsheetId, string range, string value);
         Task DeleteDefaultSheet(string spreadsheetId);
-        Task<(bool Success, Google.Apis.Drive.v3.Data.File? File)> FindSpreadsheet(string name, string? parentFolderId = null);
+        Task<FindSpreadsheetResponse> FindSpreadsheet(string name, string? parentFolderId = null);
 
     }
 }

@@ -15,5 +15,9 @@ namespace FloristAI.Application.Language
         string GetString(string key, string languageCode);
 
         string GetSheetName(string key);
+
+        string GetFolderId(string key);
+
+        string GetFolderName(string key);
     }
 }

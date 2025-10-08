@@ -28,6 +28,8 @@ namespace FloristAI.Application.Language
             TryLoadLocale(logger, "ru");
             TryLoadLocale(logger, "ro");
             TryLoadLocale(logger, "sheetName");
+            TryLoadLocale(logger, "folderId");
+            TryLoadLocale(logger, "folderName");
         }
 
         /// <summary>
@@ -63,6 +65,46 @@ namespace FloristAI.Application.Language
         public string GetSheetName(string key)
         {
             if (_locales.TryGetValue("sheetName", out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                    return value;
+
+                Console.WriteLine($"[i18n] Ключ не найден в sheetName: {key}");
+            }
+            else
+            {
+                Console.WriteLine("[i18n] sheetName.json не загружен");
+            }
+
+            return key;
+        }
+
+        /// <summary>
+        /// Получить строку из sheetName.json
+        /// </summary>
+        public string GetFolderId(string key)
+        {
+            if (_locales.TryGetValue("folderId", out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                    return value;
+
+                Console.WriteLine($"[i18n] Ключ не найден в sheetName: {key}");
+            }
+            else
+            {
+                Console.WriteLine("[i18n] sheetName.json не загружен");
+            }
+
+            return key;
+        }
+
+        /// <summary>
+        /// Получить строку из sheetName.json
+        /// </summary>
+        public string GetFolderName(string key)
+        {
+            if (_locales.TryGetValue("folderName", out var dict))
             {
                 if (dict.TryGetValue(key, out var value))
                     return value;

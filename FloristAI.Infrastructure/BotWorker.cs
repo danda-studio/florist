@@ -125,6 +125,8 @@ namespace FloristAI.Infrastructure
                         chatId: chatId,
                         text: result.Text,
                         replyMarkup: result.ReplyMarkup,
+                        parseMode: ParseMode.Html,
+                        linkPreviewOptions: new LinkPreviewOptions { IsDisabled = true },
                         cancellationToken: token
                     );
                 }

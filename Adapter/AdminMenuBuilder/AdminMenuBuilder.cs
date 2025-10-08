@@ -45,6 +45,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder
             bool removePin = _hasTempPin.Contains(chatId);
             if(removePin)
                 _hasTempPin.Remove(chatId);
+
             return new MessageResult
             {
                 Text = _localizationService.GetString("Menu_Admin", user.LanguageCode),
