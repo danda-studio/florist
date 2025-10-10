@@ -43,13 +43,13 @@ namespace FloristAI.Application.GoogleSheets
         public async Task<GetModeratorSpreadsheetResponse> GetModeratorSpreadsheet(string spreadSheetName)
         {
 
-            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName, _localizationService.GetSheetName("RootFolderId"));
+            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName, _localizationService.GetFolderId("RootFolderId"));
             if(spreadsheet.Success == false || spreadsheet.File == null)
             {
                 var newSpreadsheet = await CreateSpreadsheetModerator(new CreateSpreadsheetModeratorRequest 
                 { 
                     SheetName = spreadSheetName, 
-                    FolderId = _localizationService.GetSheetName("RootFolderId")
+                    FolderId = _localizationService.GetFolderId("RootFolderId")
                 });
 
                 return new GetModeratorSpreadsheetResponse
@@ -59,6 +59,32 @@ namespace FloristAI.Application.GoogleSheets
                 };
             }
             return new GetModeratorSpreadsheetResponse
+            {
+                Success = spreadsheet.Success,
+                SpreadSheetId = spreadsheet.File.Id,
+            };
+
+        }
+
+        public async Task<GetBoutiqueSpreadsheetResponse> GetBoutiqueSpreadsheet(string spreadSheetName)
+        {
+
+            var spreadsheet = await _googleSheets.FindSpreadsheet(spreadSheetName, _localizationService.GetFolderId("RootFolderId"));
+            if (spreadsheet.Success == false || spreadsheet.File == null)
+            {
+                var newSpreadsheet = await CreateSpreadsheetBoutique(new CreateSpreadsheetBoutiqueRequest
+                {
+                    SheetName = spreadSheetName,
+                    FolderId = _localizationService.GetFolderId("RootFolderId")
+                });
+
+                return new GetBoutiqueSpreadsheetResponse
+                {
+                    Success = true,
+                    SpreadSheetId = newSpreadsheet.SpreadsheetId,
+                };
+            }
+            return new GetBoutiqueSpreadsheetResponse
             {
                 Success = spreadsheet.Success,
                 SpreadSheetId = spreadsheet.File.Id,
@@ -264,7 +290,6 @@ namespace FloristAI.Application.GoogleSheets
             return result;
         }
 
-
         public async Task<CreateSpreadsheetModeratorResponse> CreateSpreadsheetModerator(CreateSpreadsheetModeratorRequest request)
         {
             var headers = new List<string[]>
@@ -290,6 +315,37 @@ namespace FloristAI.Application.GoogleSheets
             }
 
             return new CreateSpreadsheetModeratorResponse
+            {
+                SheetName = request.SheetName,
+                SpreadsheetId = sheetInfo.SpreadsheetId
+            };
+        }
+
+        public async Task<CreateSpreadsheetBoutiqueResponse> CreateSpreadsheetBoutique(CreateSpreadsheetBoutiqueRequest request)
+        {
+            var headers = new List<string[]>
+            {
+                new[]
+                {
+                    _localizationService.GetSheetName("NameBoutique"),
+                    _localizationService.GetSheetName("Address")
+                }
+            };
+
+            // Создаём таблицу
+            var sheetInfo = await CreateSpreadsheet(request.SheetName, request.FolderId);
+
+            if (sheetInfo.IsNew != false)
+            {
+                int maxColumns = headers.Max(h => h.Length);
+                int rows = headers.Count;
+                var lastColumn = GetColumnLetter(maxColumns);
+                var range = $"Лист1!A1:{lastColumn}{rows}";
+
+                await _googleSheets.AddHeaders(sheetInfo.SpreadsheetId, range, headers);
+            }
+
+            return new CreateSpreadsheetBoutiqueResponse
             {
                 SheetName = request.SheetName,
                 SpreadsheetId = sheetInfo.SpreadsheetId

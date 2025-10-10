@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -137,7 +138,7 @@ namespace FloristAI.Application.Language
                     return false;
                 }
 
-                var json = File.ReadAllText(filePath);
+                var json = File.ReadAllText(filePath, Encoding.UTF8);
                 _locales[lang] = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
                                   ?? new Dictionary<string, string>();
 

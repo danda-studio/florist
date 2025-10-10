@@ -10,21 +10,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
+namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
 {
-    public class StepSaveChanges : IStepMenuBuilder
+    public class StepSaveChangesSpreadsheetBoutiques : IStepMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
         private readonly IGoogleSheetsService _googleSheetsService;
-        public StepSaveChanges(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
+        public StepSaveChangesSpreadsheetBoutiques(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
             _localizationService = localizationService;
             _googleSheetsService = googleSheetsService;
         }
 
-        public string Step => "save_changes_moderators";
+        public string Step => "save_changes_boutiques";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
@@ -42,9 +42,9 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
             }
             try
             {
-                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet("Модераторы");
+                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Boutique"));
 
-                var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "A:A");
+                var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "B:B");
 
                 var userIds = dataTable
                     .Select(row => row.FirstOrDefault()?.ToString())
@@ -90,7 +90,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
             {
                 new MessageResult
                 {
-                    Text = _localizationService.GetString("Control_Moderator_Success", user.LanguageCode),
+                    Text = _localizationService.GetString("Control_Boutique_Success", user.LanguageCode),
                     ReplyMarkup = keyboard
                 }
             };

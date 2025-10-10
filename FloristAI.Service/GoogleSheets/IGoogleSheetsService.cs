@@ -20,5 +20,6 @@ namespace FloristAI.Application.GoogleSheets
         Task DeleteDefaultSheet(string spreadsheetId);
         Task<FindSpreadsheetResponse> FindSpreadsheet(string name);
         Task<GetModeratorSpreadsheetResponse> GetModeratorSpreadsheet(string spreadSheetName);
+        Task<GetBoutiqueSpreadsheetResponse> GetBoutiqueSpreadsheet(string spreadSheetName);
     }
 }

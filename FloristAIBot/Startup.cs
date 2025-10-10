@@ -1,5 +1,6 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.AdminMenuBuilder;
+using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators;
 using FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep;
@@ -160,7 +161,9 @@ namespace FloristAIBot
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReferralUrl>();
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReporting>();
             services.AddScoped<IStepMenuBuilder, ControlModerators>();
-            services.AddScoped<IStepMenuBuilder, StepSaveChanges>();
+            services.AddScoped<IStepMenuBuilder, StepSaveChangesSpreadsheetModerators>();
+            services.AddScoped<IStepMenuBuilder, ControlBoutiques>();
+            services.AddScoped<IStepMenuBuilder, StepSaveChangesSpreadsheetBoutiques>();
             services.AddScoped<IStepMenuBuilder, AdminReporting>();
             services.AddScoped<IStepMenuBuilder, BussinesReportingModerator>();
             services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFirstNamePartner>();
@@ -200,17 +203,17 @@ namespace FloristAIBot
 
 
 
-        private static GoogleCredential GetServiceAccountCredential()
-        {
-            var keyFilePath = Path.Combine(AppContext.BaseDirectory, "kisaflori-8a9b4bc9ff09.json");
+        //private static GoogleCredential GetServiceAccountCredential()
+        //{
+        //    var keyFilePath = Path.Combine(AppContext.BaseDirectory, "kisaflori-8a9b4bc9ff09.json");
 
-            return GoogleCredential.FromFile(keyFilePath)
-                .CreateScoped(new[]
-                {
-                DriveService.Scope.Drive,
-                SheetsService.Scope.Spreadsheets
-                });
-        }
+        //    return GoogleCredential.FromFile(keyFilePath)
+        //        .CreateScoped(new[]
+        //        {
+        //        DriveService.Scope.Drive,
+        //        SheetsService.Scope.Spreadsheets
+        //        });
+        //}
 
         /// <summary>
         /// Метод конфигурации HTTP конвейера приложения.

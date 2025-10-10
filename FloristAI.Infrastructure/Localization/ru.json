@@ -85,6 +85,8 @@
   "IsPartner": "👤 Вы уже являетесь партнером",
   "Update_Data": "♻️ Обновить данные",
   "Control_Header_Moderator": "ℹ️ Вы находитесь в меню контроля списка модераторов",
-  "Control_Moderator_Success": "✅ Список модераторов успешно изменен."
+  "Control_Moderator_Success": "✅ Список модераторов успешно изменен.",
+  "Control_Header_Boutiques": "ℹ️ Вы находитесь в меню контроля списка бутиков",
+  "Control_Boutique_Success": "✅ Список бутиков успешно изменен."
 }
 

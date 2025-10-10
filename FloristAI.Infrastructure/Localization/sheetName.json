@@ -14,5 +14,9 @@
   "ReferralCount": "Кол-во рефералов",
   "PartnerTotalIncome": "Общий доход (5%)",
   "NetTotalIncome": "Общий доход, без комиссии партнера (95%)",
-  "GrandTotalIncome": "Общий доход (100%)"
+  "GrandTotalIncome": "Общий доход (100%)",
+  "NameBoutique": "Название",
+  "Address": "Адрес",
+  "Moderator": "Модератор",
+  "Boutique" : "Бутики"
 }
