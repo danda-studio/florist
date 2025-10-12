@@ -1,9 +1,13 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
+using FloristAI.Application.GoogleDrive;
+using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.GoogleSheets.Models.Request;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
+using FloristAI.Core.Entities.ReferralsAndPartners;
+using Google.Apis.Sheets.v4.Data;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
@@ -11,19 +15,35 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
     public class BecomePartnerStepFinal : IStepFlowBuilder
     {
         private readonly IUserService _userService;
+        private readonly IPartnerService _partnerService;
+
+        private readonly IStepFlowService _stepFlowService;
         private readonly ILocalizationService _localizationService;
 
-        public BecomePartnerStepFinal(IUserService userService, ILocalizationService localizationService)
+        private readonly IGoogleSheetsService _googleSheetsService;
+        private readonly IGoogleDriveService _googleDriveService;
+
+        public BecomePartnerStepFinal(
+            IUserService userService,
+            IPartnerService partnerService,
+            ILocalizationService localizationService, 
+            IStepFlowService stepFlowService, 
+            IGoogleSheetsService googleSheetsService, 
+            IGoogleDriveService googleDriveService)
         {
             _userService = userService;
+            _partnerService = partnerService;
             _localizationService = localizationService;
+            _stepFlowService = stepFlowService;
+            _googleSheetsService = googleSheetsService;
+            _googleDriveService = googleDriveService;
         }
 
         public string Step => "become_partner_step_final";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId, string? username = null)
         {
-            var user = await _userService.GetUser(chatId);
+            var user = await _userService.GetOrCreateUser(chatId, "ru", false);
             if (user == null)
             {
                 return new List<MessageResult>
@@ -36,12 +56,12 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 };
             }
 
-            byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
+            byte[] qrBytes = _partnerService.GetReferralQrCode(user.UserId);
 
             var referralText = $"""
             {_localizationService.GetString("Become_Form_Success", user.LanguageCode)}
 
-            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_userService.GetReferralLink(user.UserId)}
+            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_partnerService.GetReferralLink(user.UserId)}
 
             {_localizationService.GetString("Referral_Description", user.LanguageCode)}
             """;
@@ -64,24 +84,25 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 }
             };
 
-            var userInfo = await _userService.GetStep(chatId);
+            var userInfo = await _stepFlowService.GetStep(chatId);
 
-            var request = new CreateStructureFolderAndSheetRequest
-            {
-                PartnerId = user.UserId,
-                FirstName = userInfo.FirstName,
-                LastName = userInfo.LastName,
-            };
+            var folder = await _googleDriveService.CreateStructureFolder();
+            var request = new SheetsCreationParams(
+                PartnerId: user.UserId,
+                FirstName: userInfo.FirstName,
+                LastName: userInfo.LastName,
+                PublicFolderId: folder.PublicFolderId,
+                PrivateFolderId: folder.PrivateFolderId);
 
-            var sheet = await _userService.CreateStructureFolderAndSheet(request);
+            var sheet = await _googleSheetsService.CreateStructureSheet(request);
 
             var SheetId = sheet.FirstOrDefault(s => s.FileName == _localizationService.GetSheetName("General_Info") || s.SheetName == _localizationService.GetSheetName("General_Info")) ?? throw new Exception("Не удалось найти таблицу");
             var privateSheet = sheet.FirstOrDefault(s => s.FileName != _localizationService.GetSheetName("General_Info") && s.IsPublic == false) ?? throw new Exception("Не удалось найти приватную таблицу");
             var publicSheet = sheet.FirstOrDefault(s => s.IsPublic == true) ?? throw new Exception("Не удалось найти публичную таблицу");
 
-            await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId, privateSheet.SpreadsheetId);
+            await _partnerService.RegisterPartner(chatId, publicSheet.SpreadsheetId, privateSheet.SpreadsheetId);
 
-            await _userService.AddDataInRowPartnerTable(
+            await _googleSheetsService.AddDataInRowPartnerTable(
                 new AddDataRequest
                 {
                     UserId = user.UserId,

@@ -15,9 +15,9 @@ using FloristAI.Application;
 using FloristAI.Application.GoogleDrive;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
+using FloristAI.Application.Mapping;
 using FloristAI.Application.Store;
 using FloristAI.Application.Users;
-using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
 using FloristAI.Router;
@@ -66,6 +66,7 @@ namespace FloristAIBot
             var database = Environment.GetEnvironmentVariable("Database");
             var username = Environment.GetEnvironmentVariable("Username");
             var password = Environment.GetEnvironmentVariable("Password");
+            
             if (!string.IsNullOrEmpty(host))
             {
                 connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
@@ -143,6 +144,8 @@ namespace FloristAIBot
             services.AddScoped<IGoogleDrive, GoogleDrive>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPartnerService, PartnerService>();
+            services.AddScoped<IStepFlowService, StepFlowService>();
             services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
             services.AddScoped<IGoogleDriveService, GoogleDriveService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
@@ -183,10 +186,17 @@ namespace FloristAIBot
             services.AddScoped<IStepFlowProvider, StepFlowProvider>();
             services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IPartnerRepository, PartnerRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
 
             services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
                 new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<MappingPartnerProfile>();
+                cfg.AddProfile<MappingReferalProfile>();
+            });
 
             var token = Environment.GetEnvironmentVariable("Bot_token");
             if (string.IsNullOrEmpty(token))

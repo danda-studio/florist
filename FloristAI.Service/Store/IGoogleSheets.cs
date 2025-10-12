@@ -3,7 +3,6 @@ using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Store.Models.Response;
 using Google.Apis.Sheets.v4.Data;
 
-
 namespace FloristAI.Application.Store
 {
     public interface IGoogleSheets

@@ -16,7 +16,6 @@ namespace FloristAI.Adapter
 
         public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-
             var builder = _stepMenuProvider.GetBuilder(context.Message);
             if (builder == null)
             {

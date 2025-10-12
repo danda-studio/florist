@@ -1,7 +1,7 @@
 ﻿using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
 
-namespace FloristAI.Core.Store
+namespace FloristAI.Application.Store
 {
     /// <summary>
     /// Интерфейс репозитория для работы с пользователями и их ролями.
@@ -21,10 +21,7 @@ namespace FloristAI.Core.Store
         /// <param name="chatId">Идентификатор чата Telegram.</param>
         /// <returns>Пользователь или null, если не найден.</returns>
         Task<User?> GetUserByChatId(long chatId);
-        Task<Partner?> GetPartnerByInviteCode(string inviteCode);
         Task<string?> GetSpreadsheetId(int userId);
-
-        Task<Partner?> ResolvePartnerInvite(string code);
 
         /// <summary>
         /// Создаёт нового пользователя с данными чата Telegram и кодом языка интерфейса.
@@ -34,10 +31,6 @@ namespace FloristAI.Core.Store
         /// <returns>Созданный пользователь.</returns>
         Task<User> CreateUserWithChatData(long chatId, string languageCode, bool IsModerator);
 
-        Task<Partner> AddPartner(Partner partner);
-        Task UpdatePartner(Partner partner);
-        Task<Referal> AddReferal(Referal referal, int partnerId);
-
         /// <summary>
         /// Обновляет код языка интерфейса пользователя.
         /// </summary>
@@ -45,9 +38,5 @@ namespace FloristAI.Core.Store
         /// <param name="languageCode">Новый код языка интерфейса.</param>
         /// <returns>True, если обновление прошло успешно, иначе false.</returns>
         Task<bool> EditLanguageCode(int Id, string languageCode);
-
-        Task<bool> IsPartner(long chatId);
-
-
     }
 }

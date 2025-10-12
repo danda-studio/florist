@@ -1,6 +1,6 @@
 ﻿using FloristAI.Application.Language.Models;
+using FloristAI.Application.Store;
 using FloristAI.Core.Entities.Enums;
-using FloristAI.Core.Store;
 
 namespace FloristAI.Application.Language
 {

@@ -12,15 +12,16 @@ namespace FloristAI.Infrastructure
 {
     public class GoogleSheets : IGoogleSheets
     {
+        private readonly ILocalizationService _localizationService;
+
         private readonly SheetsService _sheetsService;
         private readonly DriveService _driveService;
-        private readonly ILocalizationService _localizationService;
 
         public GoogleSheets(SheetsService sheetsService, DriveService driveService, ILocalizationService localizationService)
         {
+            _localizationService = localizationService;
             _sheetsService = sheetsService;
             _driveService = driveService;
-            _localizationService = localizationService;
         }
 
         public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)

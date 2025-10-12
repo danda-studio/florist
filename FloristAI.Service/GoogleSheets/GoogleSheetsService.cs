@@ -3,7 +3,6 @@ using FloristAI.Application.GoogleSheets.Models.Response;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
 using FloristAI.Application.Store.Models.Response;
-using FloristAI.Core.Store;
 using Google.Apis.Sheets.v4.Data;
 using System.Globalization;
 
@@ -249,9 +248,7 @@ namespace FloristAI.Application.GoogleSheets
                     continue;
                 }
 
-
                 await _googleSheets.AddSheet(sheetInfo.SpreadsheetId, monthSheetName);
-
 
                 if (headersConfig.TryGetValue(spreadsheet.FlagName, out var headers))
                 {
@@ -270,7 +267,6 @@ namespace FloristAI.Application.GoogleSheets
                         await _googleSheets.AddHeaders(sheetInfo.SpreadsheetId, range, headers);
                     }
                 }
-
 
                 await DeleteDefaultSheet(sheetInfo.SpreadsheetId);
                 result.Add(new CreateStructureSheetResponse

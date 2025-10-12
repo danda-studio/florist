@@ -11,12 +11,14 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
     {
         private readonly IUserService _userService;
 
+        private readonly IStepFlowService _stepFlowService;
         private readonly ILocalizationService _localizationService;
 
         private readonly Lazy<IStepFlowProvider> _menuProvider;
-        public GenerateInviteLinkPartnerStepLastNamePartner(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
+        public GenerateInviteLinkPartnerStepLastNamePartner(IUserService userService, IStepFlowService stepFlowService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
+            _stepFlowService = stepFlowService;
             _localizationService = localizationService;
             _menuProvider = menuProvider;
         }
@@ -42,11 +44,13 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:generate_partnerlink_firstname") },
             };
-            await _userService.SaveStep(new SaveStepRequest
+
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 Step = Step
             });
+
             return new List<MessageResult>
             {
                 new MessageResult
@@ -59,7 +63,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
 
         public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
-            await _userService.SaveStep(new SaveStepRequest
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 LastName = input,

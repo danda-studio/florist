@@ -12,12 +12,15 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
     {
         private readonly IUserService _userService;
 
+        private readonly IStepFlowService _stepFlowService;
+
         private readonly ILocalizationService _localizationService;
 
         private readonly Lazy<IStepFlowProvider> _menuProvider;
-        public BecomePartnerStepPhone(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
+        public BecomePartnerStepPhone(IUserService userService, IStepFlowService stepFlowService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
+            _stepFlowService = stepFlowService;
             _localizationService = localizationService;
             _menuProvider = menuProvider;
         }
@@ -38,15 +41,18 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                     }
                 };
             }
+
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Back", user.LanguageCode), "step_message:become_partner_step_lastName") },
             };
-            await _userService.SaveStep(new SaveStepRequest
+
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 Step = Step
             });
+
             return new List<MessageResult>
             {
                 new MessageResult
@@ -84,7 +90,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 };  
             }
 
-            await _userService.SaveStep(new SaveStepRequest
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 Phone = input,

@@ -1,16 +1,8 @@
-﻿using FloristAI.Application.GoogleDrive;
-using FloristAI.Application.GoogleSheets;
-using FloristAI.Application.GoogleSheets.Models.Request;
-using FloristAI.Application.GoogleSheets.Models.Response;
+﻿using AutoMapper;
 using FloristAI.Application.Language;
 using FloristAI.Application.Store;
-using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
-using FloristAI.Core.Entities.ReferralsAndPartners;
-using FloristAI.Core.Entities.UserInfo;
-using FloristAI.Core.Store;
-using Newtonsoft.Json;
-using QRCoder;
+
 
 namespace FloristAI.Application.Users
 {
@@ -20,32 +12,28 @@ namespace FloristAI.Application.Users
     public class UserService : IUserService
     {
         /// <summary>
-        /// Репозиторий для работы с данными пользователей.
+        /// Репозитории для работы с данными пользователей.
         /// </summary>
         private readonly IUserRepository _userRepository;
-
-        private readonly ICacheRepository _cacheRepository;
-
-        private readonly IGoogleSheetsService _googleSheetsService;
-        private readonly IGoogleDriveService _googleDriveService;
+        private readonly IPartnerRepository _partnerRepository;
 
         /// <summary>
         /// Сервис локализации для получения локализованных строк.
         /// </summary>
         private readonly ILocalizationService _localizationService;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Инициализирует новый экземпляр <see cref="UserService"/>.
         /// </summary>
         /// <param name="userRepository">Репозиторий пользователей.</param>
         /// <param name="localizationService">Сервис локализации.</param>
-        public UserService(IUserRepository userRepository, ILocalizationService localizationService, ICacheRepository cacheRepository, IGoogleSheetsService googleSheetsService, IGoogleDriveService googleDriveService)
+        public UserService(IUserRepository userRepository, ILocalizationService localizationService, IPartnerRepository partnerRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _localizationService = localizationService;
-            _cacheRepository = cacheRepository;
-            _googleSheetsService = googleSheetsService;
-            _googleDriveService = googleDriveService;
+            _partnerRepository = partnerRepository;
+            _mapper = mapper;
         }
 
         public async Task<GetUserResponse> GetOrCreateUser(long chatId, string languageCode, bool IsModerator)
@@ -78,7 +66,7 @@ namespace FloristAI.Application.Users
                 return new GetUserResponse();
             }
 
-            var isPartner = await _userRepository.IsPartner(chatId);
+            var isPartner = await _partnerRepository.IsPartner(chatId);
 
             return new GetUserResponse
             {
@@ -115,67 +103,6 @@ namespace FloristAI.Application.Users
             };
         }
 
-        public string GetReferralLink(int Id)
-        {
-            string botName = "FLowerKisaBot";
-            return $"https://t.me/{botName}?start={Id}";
-        }
-
-        public async Task<string> GetPartnerLink(GetPartnerLinkRequest request)
-        {
-            string botName = "FlowerKisaBot";
-
-            string code = Guid.NewGuid().ToString("N")[..8];
-
-
-            await AddPartnerFromInviteCode(new AddPartnerFromInviteCodeRequest
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PhoneNumber = request.Phone,
-                InviteCode = code
-            });
-
-            return $"https://t.me/{botName}?start=partner_{code}";
-        }
-
-        public byte[] GetReferralQrCode(int id)
-        {
-            string link = GetReferralLink(id);
-
-            var generator = new QRCodeGenerator();
-            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
-
-            var renderer = new PngByteQRCode(data);
-            return renderer.GetGraphic(20);
-        }
-
-        public byte[] GetPartnerLinkQrCode(string link)
-        {
-            var generator = new QRCodeGenerator();
-            var data = generator.CreateQrCode(link, QRCodeGenerator.ECCLevel.Q);
-
-            var renderer = new PngByteQRCode(data);
-            return renderer.GetGraphic(20);
-        }
-
-
-        public async Task<GetStepResponse> GetStep(long chatId)
-        {
-            var step = await _cacheRepository.GetStepFlowBecomePartnerProgress(chatId);
-
-            return new GetStepResponse
-            {
-                ChatId = chatId,
-                Step = step.Step,
-                FirstName = step.FirstName,
-                LastName = step.LastName,
-                Phone = step.Phone,
-                Username = step.Username
-            };
-
-        }
-
         /// <summary>
         /// Добавляет пользователя с указанным chatId и языком интерфейса.
         /// </summary>
@@ -202,7 +129,7 @@ namespace FloristAI.Application.Users
         public async Task<EditLanguageInterfaceUserResponse> EditLanguageInterfaceUser(long chatId, string languageCode)
         {
             var user = await GetUser(chatId);
-            var isPartner = await _userRepository.IsPartner(chatId);
+            var isPartner = await _partnerRepository.IsPartner(chatId);
             await _userRepository.EditLanguageCode(user.UserId, languageCode);
 
             return new EditLanguageInterfaceUserResponse
@@ -210,174 +137,6 @@ namespace FloristAI.Application.Users
                 UserId = user.UserId,
                 LanguageCode = languageCode,
                 IsPartner = isPartner
-            };
-        }
-
-        public async Task<List<CreateStructureSheetResponse>> CreateStructureFolderAndSheet(CreateStructureFolderAndSheetRequest request)
-        {
-            var folder = await _googleDriveService.CreateStructureFolder();
-
-            var sheetsParams = new SheetsCreationParams(
-                PartnerId: request.PartnerId,
-                FirstName: request.FirstName,
-                LastName: request.LastName,
-                PublicFolderId: folder.PublicFolderId,
-                PrivateFolderId: folder.PrivateFolderId
-            );
-
-            return await _googleSheetsService.CreateStructureSheet(sheetsParams);
-
-        }
-
-        public async Task RegisterPartner(long chatId, string spreadSheetId, string privateSpreadSheetId)
-        {
-            var stepData = await GetStep(chatId) ?? throw new InvalidOperationException($"Step data not found for chatId {chatId}");
-            var request = new AddPartnerRequest
-            {
-                ChatId = stepData.ChatId,
-                FirstName = stepData.FirstName ?? string.Empty,
-                LastName = stepData.LastName ?? string.Empty,
-                PhoneNumber = stepData.Phone ?? string.Empty,
-                SpreadSheetId = spreadSheetId,
-                PrivateSpreadSheetId = privateSpreadSheetId
-            };
-
-            await AddPartner(request);
-            await ClearStep(chatId);
-        }
-
-        public async Task<AddDataInRowResponse> AddDataInRowPartnerTable(AddDataRequest request)
-        {
-            if (request == null || string.IsNullOrWhiteSpace(request.SpreadsheetId) || string.IsNullOrWhiteSpace(request.SheetName))
-            {
-                throw new ArgumentException("Неверный запрос для добавления данных в строку");
-            }
-            var response = await _googleSheetsService.AddDataInRowPartnerTable(request);
-            return response;
-
-        }
-
-        public async Task ProcessReferral(ProcessReferralRequest request)
-        {
-
-            var referal = new Referal
-            {
-                ReferalId = request.UserId,
-                PartnerReferal = new PartnerReferal
-                {
-                    PartnerId = request.PartnerId,
-                    ReferalId = request.UserId
-                }
-            };
-
-            await _userRepository.AddReferal(referal, request.PartnerId);
-        }
-
-        public async Task<bool> SaveStep(SaveStepRequest request)
-        {
-            if (request == null || request.ChatId <= 0)
-            {
-                throw new ArgumentException("Неверный запрос для сохранения шага");
-            }
-
-            // Получаем текущий прогресс
-            var progress = await _cacheRepository.GetStepFlowBecomePartnerProgress(request.ChatId)
-                           ?? new PartnerFormProgress { ChatId = request.ChatId };
-
-            // Обновляем только то, что пришло в запросе
-            if (request.Step != null)
-                progress.Step = request.Step;
-
-            if (!string.IsNullOrWhiteSpace(request.FirstName))
-                progress.FirstName = request.FirstName;
-
-            if (!string.IsNullOrWhiteSpace(request.LastName))
-                progress.LastName = request.LastName;
-
-            if (!string.IsNullOrWhiteSpace(request.Phone))
-                progress.Phone = request.Phone;
-
-            if (!string.IsNullOrWhiteSpace(request.TgUserName))
-                progress.Username = request.TgUserName;
-
-            // сохраняем обновлённый прогресс
-            return await _cacheRepository.SaveStepFlowBecomePartnerProgress(progress);
-        }
-
-        public async Task<bool> ClearStep(long chatId)
-        {
-            if (chatId <= 0)
-            {
-                throw new ArgumentException("Неверный идентификатор чата");
-            }
-            return await _cacheRepository.ClearProgress(chatId);
-        }
-
-        public async Task<Partner> AddPartner(AddPartnerRequest request)
-        {
-
-            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
-            var partner = new Partner
-            {
-                UserId = user?.Id,
-                FirstName = request.FirstName ?? string.Empty,
-                LastName = request.LastName ?? string.Empty,
-                PhoneNumber = request.PhoneNumber ?? string.Empty,
-                SpreadsheetId = request.SpreadSheetId ?? string.Empty,
-                PrivateSpreadsheetId = request.PrivateSpreadSheetId ?? string.Empty,
-            };
-
-            return await _userRepository.AddPartner(partner);
-        }
-
-        public async Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request)
-        {
-
-            var user = await _userRepository.GetUserByChatId(request.ChatId) ?? throw new Exception("User not found");
-            var partner = new Partner
-            {
-                UserId = user.Id,
-                SpreadsheetId = request.SpreadSheetId,
-                PrivateSpreadsheetId = request.PrivateSpreadSheetId,
-                IsActive = true,
-                InviteCode = request.InviteCode
-            };
-
-            await _userRepository.UpdatePartner(partner);
-        }
-
-        public async Task AddPartnerFromInviteCode(AddPartnerFromInviteCodeRequest request)
-        {
-            var partner = new Partner
-            {
-                UserId = null,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PhoneNumber = request.PhoneNumber,
-                InviteCode = request.InviteCode,
-                IsActive = request.IsActive
-            };
-
-            await _userRepository.AddPartner(partner);
-        }
-
-        public async Task<ResolvePartnerInviteResponse> ResolvePartnerInvite(string code)
-        {
-            var resolveInfo = await _userRepository.ResolvePartnerInvite(code);
-
-            if (resolveInfo == null)
-            {
-                Console.WriteLine($"Не удалось разрешить приглашение партнёра по коду {code}");
-                return new ResolvePartnerInviteResponse();
-            }
-
-            return new ResolvePartnerInviteResponse
-            {
-                PartnerId = resolveInfo.Id,
-                FirstName = resolveInfo.FirstName,
-                LastName = resolveInfo.LastName,
-                Phone = resolveInfo.PhoneNumber,
-                IsActive = resolveInfo.IsActive
             };
         }
 
@@ -396,6 +155,5 @@ namespace FloristAI.Application.Users
 
             return true;
         }
-
     }
 }

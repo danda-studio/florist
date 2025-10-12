@@ -9,6 +9,10 @@ namespace FloristAI.Infrastructure.Persistence
     {
         private readonly IDatabase _cache;
 
+        /// <summary>
+        /// Инициализирует новый экземпляр <see cref="CacheRepository"/>.
+        /// </summary>
+        /// <param name="dbContext">Контекст базы данных.</param>
         public CacheRepository(IConnectionMultiplexer connectionMultiplexer)
         {
             _cache = connectionMultiplexer.GetDatabase();

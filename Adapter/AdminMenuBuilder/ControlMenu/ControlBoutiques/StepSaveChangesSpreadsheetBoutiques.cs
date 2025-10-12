@@ -44,31 +44,21 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
             {
                 var spreadsheet = await _googleSheetsService.GetBoutiqueSpreadsheet(_localizationService.GetSheetName("Boutique"));
 
-                var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "B:B");
-
-                var userIds = dataTable
-                    .Select(row => row.FirstOrDefault()?.ToString())
-                    .Where(val => !string.IsNullOrEmpty(val) && long.TryParse(val, out _))
-                    .Select(val => long.Parse(val!))
-                    .ToList();
-
-                // Запускаем задачи параллельно
-                var tasks = userIds.Select(async userId =>
-                {
-                    var user = await _userService.GetUser(userId);
-                    return new { userId, Exists = user.UserId != 0 && user != null };
-                }).ToList();
-
-                var results = await Task.WhenAll(tasks);
-
-                // Теперь results содержит информацию о каждом userId
-                foreach (var result in results)
-                {
-                    if (result.Exists == false)
-                    {
-                        await _userService.GetOrCreateUser(result.userId, "ru", true);
-                    }
-                }
+                //var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "A2:C"); 
+                //var shops = dataTable 
+                //    .Where(row => row.Count >= 2) // Должен быть хотя бы Адрес
+                //    .Select(row => new Shop 
+                //    { 
+                //        Address = row[1], // Колонка B
+                //        UrlGoogleMap = row.Count >= 3 ? row[2] : "", // Колонка C
+                //    })
+                //    .ToList(); 
+                
+                //// Теперь можно сохранить в базу
+                //foreach (var shop in shops) 
+                //{ 
+                //    await _shopService.CreateOrUpdateShop(shop); 
+                //}
             }
             catch (Exception ex)
             {
