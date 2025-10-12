@@ -328,7 +328,8 @@ namespace FloristAI.Application.GoogleSheets
                 new[]
                 {
                     _localizationService.GetSheetName("NameBoutique"),
-                    _localizationService.GetSheetName("Address")
+                    _localizationService.GetSheetName("Address"),
+                    _localizationService.GetSheetName("UrlGoogleMap")
                 }
             };
 
@@ -367,9 +368,9 @@ namespace FloristAI.Application.GoogleSheets
             await _googleSheets.AddSheet(spreadSheetId, sheetName);
         }
 
-        public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
+        public async Task<AddDataInRowResponse> AddDataInRowPartnerTable(AddDataRequest request)
         {
-            await _googleSheets.AddData(request);
+            await _googleSheets.AddDataInPartnerTable(request);
 
             return new AddDataInRowResponse
             {

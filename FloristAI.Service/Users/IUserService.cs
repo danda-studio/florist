@@ -43,7 +43,7 @@ namespace FloristAI.Application.Users
         Task<AddUserResponse> AddUser(long chatId, string languageCode, bool IsModerator);
         Task<Partner> AddPartner(AddPartnerRequest request);
         Task UpdatePartnerOnActivation(UpdatePartnerOnActivationRequest request);
-        Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
+        Task<AddDataInRowResponse> AddDataInRowPartnerTable(AddDataRequest request);
 
         /// <summary>
         /// Изменяет язык интерфейса пользователя.

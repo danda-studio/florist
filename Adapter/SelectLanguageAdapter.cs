@@ -85,7 +85,7 @@ namespace FloristAI.Adapter
                         InviteCode = context.Parameter
                     });
 
-                    await _userService.AddDataInRow(
+                    await _userService.AddDataInRowPartnerTable(
                         new AddDataRequest
                         {
                             UserId = user.UserId,

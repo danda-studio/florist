@@ -81,7 +81,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
             await _userService.RegisterPartner(chatId, publicSheet.SpreadsheetId, privateSheet.SpreadsheetId);
 
-            await _userService.AddDataInRow(
+            await _userService.AddDataInRowPartnerTable(
                 new AddDataRequest
                 {
                     UserId = user.UserId,

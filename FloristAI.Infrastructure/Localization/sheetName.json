@@ -17,6 +17,7 @@
   "GrandTotalIncome": "Общий доход (100%)",
   "NameBoutique": "Название",
   "Address": "Адрес",
-  "Moderator": "Модератор",
-  "Boutique" : "Бутики"
+  "Moderator": "Модераторы",
+  "Boutique": "Бутики",
+  "UrlGoogleMap": "Cсылка на Google Map"
 }

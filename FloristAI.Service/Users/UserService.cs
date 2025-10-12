@@ -246,13 +246,13 @@ namespace FloristAI.Application.Users
             await ClearStep(chatId);
         }
 
-        public async Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request)
+        public async Task<AddDataInRowResponse> AddDataInRowPartnerTable(AddDataRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.SpreadsheetId) || string.IsNullOrWhiteSpace(request.SheetName))
             {
                 throw new ArgumentException("Неверный запрос для добавления данных в строку");
             }
-            var response = await _googleSheetsService.AddDataInRow(request);
+            var response = await _googleSheetsService.AddDataInRowPartnerTable(request);
             return response;
 
         }

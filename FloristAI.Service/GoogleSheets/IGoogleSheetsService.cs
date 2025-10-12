@@ -15,7 +15,7 @@ namespace FloristAI.Application.GoogleSheets
         Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId);
         Task<List<CreateStructureSheetResponse>> CreateStructureSheet(SheetsCreationParams parameters);
         Task AddSheet(string spreadsheetId, string sheetName);
-        Task<AddDataInRowResponse> AddDataInRow(AddDataRequest request);
+        Task<AddDataInRowResponse> AddDataInRowPartnerTable(AddDataRequest request);
         Task UpdateValue(string spreadsheetId, string range, string value);
         Task DeleteDefaultSheet(string spreadsheetId);
         Task<FindSpreadsheetResponse> FindSpreadsheet(string name);

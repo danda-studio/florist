@@ -12,7 +12,7 @@ namespace FloristAI.Application.Store
         Task<IList<Sheet>> GetSheets(string spreadsheetId);
         Task<string> AddSheet(string spreadsheetId, string sheetName);
         Task AddHeaders(string spreadsheetId, string range, List<string[]> headers);
-        Task AddData(AddDataRequest request);
+        Task AddDataInPartnerTable(AddDataRequest request);
         Task<CreateSpreadsheetResponse> CreateSpreadsheet(string name, string parentFolderId);
         Task UpdateValue(string spreadsheetId, string range, string value);
         Task DeleteDefaultSheet(string spreadsheetId);

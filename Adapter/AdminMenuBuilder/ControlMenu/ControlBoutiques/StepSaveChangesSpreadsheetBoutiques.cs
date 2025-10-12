@@ -42,7 +42,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
             }
             try
             {
-                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Boutique"));
+                var spreadsheet = await _googleSheetsService.GetBoutiqueSpreadsheet(_localizationService.GetSheetName("Boutique"));
 
                 var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "B:B");
 

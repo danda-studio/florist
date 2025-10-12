@@ -103,7 +103,7 @@ namespace FloristAI.Infrastructure
             await updateRequest.ExecuteAsync();
         }
 
-        public async Task AddData(AddDataRequest request)
+        public async Task AddDataInPartnerTable(AddDataRequest request)
         {
             // Формируем ссылку для userId
             var privateSpreadsheetId = request.PrivateSpreadsheetId; 

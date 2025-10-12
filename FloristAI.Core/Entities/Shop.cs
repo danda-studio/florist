@@ -25,5 +25,9 @@ namespace FloristAI.Core.Entities
         /// Географическая долгота магазина.
         /// </summary>
         public double Longitude { get; set; }
+        /// <summary>
+        /// Ссылка координаты в Google Maps
+        /// </summary>
+        public string UrlGoogleMap { get; set; } = string.Empty;
     }
 }
