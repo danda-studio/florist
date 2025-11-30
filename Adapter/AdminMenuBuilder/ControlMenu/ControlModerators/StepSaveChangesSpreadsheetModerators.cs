@@ -12,12 +12,12 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
 {
-    public class StepSaveChanges : IStepMenuBuilder
+    public class StepSaveChangesSpreadsheetModerators : IStepMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
         private readonly IGoogleSheetsService _googleSheetsService;
-        public StepSaveChanges(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
+        public StepSaveChangesSpreadsheetModerators(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
             _localizationService = localizationService;
@@ -42,7 +42,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
             }
             try
             {
-                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet("Модераторы");
+                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Moderator"));
 
                 var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "A:A");
 
@@ -52,7 +52,6 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
                     .Select(val => long.Parse(val!))
                     .ToList();
 
-                // Запускаем задачи параллельно
                 var tasks = userIds.Select(async userId =>
                 {
                     var user = await _userService.GetUser(userId);
@@ -61,7 +60,6 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
 
                 var results = await Task.WhenAll(tasks);
 
-                // Теперь results содержит информацию о каждом userId
                 foreach (var result in results)
                 {
                     if (result.Exists == false)

@@ -1,8 +1,7 @@
-﻿using FloristAI.Core.Entities.Enums;
+﻿using FloristAI.Application.Store;
+using FloristAI.Core.Entities.Enums;
 using FloristAI.Core.Entities.ReferralsAndPartners;
 using FloristAI.Core.Entities.UserInfo;
-using FloristAI.Core.Store;
-using FloristAI.Infrastructure.Models.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace FloristAI.Infrastructure.Persistence
@@ -45,12 +44,6 @@ namespace FloristAI.Infrastructure.Persistence
             return await _dbContext.Users
                 .Include(u => u.TgData)
                 .FirstOrDefaultAsync(u => u.TgData != null && u.TgData.TelegramId == chatId);
-        }
-
-        public async Task<Partner?> GetPartnerByInviteCode(string inviteCode)
-        {
-            return await _dbContext.Partners
-                .FirstOrDefaultAsync(p => p.InviteCode == inviteCode);
         }
 
         /// <summary>
@@ -106,72 +99,6 @@ namespace FloristAI.Infrastructure.Persistence
             return true;
         }
 
-        public async Task<Partner> AddPartner(Partner partner)
-        {
-            await _dbContext.Partners.AddAsync(partner);
-
-            if(partner.UserId.HasValue)
-            {
-                bool hasPartnerRole = await _dbContext.UserRoles
-                    .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
-
-                if (!hasPartnerRole)
-                {
-                    _dbContext.UserRoles.Add(new UserRole
-                    {
-                        UserId = (int)partner.UserId,
-                        Role = RoleType.Partner
-                    });
-                }
-            }
-
-            await _dbContext.SaveChangesAsync();
-
-            return partner;
-        }
-        public async Task UpdatePartner(Partner partner)
-        {
-            var partnerInfo  = await ResolvePartnerInvite(partner.InviteCode) 
-                ?? throw new InvalidOperationException($"Партнёр с InviteCode {partner.InviteCode} не найден");
-
-            partnerInfo.UserId = partner.UserId;
-            partnerInfo.SpreadsheetId = partner.SpreadsheetId ?? partnerInfo.SpreadsheetId;
-            partnerInfo.IsActive = partner.IsActive;
-            partnerInfo.PrivateSpreadsheetId = partner.PrivateSpreadsheetId;
-
-
-            if (partner.UserId.HasValue)
-            {
-                bool hasPartnerRole = await _dbContext.UserRoles
-                    .AnyAsync(r => r.UserId == partner.UserId && r.Role == RoleType.Partner);
-
-                if (!hasPartnerRole)
-                {
-                    _dbContext.UserRoles.Add(new UserRole
-                    {
-                        UserId = (int)partner.UserId,
-                        Role = RoleType.Partner
-                    });
-                }
-            }
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task<bool> IsPartner(long chatId)
-        {
-            var userId = await _dbContext.UserTgDatas
-                .Where(t => t.TelegramId == chatId)
-                .Select(t => t.UserId)
-                .FirstOrDefaultAsync();
-
-            if (userId == 0)
-                return false;
-
-            return await _dbContext.Partners
-                .AnyAsync(p => p.UserId == userId);
-        }
-
-
         public async Task<string?> GetSpreadsheetId(int userId)
         {
             return await _dbContext.Partners
@@ -179,36 +106,5 @@ namespace FloristAI.Infrastructure.Persistence
                  .Select(p => p.SpreadsheetId)
                  .FirstOrDefaultAsync();
         }
-
-        public async Task<Referal> AddReferal(Referal referal, int partnerId)
-        {
-            // Проверка существующего реферала
-            var existing = await _dbContext.Referals
-                .Include(r => r.PartnerReferal)
-                .FirstOrDefaultAsync(r => r.ReferalId == referal.ReferalId);
-
-            if (existing != null)
-                return existing;
-
-            var partner = await _dbContext.Partners.FirstOrDefaultAsync(p => p.UserId == partnerId) ?? throw new InvalidOperationException($"Партнёр с UserId {partnerId} не найден");
-            referal.PartnerReferal = new PartnerReferal
-            {
-                PartnerId = partner.Id,  
-                ReferalId = referal.ReferalId
-            };
-
-            await _dbContext.Referals.AddAsync(referal);
-            await _dbContext.SaveChangesAsync();
-
-            return referal;
-        }
-
-        public async Task<Partner?> ResolvePartnerInvite(string code)
-        {
-            return await _dbContext.Partners
-                .FirstOrDefaultAsync(x => x.InviteCode == code);
-        }
-
-
     }
 }

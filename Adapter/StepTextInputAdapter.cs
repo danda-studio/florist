@@ -1,23 +1,20 @@
 ﻿using FloristAI.Adapter.Models;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Application.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FloristAI.Adapter
 {
     public class StepTextInputAdapter : IMessageAdapter
     {
         private readonly IUserService _userService;
+        private readonly IStepFlowService _stepFlowService;
         private readonly IStepFlowProvider _stepFlowProvider;
 
-
-        public StepTextInputAdapter(IUserService userService, IStepFlowProvider stepFlowProvider)
+        public StepTextInputAdapter(IUserService userService, IStepFlowService stepFlowService, IStepFlowProvider stepFlowProvider)
         {
             _userService = userService;
+            _stepFlowService = stepFlowService;
             _stepFlowProvider = stepFlowProvider;
         }
 
@@ -26,7 +23,7 @@ namespace FloristAI.Adapter
 
         public async Task<List<MessageResult>> ProcessMessage(MessageContext context)
         {
-            var userStep = await _userService.GetStep(context.ChatId);
+            var userStep = await _stepFlowService.GetStep(context.ChatId);
 
             if(userStep == null || string.IsNullOrEmpty(userStep.Step))
             {

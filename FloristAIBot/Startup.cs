@@ -1,22 +1,25 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.AdminMenuBuilder;
+using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators;
 using FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep;
 using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.ModeratorMenuBilder;
+using FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques;
 using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application;
+using FloristAI.Application.Boutique;
 using FloristAI.Application.GoogleDrive;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
+using FloristAI.Application.Mapping;
 using FloristAI.Application.Store;
 using FloristAI.Application.Users;
-using FloristAI.Core.Store;
 using FloristAI.Infrastructure;
 using FloristAI.Infrastructure.Persistence;
 using FloristAI.Router;
@@ -65,6 +68,7 @@ namespace FloristAIBot
             var database = Environment.GetEnvironmentVariable("Database");
             var username = Environment.GetEnvironmentVariable("Username");
             var password = Environment.GetEnvironmentVariable("Password");
+            
             if (!string.IsNullOrEmpty(host))
             {
                 connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
@@ -142,10 +146,13 @@ namespace FloristAIBot
             services.AddScoped<IGoogleDrive, GoogleDrive>();
             services.AddScoped<ILanguageService, LanguageService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPartnerService, PartnerService>();
+            services.AddScoped<IStepFlowService, StepFlowService>();
             services.AddScoped<IGoogleSheetsService, GoogleSheetsService>();
             services.AddScoped<IGoogleDriveService, GoogleDriveService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IPinnedMessageService, PinnedMessageService>();
+            services.AddScoped<IShopService, ShopService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
             services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
@@ -160,7 +167,11 @@ namespace FloristAIBot
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReferralUrl>();
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReporting>();
             services.AddScoped<IStepMenuBuilder, ControlModerators>();
-            services.AddScoped<IStepMenuBuilder, StepSaveChanges>();
+            services.AddScoped<IStepMenuBuilder, StepSaveChangesSpreadsheetModerators>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques.ControlBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.ControlBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
             services.AddScoped<IStepMenuBuilder, AdminReporting>();
             services.AddScoped<IStepMenuBuilder, BussinesReportingModerator>();
             services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFirstNamePartner>();
@@ -180,10 +191,19 @@ namespace FloristAIBot
             services.AddScoped<IStepFlowProvider, StepFlowProvider>();
             services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IShopRepository, ShopRepository>();
+            services.AddScoped<IPartnerRepository, PartnerRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
 
             services.AddScoped<Lazy<IStepFlowProvider>>(sp =>
                 new Lazy<IStepFlowProvider>(() => sp.GetRequiredService<IStepFlowProvider>()));
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<MappingPartnerProfile>();
+                cfg.AddProfile<MappingReferalProfile>();
+                cfg.AddProfile<MappingShopProfile>();
+            });
 
             var token = Environment.GetEnvironmentVariable("Bot_token");
             if (string.IsNullOrEmpty(token))
@@ -200,17 +220,17 @@ namespace FloristAIBot
 
 
 
-        private static GoogleCredential GetServiceAccountCredential()
-        {
-            var keyFilePath = Path.Combine(AppContext.BaseDirectory, "kisaflori-8a9b4bc9ff09.json");
+        //private static GoogleCredential GetServiceAccountCredential()
+        //{
+        //    var keyFilePath = Path.Combine(AppContext.BaseDirectory, "kisaflori-8a9b4bc9ff09.json");
 
-            return GoogleCredential.FromFile(keyFilePath)
-                .CreateScoped(new[]
-                {
-                DriveService.Scope.Drive,
-                SheetsService.Scope.Spreadsheets
-                });
-        }
+        //    return GoogleCredential.FromFile(keyFilePath)
+        //        .CreateScoped(new[]
+        //        {
+        //        DriveService.Scope.Drive,
+        //        SheetsService.Scope.Spreadsheets
+        //        });
+        //}
 
         /// <summary>
         /// Метод конфигурации HTTP конвейера приложения.

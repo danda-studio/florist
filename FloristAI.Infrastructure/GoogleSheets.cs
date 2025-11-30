@@ -12,15 +12,16 @@ namespace FloristAI.Infrastructure
 {
     public class GoogleSheets : IGoogleSheets
     {
+        private readonly ILocalizationService _localizationService;
+
         private readonly SheetsService _sheetsService;
         private readonly DriveService _driveService;
-        private readonly ILocalizationService _localizationService;
 
         public GoogleSheets(SheetsService sheetsService, DriveService driveService, ILocalizationService localizationService)
         {
+            _localizationService = localizationService;
             _sheetsService = sheetsService;
             _driveService = driveService;
-            _localizationService = localizationService;
         }
 
         public async Task<IList<IList<object>>> GetValues(string spreadsheetId, string range)
@@ -103,7 +104,7 @@ namespace FloristAI.Infrastructure
             await updateRequest.ExecuteAsync();
         }
 
-        public async Task AddData(AddDataRequest request)
+        public async Task AddDataInPartnerTable(AddDataRequest request)
         {
             // Формируем ссылку для userId
             var privateSpreadsheetId = request.PrivateSpreadsheetId; 

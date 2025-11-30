@@ -34,6 +34,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Localization\errorText.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Localization\folderId.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Localization\folderName.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Localization\ro.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

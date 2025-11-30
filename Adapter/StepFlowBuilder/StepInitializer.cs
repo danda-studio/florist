@@ -1,28 +1,26 @@
 ﻿using FloristAI.Application.Users;
 using FloristAI.Application.Users.Models.Request;
 using FloristAI.Application.Users.Models.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FloristAI.Adapter.StepFlowBuilder
 {
     public class StepInitializer : IStepInitializer
     {
         private readonly IUserService _userService;
+        private readonly IStepFlowService _stepFlowService;
         private readonly IStepFlowProvider _stepFlowProvider;
 
-        public StepInitializer(IUserService userService, IStepFlowProvider stepFlowProvider)
+        public StepInitializer(IUserService userService, IStepFlowService stepFlowService, IStepFlowProvider stepFlowProvider)
         {
             _userService = userService;
+            _stepFlowService = stepFlowService;
             _stepFlowProvider = stepFlowProvider;
         }
 
         public async Task<GetStepResponse> EnsureStepInitialized(long chatId)
         {
-            var progress = await _userService.GetStep(chatId);
+            var progress = await _stepFlowService.GetStep(chatId);
             if (!string.IsNullOrEmpty(progress.Step))
             {
                 return new GetStepResponse
@@ -44,7 +42,7 @@ namespace FloristAI.Adapter.StepFlowBuilder
                 Step = entry.Step
             };
 
-            await _userService.SaveStep(request);
+            await _stepFlowService.SaveStep(request);
 
             return new GetStepResponse
             {

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -30,6 +31,7 @@ namespace FloristAI.Application.Language
             TryLoadLocale(logger, "sheetName");
             TryLoadLocale(logger, "folderId");
             TryLoadLocale(logger, "folderName");
+            TryLoadLocale(logger, "errorText");
         }
 
         /// <summary>
@@ -89,11 +91,11 @@ namespace FloristAI.Application.Language
                 if (dict.TryGetValue(key, out var value))
                     return value;
 
-                Console.WriteLine($"[i18n] Ключ не найден в sheetName: {key}");
+                Console.WriteLine($"[i18n] Ключ не найден в folderId: {key}");
             }
             else
             {
-                Console.WriteLine("[i18n] sheetName.json не загружен");
+                Console.WriteLine("[i18n] folderId.json не загружен");
             }
 
             return key;
@@ -109,11 +111,35 @@ namespace FloristAI.Application.Language
                 if (dict.TryGetValue(key, out var value))
                     return value;
 
-                Console.WriteLine($"[i18n] Ключ не найден в sheetName: {key}");
+                Console.WriteLine($"[i18n] Ключ не найден в folderName: {key}");
             }
             else
             {
-                Console.WriteLine("[i18n] sheetName.json не загружен");
+                Console.WriteLine("[i18n] folderName.json не загружен");
+            }
+
+            return key;
+        }
+
+        public string GetErrorText(string key, string languageCode)
+        {
+            if (_locales.TryGetValue("errorText", out var dict))
+            {
+                if (dict.TryGetValue(key, out var value))
+                {
+                    return value;
+                }
+
+                Console.WriteLine($"[i18n] Ключ не найден в errorText: {key}");
+                
+                //else
+                //{
+                //    Console.WriteLine($"[i18n] Ключ не найден: {key} в языке {languageCode}");
+                //}
+            }
+            else
+            {
+                Console.WriteLine("[i18n] errorText.json не загружен");
             }
 
             return key;
@@ -125,11 +151,11 @@ namespace FloristAI.Application.Language
         /// <param name="logger">Логгер для записи информации и ошибок.</param>
         /// <param name="lang">Код языка (например, "ru").</param>
         /// <returns>True, если файл успешно загружен, иначе false.</returns>
-        private bool TryLoadLocale(ILogger logger, string lang)
+        private bool TryLoadLocale(ILogger logger, string value)
         {
             try
             {
-                var filePath = Path.Combine(_localizationFolder, $"{lang}.json");
+                var filePath = Path.Combine(_localizationFolder, $"{value}.json");
 
                 if (!File.Exists(filePath))
                 {
@@ -137,15 +163,15 @@ namespace FloristAI.Application.Language
                     return false;
                 }
 
-                var json = File.ReadAllText(filePath);
-                _locales[lang] = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                var json = File.ReadAllText(filePath, Encoding.UTF8);
+                _locales[value] = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
                                   ?? new Dictionary<string, string>();
 
                 return true;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Ошибка при загрузке локализации для языка {Language}", lang);
+                logger.LogError(ex, "Ошибка при загрузке локализации для языка {Language}", value);
                 return false;
             }
         }

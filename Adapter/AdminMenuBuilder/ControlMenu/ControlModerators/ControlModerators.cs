@@ -3,7 +3,6 @@ using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
-using Google.Apis.Sheets.v4.Data;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator
@@ -37,12 +36,11 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator
                 };
             }
 
-            var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet("Модераторы");
+            var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Moderator"));
             var googleSheetsUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheet.SpreadSheetId}"; ;
 
             var header = _localizationService.GetString("Control_Header_Moderator", user.LanguageCode);
             var body = _localizationService.GetString("Control_Instructions", user.LanguageCode);
-
             var messageText = string.Format(header + "\n" + body, $"<a href=\"{googleSheetsUrl}\">{_localizationService.GetString("Text_Table", user.LanguageCode)}</a>");
 
             var keyboard = new[]
@@ -51,6 +49,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_moderators") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Admin") },
             };
+
             return new List<MessageResult>
             {
                 new MessageResult

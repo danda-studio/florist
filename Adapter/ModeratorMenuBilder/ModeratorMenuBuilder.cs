@@ -38,7 +38,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Generate_PartnerLink", user.LanguageCode), "step_message:generate_partnerlink_firstname_moderator") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Send_Messages", user.LanguageCode), "step:sends_message") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Reporting", user.LanguageCode), "step:reporting_bussines_moderator") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Shops", user.LanguageCode), "step:control_shop") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Shops", user.LanguageCode), "step:control_boutiques_moder") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Select_Room", user.LanguageCode), $"select_role:{user.LanguageCode}") }
             };
 

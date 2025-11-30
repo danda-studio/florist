@@ -167,7 +167,7 @@ namespace FloristAI.Router
             var command = parts[0].ToLowerInvariant();
             string? param = parts.Length > 1 ? parts[1] : null;
 
-            // 🔹 если параметр вида "partner_xxx", то берём только часть после "_"
+            // если параметр вида "partner_xxx", то берём только часть после "_"
             if (!string.IsNullOrEmpty(param) && param.Contains("_"))
                 param = param.Split('_', 2)[1];
 
@@ -175,16 +175,16 @@ namespace FloristAI.Router
         }
 
 
-        private bool TryExtractPartnerId(string message, out int partnerId)
-        {
-            partnerId = 0;
-            var parts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length > 1 && int.TryParse(parts[1], out int pid))
-            {
-                partnerId = pid;
-                return true;
-            }
-            return false;
-        }
+        //private bool TryExtractPartnerId(string message, out int partnerId)
+        //{
+        //    partnerId = 0;
+        //    var parts = message.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        //    if (parts.Length > 1 && int.TryParse(parts[1], out int pid))
+        //    {
+        //        partnerId = pid;
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

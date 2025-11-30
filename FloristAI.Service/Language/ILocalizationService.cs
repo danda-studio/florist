@@ -13,6 +13,7 @@ namespace FloristAI.Application.Language
         /// <param name="languageCode">Код языка (например, "ru", "en", "ro").</param>
         /// <returns>Локализованная строка, если ключ найден, иначе возвращает сам ключ.</returns>
         string GetString(string key, string languageCode);
+        string GetErrorText(string key, string languageCode);
 
         string GetSheetName(string key);
 

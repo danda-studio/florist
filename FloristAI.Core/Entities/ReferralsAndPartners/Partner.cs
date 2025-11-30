@@ -47,6 +47,6 @@ namespace FloristAI.Core.Entities.ReferralsAndPartners
         public string PrivateSpreadsheetId { get; set; } = string.Empty;
 
         public string InviteCode{ get; set; } = string.Empty;
-        public bool IsActive { get; set; } 
+        public bool IsActive { get; set; }
     }
 }

@@ -2,11 +2,6 @@
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application.Language;
 using FloristAI.Application.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace FloristAI.Adapter.PartnerMenuBuilder
@@ -14,10 +9,12 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
     public class PartnerMenuStepReferralUrl : IStepMenuBuilder
     {
         private readonly IUserService _userService;
+        private readonly IPartnerService _partnerService;
         private readonly ILocalizationService _localizationService;
-        public PartnerMenuStepReferralUrl(IUserService userService, ILocalizationService localizationService)
+        public PartnerMenuStepReferralUrl(IUserService userService, IPartnerService partnerService, ILocalizationService localizationService)
         {
             _userService = userService;
+            _partnerService = partnerService;
             _localizationService = localizationService;
         }
         public string Step => "referal_url";
@@ -37,10 +34,10 @@ namespace FloristAI.Adapter.PartnerMenuBuilder
                 };
             }
 
-            byte[] qrBytes = _userService.GetReferralQrCode(user.UserId);
+            byte[] qrBytes = _partnerService.GetReferralQrCode(user.UserId);
             var referralText = $"""
 
-            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_userService.GetReferralLink(user.UserId)}
+            {_localizationService.GetString("Referral_Link_Label", user.LanguageCode)} {_partnerService.GetReferralLink(user.UserId)}
 
             {_localizationService.GetString("Referral_Description", user.LanguageCode)}
             """;

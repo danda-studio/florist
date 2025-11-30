@@ -10,13 +10,16 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
     public class BecomePartnerStepFirstName : IStepFlowBuilder
     {
         private readonly IUserService _userService;
+
+        private readonly IStepFlowService _stepFlowService;
         
         private readonly ILocalizationService _localizationService;
 
         private readonly Lazy<IStepFlowProvider> _menuProvider;
-        public BecomePartnerStepFirstName(IUserService userService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
+        public BecomePartnerStepFirstName(IUserService userService, IStepFlowService stepFlowService, ILocalizationService localizationService, Lazy<IStepFlowProvider> menuProvider)
         {
             _userService = userService;
+            _stepFlowService = stepFlowService;
             _localizationService = localizationService;
             _menuProvider = menuProvider;
         }
@@ -40,7 +43,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
                 };
             }
 
-            await _userService.SaveStep(new SaveStepRequest
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 Step = Step,
@@ -74,7 +77,7 @@ namespace FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep
 
         public async Task<List<MessageResult>> HandleInput(string input, long chatId)
         {
-            await _userService.SaveStep(new SaveStepRequest
+            await _stepFlowService.SaveStep(new SaveStepRequest
             {
                 ChatId = chatId,
                 FirstName = input,

@@ -10,11 +10,16 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
     public class GenerateInviteLinkPartnerStepFinalPartner : IStepFlowBuilder
     {
         private readonly IUserService _userService;
+        private readonly IPartnerService _partnerService;
+
+        private readonly IStepFlowService _stepFlowService;
         private readonly ILocalizationService _localizationService;
 
-        public GenerateInviteLinkPartnerStepFinalPartner(IUserService userService, ILocalizationService localizationService)
+        public GenerateInviteLinkPartnerStepFinalPartner(IUserService userService, IPartnerService partnerService, IStepFlowService stepFlowService, ILocalizationService localizationService)
         {
             _userService = userService;
+            _partnerService = partnerService;
+            _stepFlowService = stepFlowService;
             _localizationService = localizationService;
         }
 
@@ -46,7 +51,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
                 }
             };
 
-            var userInfo = await _userService.GetStep(chatId);
+            var userInfo = await _stepFlowService.GetStep(chatId);
 
             var mappingDataForLink = new GetPartnerLinkRequest
             {
@@ -55,8 +60,8 @@ namespace FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep
                 Phone = userInfo.Phone,
             };
 
-            var partnerLink = await _userService.GetPartnerLink(mappingDataForLink);
-            byte[] qrBytes = _userService.GetPartnerLinkQrCode(partnerLink);
+            var partnerLink = await _partnerService.GetPartnerLink(mappingDataForLink);
+            byte[] qrBytes = _partnerService.GetPartnerLinkQrCode(partnerLink);
 
             var referralText = $"""
             {_localizationService.GetString("Generate_PartnerLink_Success", user.LanguageCode)} {partnerLink}
