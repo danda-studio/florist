@@ -31,7 +31,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder
             }
             var keyboard = new []
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Flowers", user.LanguageCode), "step:control_flowers") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Flowers", user.LanguageCode), "step:control_flowers_admin") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Bouquets", user.LanguageCode), "step:control_bouquets") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Control_Baskets", user.LanguageCode), "step:control_baskets") },
                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Generate_PartnerLink", user.LanguageCode), "step_message:generate_partnerlink_firstname") },

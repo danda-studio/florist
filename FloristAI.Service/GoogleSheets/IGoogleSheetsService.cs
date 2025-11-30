@@ -19,7 +19,6 @@ namespace FloristAI.Application.GoogleSheets
         Task UpdateValue(string spreadsheetId, string range, string value);
         Task DeleteDefaultSheet(string spreadsheetId);
         Task<FindSpreadsheetResponse> FindSpreadsheet(string name);
-        Task<GetModeratorSpreadsheetResponse> GetModeratorSpreadsheet(string spreadSheetName);
-        Task<GetBoutiqueSpreadsheetResponse> GetBoutiqueSpreadsheet(string spreadSheetName);
+        Task<GetSpreadsheetResponse> GetSpreadsheet(string spreadSheetName);
     }
 }

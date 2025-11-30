@@ -1,6 +1,7 @@
 ﻿using FloristAI.Adapter;
 using FloristAI.Adapter.AdminMenuBuilder;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques;
+using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlFlowers;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator;
 using FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators;
 using FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep;
@@ -8,6 +9,7 @@ using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.ModeratorMenuBilder;
 using FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques;
+using FloristAI.Adapter.ModeratorMenuBilder.ControlMenu.ControlFlowers;
 using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
@@ -172,6 +174,10 @@ namespace FloristAIBot
             services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.ControlBoutiques>();
             services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
             services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlFlowers.ControlFlowers>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlFlowers.StepSaveChangesSpreadsheetFlowers>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlMenu.ControlFlowers.ControlFlowers>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlMenu.ControlFlowers.StepSaveChangesSpreadsheetFlowers>();
             services.AddScoped<IStepMenuBuilder, AdminReporting>();
             services.AddScoped<IStepMenuBuilder, BussinesReportingModerator>();
             services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFirstNamePartner>();

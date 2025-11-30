@@ -36,7 +36,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
                     }
                 };
             }
-            var spreadsheet = await _googleSheetsService.GetBoutiqueSpreadsheet(_localizationService.GetSheetName("Boutique"));
+            var spreadsheet = await _googleSheetsService.GetSpreadsheet(_localizationService.GetSheetName("Boutique"));
             var googleSheetsUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheet.SpreadSheetId}";
             
             var header = _localizationService.GetString("Control_Header_Boutiques", user.LanguageCode);

@@ -55,9 +55,11 @@
   "Menu_Reporting_Partner": "ℹ️ Ați câștigat {0} pentru luna curentă.",
   "Menu_Reporting_Admin": "ℹ️ Mai jos sunt prezentate linkurile către documentele cu raportările.",
   "Control_Header_Moderator": "ℹ️ Vă aflați în meniul de control al listei moderatorilor.",
-  "Control_Instructions": "Cum funcționează:\n●  Accesați {0} și modificați gama de produse;\n●  Apăsați butonul „Salvați modificările” pentru a le aplica.",
+  "Control_Instructions": "Cum funcționează:\n●  Accesați {0} și modificați gama de produse;\n●  Apăsați butonul „💾 Salvați modificările” pentru a le aplica.",
   "Text_Table": "tabel",
   "Control_Moderator_Success": "✅ Moderatorul a fost adăugat cu succes.",
   "Control_Header_Boutiques": "ℹ️ Vă aflați în meniul de control al listei de buticuri",
-  "Control_Boutiques_Success": "✅ Lista buticurilor a fost modificată cu succes."
+  "Control_Boutiques_Success": "✅ Lista buticurilor a fost modificată cu succes.",
+  "Control_Header_Flowers": "ℹ️ Vă aflați în meniul de control al gamei de culori",
+  "Control_Flowers_Success": "✅ Sortimentul de culori a fost modificat cu succes."
 }

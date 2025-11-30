@@ -42,7 +42,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
             }
             try
             {
-                var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Moderator"));
+                var spreadsheet = await _googleSheetsService.GetSpreadsheet(_localizationService.GetSheetName("Moderator"));
 
                 var dataTable = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, "A:A");
 

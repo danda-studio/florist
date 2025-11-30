@@ -1,6 +1,4 @@
 using FloristAIBot;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>

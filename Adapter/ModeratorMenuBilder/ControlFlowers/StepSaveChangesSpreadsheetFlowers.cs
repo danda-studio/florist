@@ -8,23 +8,23 @@ using FloristAI.Application.Users;
 using FloristAI.Core.Entities;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
+namespace FloristAI.Adapter.ModeratorMenuBilder.ControlMenu.ControlFlowers
 {
-    public class StepSaveChangesSpreadsheetBoutiques : IStepMenuBuilder
+    public class StepSaveChangesSpreadsheetFlowers : IStepMenuBuilder
     {
         private readonly IUserService _userService;
         private readonly IShopService _shopService;
         private readonly ILocalizationService _localizationService;
         private readonly IGoogleSheetsService _googleSheetsService;
-        public StepSaveChangesSpreadsheetBoutiques(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService, IShopService shopService)
+        public StepSaveChangesSpreadsheetFlowers(IUserService userService, IShopService shopService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
         {
             _userService = userService;
+            _shopService = shopService;
             _localizationService = localizationService;
             _googleSheetsService = googleSheetsService;
-            _shopService = shopService;
         }
 
-        public string Step => "save_changes_boutiques_moder";
+        public string Step => "save_changes_flowers_moderator";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
@@ -42,12 +42,12 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
             }
             try
             {
-                var spreadsheet = await _googleSheetsService.GetSpreadsheet(_localizationService.GetSheetName("Boutique"));
+                var spreadsheet = await _googleSheetsService.GetSpreadsheet(_localizationService.GetSheetName("Flowers"));
 
                 var rows = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, $"A2:B");
-
+                
                 var shops = new List<Shop>();
-
+                
                 var validationErrors = new List<string>();
 
                 for (int i = 0; i < rows.Count; i++)
@@ -67,7 +67,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
 
                     if (validation.Errors.Count > 0)
                     {
-                        validationErrors.AddRange(validation.Errors);
+                        validationErrors.AddRange(validation.Errors); 
                         continue;
                     }
 
@@ -103,7 +103,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
                 if (validationErrors.Count > 0)
                 {
                     var googleSheetsUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheet.SpreadSheetId}";
-
+  
                     return new List<MessageResult>
                     {
                         new MessageResult
@@ -112,7 +112,7 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
                             ReplyMarkup = new[]
                             {
                                 new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode),googleSheetsUrl) },
-                                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_boutiques_moder") },
+                                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_flowers_moder") },
                                 new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") }
                             }
                         }
@@ -130,19 +130,16 @@ namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
                     }
                 };
             }
-
+            
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_boutiques_moder") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") }
             };
-
             return new List<MessageResult>
             {
                 new MessageResult
                 {
-                    Text = _localizationService.GetString("Control_Boutique_Success", user.LanguageCode),
+                    Text = _localizationService.GetString("Control_Flowers_Success", user.LanguageCode),
                     ReplyMarkup = keyboard
                 }
             };

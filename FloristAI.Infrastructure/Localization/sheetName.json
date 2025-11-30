@@ -15,9 +15,15 @@
   "PartnerTotalIncome": "Общий доход (5%)",
   "NetTotalIncome": "Общий доход, без комиссии партнера (95%)",
   "GrandTotalIncome": "Общий доход (100%)",
-  "NameBoutique": "Название",
+  "Name": "Название",
   "Address": "Адрес",
   "Moderator": "Модераторы",
   "Boutique": "Бутики",
-  "UrlGoogleMap": "Cсылка на Google Map"
+  "Flowers": "Цветы",
+  "UrlGoogleMap": "Cсылка на Google Map",
+  "Image": "Фото",
+  "Color": "Цвет",
+  "Size": "Размер",
+  "Price": "Цена",
+  "SerialNumber": "Порядковый номер"
 }

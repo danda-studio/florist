@@ -36,7 +36,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerator
                 };
             }
 
-            var spreadsheet = await _googleSheetsService.GetModeratorSpreadsheet(_localizationService.GetSheetName("Moderator"));
+            var spreadsheet = await _googleSheetsService.GetSpreadsheet(_localizationService.GetSheetName("Moderator"));
             var googleSheetsUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheet.SpreadSheetId}"; ;
 
             var header = _localizationService.GetString("Control_Header_Moderator", user.LanguageCode);
