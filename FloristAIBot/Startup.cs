@@ -7,11 +7,13 @@ using FloristAI.Adapter.AdminMenuBuilder.GenerateInviteLinkPartnerStep;
 using FloristAI.Adapter.ClientMenuBuilder;
 using FloristAI.Adapter.ClientMenuBuilder.BecomePartnerStep;
 using FloristAI.Adapter.ModeratorMenuBilder;
+using FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques;
 using FloristAI.Adapter.PartnerMenuBuilder;
 using FloristAI.Adapter.RoleMenuBuilder;
 using FloristAI.Adapter.StepFlowBuilder;
 using FloristAI.Adapter.StepMenuBuilder;
 using FloristAI.Application;
+using FloristAI.Application.Boutique;
 using FloristAI.Application.GoogleDrive;
 using FloristAI.Application.GoogleSheets;
 using FloristAI.Application.Language;
@@ -150,6 +152,7 @@ namespace FloristAIBot
             services.AddScoped<IGoogleDriveService, GoogleDriveService>();
             services.AddScoped<ILocalizationService, JsonLocalizationService>();
             services.AddScoped<IPinnedMessageService, PinnedMessageService>();
+            services.AddScoped<IShopService, ShopService>();
             services.AddScoped<IMessageAdapter, SelectLanguageAdapter>();
             services.AddScoped<IMessageAdapter, SelectRoleAdapter>();
             services.AddScoped<IMessageAdapter, MenuRoleAdapter>();
@@ -165,8 +168,10 @@ namespace FloristAIBot
             services.AddScoped<IStepMenuBuilder, PartnerMenuStepReporting>();
             services.AddScoped<IStepMenuBuilder, ControlModerators>();
             services.AddScoped<IStepMenuBuilder, StepSaveChangesSpreadsheetModerators>();
-            services.AddScoped<IStepMenuBuilder, ControlBoutiques>();
-            services.AddScoped<IStepMenuBuilder, StepSaveChangesSpreadsheetBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques.ControlBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.ControlBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
+            services.AddScoped<IStepMenuBuilder, FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques.StepSaveChangesSpreadsheetBoutiques>();
             services.AddScoped<IStepMenuBuilder, AdminReporting>();
             services.AddScoped<IStepMenuBuilder, BussinesReportingModerator>();
             services.AddScoped<IStepFlowBuilder, GenerateInviteLinkPartnerStepFirstNamePartner>();
@@ -186,6 +191,7 @@ namespace FloristAIBot
             services.AddScoped<IStepFlowProvider, StepFlowProvider>();
             services.AddScoped<IStepInitializer, StepInitializer>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IShopRepository, ShopRepository>();
             services.AddScoped<IPartnerRepository, PartnerRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
 
@@ -196,6 +202,7 @@ namespace FloristAIBot
             {
                 cfg.AddProfile<MappingPartnerProfile>();
                 cfg.AddProfile<MappingReferalProfile>();
+                cfg.AddProfile<MappingShopProfile>();
             });
 
             var token = Environment.GetEnvironmentVariable("Bot_token");

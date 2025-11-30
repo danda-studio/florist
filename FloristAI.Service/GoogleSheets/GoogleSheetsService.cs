@@ -324,8 +324,7 @@ namespace FloristAI.Application.GoogleSheets
                 new[]
                 {
                     _localizationService.GetSheetName("NameBoutique"),
-                    _localizationService.GetSheetName("Address"),
-                    _localizationService.GetSheetName("UrlGoogleMap")
+                    _localizationService.GetSheetName("Address")
                 }
             };
 

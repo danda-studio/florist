@@ -8,7 +8,7 @@ using FloristAI.Application.Users;
 using FloristAI.Core.Entities;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
+namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
 {
     public class StepSaveChangesSpreadsheetBoutiques : IStepMenuBuilder
     {
@@ -16,15 +16,15 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
         private readonly IShopService _shopService;
         private readonly ILocalizationService _localizationService;
         private readonly IGoogleSheetsService _googleSheetsService;
-        public StepSaveChangesSpreadsheetBoutiques(IUserService userService, IShopService shopService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService)
+        public StepSaveChangesSpreadsheetBoutiques(IUserService userService, ILocalizationService localizationService, IGoogleSheetsService googleSheetsService, IShopService shopService)
         {
             _userService = userService;
-            _shopService = shopService;
             _localizationService = localizationService;
             _googleSheetsService = googleSheetsService;
+            _shopService = shopService;
         }
 
-        public string Step => "save_changes_boutiques_admin";
+        public string Step => "save_changes_boutiques_moder";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
@@ -45,9 +45,9 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
                 var spreadsheet = await _googleSheetsService.GetBoutiqueSpreadsheet(_localizationService.GetSheetName("Boutique"));
 
                 var rows = await _googleSheetsService.GetValues(spreadsheet.SpreadSheetId, $"A2:B");
-                
+
                 var shops = new List<Shop>();
-                
+
                 var validationErrors = new List<string>();
 
                 for (int i = 0; i < rows.Count; i++)
@@ -67,7 +67,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
 
                     if (validation.Errors.Count > 0)
                     {
-                        validationErrors.AddRange(validation.Errors); 
+                        validationErrors.AddRange(validation.Errors);
                         continue;
                     }
 
@@ -103,7 +103,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
                 if (validationErrors.Count > 0)
                 {
                     var googleSheetsUrl = $"https://docs.google.com/spreadsheets/d/{spreadsheet.SpreadSheetId}";
-  
+
                     return new List<MessageResult>
                     {
                         new MessageResult
@@ -130,11 +130,14 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
                     }
                 };
             }
-            
+
             var keyboard = new[]
             {
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Admin") }
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_boutiques_moder") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") },
             };
+
             return new List<MessageResult>
             {
                 new MessageResult

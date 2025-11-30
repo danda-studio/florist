@@ -52,7 +52,6 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
                     .Select(val => long.Parse(val!))
                     .ToList();
 
-                // Запускаем задачи параллельно
                 var tasks = userIds.Select(async userId =>
                 {
                     var user = await _userService.GetUser(userId);
@@ -61,7 +60,6 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlModerators
 
                 var results = await Task.WhenAll(tasks);
 
-                // Теперь results содержит информацию о каждом userId
                 foreach (var result in results)
                 {
                     if (result.Exists == false)

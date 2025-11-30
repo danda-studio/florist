@@ -5,7 +5,7 @@ using FloristAI.Application.Language;
 using FloristAI.Application.Users;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
+namespace FloristAI.Adapter.ModeratorMenuBilder.ControlBoutiques
 {
     public class ControlBoutiques : IStepMenuBuilder
     {
@@ -20,7 +20,7 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
             _googleSheetsService = googleSheetsService;
         }
 
-        public string Step => "control_boutiques_admin";
+        public string Step => "control_boutiques_moder";
 
         public async Task<List<MessageResult>> BuildMenu(long chatId)
         {
@@ -46,8 +46,8 @@ namespace FloristAI.Adapter.AdminMenuBuilder.ControlMenu.ControlBoutiques
             var keyboard = new[]
             {
                 new[] { InlineKeyboardButton.WithUrl(_localizationService.GetString("Button_Go_To_Table", user.LanguageCode), googleSheetsUrl) },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_boutiques_admin") },
-                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Admin") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Save_Changes", user.LanguageCode), "step:save_changes_boutiques_moder") },
+                new[] { InlineKeyboardButton.WithCallbackData(_localizationService.GetString("Button_Menu", user.LanguageCode), "role_menu:Moderator") },
             };
             
             return new List<MessageResult>

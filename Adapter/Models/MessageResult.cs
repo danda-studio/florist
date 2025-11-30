@@ -37,5 +37,6 @@ namespace FloristAI.Adapter.Models
         /// Удалить закрепленное сообщение
         /// </summary>
         public bool RemovePinnedMessage { get; set; } = false;
+
     }
 }
